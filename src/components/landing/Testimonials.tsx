@@ -94,9 +94,9 @@ export function Testimonials() {
               {/* Team avatars */}
               <div className="flex items-center gap-4 mt-8">
                 <div className="flex -space-x-3">
-                  <Image src="/images/people/download (12).jfif" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
-                  <Image src="/images/people/download (13).jfif" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
-                  <Image src="/images/people/%23mensstyle %23fashion %23mensfashion %23affiliatelink %23sweaterweather.jfif" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
+                  <Image src="/images/people/person-1.jfif" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
+                  <Image src="/images/people/person-2.jfif" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
+                  <Image src="/images/people/person-3.jfif" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
                   <Image src="/images/people/person-4.jfif" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
                 </div>
                 <div>
