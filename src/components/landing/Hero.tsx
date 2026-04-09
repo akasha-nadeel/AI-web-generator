@@ -20,7 +20,7 @@ function DotLine({ className }: { className?: string }) {
 /* Cards for the bento columns */
 const leftCards = [
   /* Stats card */
-  <div key="stats" className="rounded-2xl h-56 shrink-0 relative overflow-hidden">
+  <div key="stats" className="rounded-2xl h-[clamp(10rem,15vw,14rem)] shrink-0 relative overflow-hidden">
     <Image src="/images/growth-card.jpg" alt="Growth" fill className="object-cover object-center" />
     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-5 pt-10">
       <p className="text-white text-sm font-medium">+42% Growth</p>
@@ -43,11 +43,10 @@ const leftCards = [
       ].map((item) => (
         <div
           key={item.label}
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm ${
-            item.active
-              ? "bg-[#0a0a0a]/[0.06] font-semibold text-[#0a0a0a]"
-              : "text-[#0a0a0a]/50"
-          }`}
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm ${item.active
+            ? "bg-[#0a0a0a]/[0.06] font-semibold text-[#0a0a0a]"
+            : "text-[#0a0a0a]/50"
+            }`}
         >
           <item.icon className="w-4 h-4" />
           {item.label}
@@ -57,7 +56,7 @@ const leftCards = [
   </div>,
 
   /* Color card */
-  <div key="color" className="rounded-2xl h-72 shrink-0 overflow-hidden relative">
+  <div key="color" className="rounded-2xl h-[clamp(13rem,19vw,18rem)] shrink-0 overflow-hidden relative">
     <Image src="/images/beautiful-themes-card.jfif" alt="Beautiful Themes" fill className="object-cover object-[center_80%]" />
     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-5 pt-12">
       <p className="text-white/90 text-sm font-medium">Beautiful Themes</p>
@@ -101,7 +100,7 @@ const rightCards = [
   </div>,
 
   /* Person/feature card */
-  <div key="person" className="rounded-2xl h-72 shrink-0 relative overflow-hidden">
+  <div key="person" className="rounded-2xl h-[clamp(13rem,19vw,18rem)] shrink-0 relative overflow-hidden">
     <Image src="/images/ai-powered-card.jfif" alt="AI Powered" fill className="object-cover" />
     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 pt-10">
       <p className="text-white text-sm font-semibold">AI-Powered</p>
@@ -130,7 +129,7 @@ const rightCards = [
       <div className="h-2 w-14 rounded-full bg-[#0a0a0a]/10" />
     </div>
     <div className="flex items-center gap-1.5 mt-4">
-      {["bg-purple-500","bg-blue-500","bg-cyan-500"].map((c,i) => (
+      {["bg-purple-500", "bg-blue-500", "bg-cyan-500"].map((c, i) => (
         <div key={i} className={`w-3 h-3 rounded-full ${c}`} />
       ))}
       <span className="text-[11px] text-[#0a0a0a]/40 ml-1">3 styles applied</span>
@@ -138,7 +137,7 @@ const rightCards = [
   </div>,
 
   /* Warm gradient card */
-  <div key="warm" className="rounded-2xl h-44 shrink-0 relative overflow-hidden">
+  <div key="warm" className="rounded-2xl h-[clamp(9rem,12vw,11rem)] shrink-0 relative overflow-hidden">
     <Image src="/images/export-card.jfif" alt="Export Anywhere" fill className="object-cover object-center" />
     <div className="absolute inset-0 bg-black/15" />
     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-5 pt-10">
@@ -169,8 +168,8 @@ export function Hero() {
       {/* Subtle background — desktop */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(120,119,198,0.04),transparent_50%)]" />
 
-      {/* Mobile background slideshow */}
-      <div className="lg:hidden absolute inset-0">
+      {/* Background image slideshow — mobile only */}
+      <div className="lg:hidden absolute inset-0 z-[2]">
         <AnimatePresence mode="sync">
           <motion.div
             key={bgIndex}
@@ -184,13 +183,15 @@ export function Hero() {
               src={MOBILE_BG_IMAGES[bgIndex]}
               alt=""
               fill
+              sizes="100vw"
               className="object-cover"
               priority={bgIndex === 0}
+              unoptimized
             />
           </motion.div>
         </AnimatePresence>
         {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-black/60 z-[1]" />
+        <div className="absolute inset-0 bg-black/60 z-[3]" />
       </div>
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-4 md:px-8 flex items-center min-h-[calc(100vh-64px)]">
@@ -254,7 +255,7 @@ export function Hero() {
             <DotLine className="mt-20 shrink-0" />
 
             {/* Left column — scrolls UP */}
-            <div className="w-[280px] shrink-0 mx-2 relative overflow-hidden h-full">
+            <div className="w-[clamp(180px,20vw,280px)] shrink-0 mx-2 relative overflow-hidden h-full">
               <div className="animate-scroll-up flex flex-col gap-3">
                 {/* Duplicate cards for seamless loop */}
                 {leftCards}
@@ -266,7 +267,7 @@ export function Hero() {
             <DotLine className="mt-32 shrink-0" />
 
             {/* Right column — scrolls DOWN */}
-            <div className="w-[260px] shrink-0 mx-2 relative overflow-hidden h-full">
+            <div className="w-[clamp(170px,18.5vw,260px)] shrink-0 mx-2 relative overflow-hidden h-full">
               <div className="animate-scroll-down flex flex-col gap-3">
                 {/* Duplicate cards for seamless loop */}
                 {rightCards}
