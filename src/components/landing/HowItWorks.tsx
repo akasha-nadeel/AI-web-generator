@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { fadeLeft, fadeUp, staggerContainer, ease, viewport as vp } from "@/lib/animations";
 
@@ -92,10 +93,11 @@ export function HowItWorks() {
                 {/* Full background image for cards that have bgImage */}
                 {step.bgImage && (
                   <>
-                    <img
+                    <Image
                       src={step.bgImage}
                       alt=""
-                      className="absolute inset-0 w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   </>
                 )}
@@ -123,11 +125,12 @@ export function HowItWorks() {
                           : "translateY(20px)",
                       }}
                     >
-                      <div className="w-36 h-48 rounded-xl overflow-hidden mt-4">
-                        <img
+                      <div className="w-36 h-48 rounded-xl overflow-hidden mt-4 relative">
+                        <Image
                           src={step.image}
                           alt={step.title}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
                         />
                       </div>
                     </div>
@@ -168,11 +171,12 @@ export function HowItWorks() {
                 {step.title}
               </h3>
               {step.image && (
-                <div className="w-28 h-36 rounded-xl overflow-hidden">
-                  <img
+                <div className="w-28 h-36 rounded-xl overflow-hidden relative">
+                  <Image
                     src={step.image}
                     alt={step.title}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </div>
               )}

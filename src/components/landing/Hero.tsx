@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Play, Sparkles, Send, Users, Box, Wallet, Settings, MapPin } from "lucide-react";
 import Link from "next/link";
@@ -19,7 +20,7 @@ function DotLine({ className }: { className?: string }) {
 const leftCards = [
   /* Stats card */
   <div key="stats" className="rounded-2xl h-56 shrink-0 relative overflow-hidden">
-    <img src="/images/growth-card.jpg" alt="Growth" className="absolute inset-0 w-full h-full object-cover object-center" />
+    <Image src="/images/growth-card.jpg" alt="Growth" fill className="object-cover object-center" />
     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-5 pt-10">
       <p className="text-white text-sm font-medium">+42% Growth</p>
       <p className="text-white/50 text-xs mt-1">This month</p>
@@ -56,7 +57,7 @@ const leftCards = [
 
   /* Color card */
   <div key="color" className="rounded-2xl h-72 shrink-0 overflow-hidden relative">
-    <img src="/images/beautiful-themes-card.jfif" alt="Beautiful Themes" className="absolute inset-0 w-full h-full object-cover object-[center_80%]" />
+    <Image src="/images/beautiful-themes-card.jfif" alt="Beautiful Themes" fill className="object-cover object-[center_80%]" />
     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-5 pt-12">
       <p className="text-white/90 text-sm font-medium">Beautiful Themes</p>
       <p className="text-white/50 text-xs mt-1">12+ color palettes</p>
@@ -100,7 +101,7 @@ const rightCards = [
 
   /* Person/feature card */
   <div key="person" className="rounded-2xl h-72 shrink-0 relative overflow-hidden">
-    <img src="/images/ai-powered-card.jfif" alt="AI Powered" className="absolute inset-0 w-full h-full object-cover" />
+    <Image src="/images/ai-powered-card.jfif" alt="AI Powered" fill className="object-cover" />
     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 pt-10">
       <p className="text-white text-sm font-semibold">AI-Powered</p>
     </div>
@@ -137,7 +138,7 @@ const rightCards = [
 
   /* Warm gradient card */
   <div key="warm" className="rounded-2xl h-44 shrink-0 relative overflow-hidden">
-    <img src="/images/export-card.jfif" alt="Export Anywhere" className="absolute inset-0 w-full h-full object-cover object-center" />
+    <Image src="/images/export-card.jfif" alt="Export Anywhere" fill className="object-cover object-center" />
     <div className="absolute inset-0 bg-black/15" />
     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-5 pt-10">
       <p className="text-white/90 text-sm font-medium">Export Anywhere</p>
@@ -159,7 +160,7 @@ export function Hero() {
             initial={{ opacity: 1, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="relative z-10 pr-8"
+            className="relative z-10 lg:pr-8"
           >
             {/* Heading */}
             <h1 className="text-[clamp(48px,6.5vw,88px)] font-medium leading-[1.05] tracking-tight text-[#f5f0e8] mb-6">
@@ -171,7 +172,7 @@ export function Hero() {
             </h1>
 
             {/* Decorative arrow */}
-            <img src="/images/hero-arrow.png" alt="" className="hidden lg:block absolute right-0 top-[55%] w-20 h-20 invert opacity-80 -rotate-[30deg]" />
+            <Image src="/images/hero-arrow.png" alt="" width={80} height={80} className="hidden lg:block absolute right-0 top-[55%] invert opacity-80 -rotate-[30deg]" />
 
             {/* Description */}
             <p className="text-base lg:text-lg text-[#f5f0e8]/50 max-w-md mb-10 leading-relaxed">
@@ -179,7 +180,7 @@ export function Hero() {
             </p>
 
             {/* CTAs */}
-            <div className="flex items-center gap-6">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
               <Link
                 href="/sign-up"
                 className="inline-flex items-center gap-2 bg-[#f5f0e8] text-[#0a0a0a] font-semibold px-8 py-4 rounded-full hover:bg-white transition-colors text-sm"

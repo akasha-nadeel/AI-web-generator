@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 const linkColumns = [
@@ -53,7 +54,7 @@ export function Footer() {
     <footer className="bg-[#0a0a0a] text-white">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Top Section — Brand + Link Columns */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-10 py-16">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 md:gap-10 py-12 md:py-16">
           {/* Brand Column */}
           <div className="col-span-2">
             <Link href="/" className="flex items-center mb-4">
@@ -127,16 +128,17 @@ export function Footer() {
           </div>
 
           {/* Gallery */}
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {galleryImages.map((src, i) => (
               <div
                 key={i}
-                className={`rounded-xl overflow-hidden ${i === 0 ? "row-span-1" : ""}`}
+                className="rounded-xl overflow-hidden relative h-40"
               >
-                <img
+                <Image
                   src={src}
                   alt=""
-                  className="w-full h-40 object-cover hover:scale-105 transition-transform duration-500"
+                  fill
+                  className="object-cover hover:scale-105 transition-transform duration-500"
                 />
               </div>
             ))}

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
@@ -13,10 +14,12 @@ export function CTA() {
   return (
     <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden">
       {/* Full background image */}
-      <img
+      <Image
         src="/images/banner-bg.png"
         alt=""
-        className="absolute inset-0 w-full h-full object-cover"
+        fill
+        className="object-cover"
+        priority
       />
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-black/40" />
@@ -30,7 +33,7 @@ export function CTA() {
         variants={fadeUp}
         transition={ease.slow}
       >
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 max-w-3xl leading-tight">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 max-w-3xl leading-tight">
           Ready to Build Your Website?
         </h2>
         <p className="text-white/60 max-w-xl mx-auto mb-8 text-base md:text-lg">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { Phone, HelpCircle } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 import { fadeLeft, fadeRight, ease, viewport as vp } from "@/lib/animations";
@@ -93,10 +94,10 @@ export function Testimonials() {
               {/* Team avatars */}
               <div className="flex items-center gap-4 mt-8">
                 <div className="flex -space-x-3">
-                  <img src="/images/people/download (12).jfif" alt="" className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
-                  <img src="/images/people/download (13).jfif" alt="" className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
-                  <img src="/images/people/%23mensstyle %23fashion %23mensfashion %23affiliatelink %23sweaterweather.jfif" alt="" className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
-                  <img src="/images/people/person-4.jfif" alt="" className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
+                  <Image src="/images/people/download (12).jfif" alt="" width={40} height={40} className="rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
+                  <Image src="/images/people/download (13).jfif" alt="" width={40} height={40} className="rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
+                  <Image src="/images/people/%23mensstyle %23fashion %23mensfashion %23affiliatelink %23sweaterweather.jfif" alt="" width={40} height={40} className="rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
+                  <Image src="/images/people/person-4.jfif" alt="" width={40} height={40} className="rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-white/80">Meet Our</p>
@@ -111,7 +112,7 @@ export function Testimonials() {
                 <div key={s.target}>
                   {i > 0 && <div className="h-px bg-white/[0.08]" />}
                   <div className="flex items-center gap-6 py-5">
-                    <p className="text-5xl md:text-7xl font-light text-white min-w-[120px] md:min-w-[150px] tracking-tight">
+                    <p className="text-4xl sm:text-5xl md:text-7xl font-light text-white min-w-[100px] sm:min-w-[120px] md:min-w-[150px] tracking-tight">
                       <CountUp target={s.target} suffix={s.suffix} />
                     </p>
                     <div>
@@ -134,16 +135,17 @@ export function Testimonials() {
             transition={ease.slow}
           >
             {/* Main image */}
-            <div className="rounded-2xl overflow-hidden relative aspect-[4/5]">
-              <img
+            <div className="rounded-2xl overflow-hidden relative aspect-[3/4] sm:aspect-[4/5]">
+              <Image
                 src="/images/testimonial-hero.png"
                 alt="Weavo"
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
               />
 
               {/* Contact Us Now — floating top right */}
-              <div className="absolute top-5 right-5">
-                <div className="flex items-center gap-2 bg-white rounded-full px-5 py-2.5 shadow-lg">
+              <div className="absolute top-3 right-3 sm:top-5 sm:right-5">
+                <div className="flex items-center gap-2 bg-white rounded-full px-3 py-2 sm:px-5 sm:py-2.5 shadow-lg">
                   <Phone className="w-4 h-4 text-[#0a0a0a]" />
                   <span className="text-sm font-semibold text-[#0a0a0a]">Contact Us Now</span>
                 </div>
@@ -157,10 +159,10 @@ export function Testimonials() {
               </div>
 
               {/* Bottom overlay — tagline + consultation card */}
-              <div className="absolute bottom-0 inset-x-0 p-5">
-                <div className="flex items-end justify-between gap-4">
+              <div className="absolute bottom-0 inset-x-0 p-3 sm:p-5">
+                <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-2 sm:gap-4">
                   {/* Left tagline */}
-                  <p className="text-white font-semibold text-lg italic">Building Your Dreams</p>
+                  <p className="text-white font-semibold text-base sm:text-lg italic">Building Your Dreams</p>
 
                   {/* Consultation card */}
                   <div className="bg-white rounded-xl px-4 py-3 flex items-center gap-3 shadow-xl">

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { zoomIn, fadeUp, ease, viewport as vp } from "@/lib/animations";
@@ -20,11 +21,12 @@ export function Contact() {
           transition={ease.slow}
         >
           {/* Left — Image + Info */}
-          <div className="relative min-h-[500px] lg:min-h-0 bg-[#1a1a2e] overflow-hidden">
-            <img
+          <div className="relative min-h-[380px] sm:min-h-[500px] lg:min-h-0 bg-[#1a1a2e] overflow-hidden">
+            <Image
               src="/images/contact-watch.png"
               alt=""
-              className="absolute inset-0 w-full h-full object-cover scale-110"
+              fill
+              className="object-cover scale-110"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/30 to-transparent" />

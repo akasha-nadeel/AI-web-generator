@@ -1277,7 +1277,7 @@ function TrashedListRow({
 
       <span className="text-xs text-muted-foreground">{formattedDate}</span>
 
-      <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center gap-1.5 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
         <button
           onClick={() => onRestore(site.id)}
           className="flex items-center gap-1 h-7 px-2 rounded-md text-xs text-foreground bg-white/[0.06] hover:bg-white/[0.1] transition-all"
@@ -1329,7 +1329,7 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
         </div>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="p-1 rounded-md hover:bg-white/[0.08] transition-colors opacity-0 group-hover:opacity-100 shrink-0">
+          <DropdownMenuTrigger className="p-1 rounded-md hover:bg-white/[0.08] transition-colors md:opacity-0 md:group-hover:opacity-100 shrink-0">
             <MoreVertical className="w-4 h-4 text-muted-foreground" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40 bg-[rgba(20,20,40,0.95)] backdrop-blur-xl border-white/[0.1]">
@@ -1386,7 +1386,7 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
       <span className="text-xs text-muted-foreground w-24 text-right">{formattedDate}</span>
 
       <DropdownMenu>
-        <DropdownMenuTrigger className="p-1 rounded-md hover:bg-white/[0.08] transition-colors opacity-0 group-hover:opacity-100">
+        <DropdownMenuTrigger className="p-1 rounded-md hover:bg-white/[0.08] transition-colors md:opacity-0 md:group-hover:opacity-100">
           <MoreVertical className="w-4 h-4 text-muted-foreground" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40 bg-[rgba(20,20,40,0.95)] backdrop-blur-xl border-white/[0.1]">
