@@ -76,7 +76,7 @@ export function Testimonials() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
           {/* Left — Text + Stats */}
           <motion.div
-            className="flex flex-col justify-between h-full"
+            className="flex flex-col justify-between h-full order-2 lg:order-1"
             initial="hidden"
             whileInView="visible"
             viewport={vp}
@@ -94,10 +94,10 @@ export function Testimonials() {
               {/* Team avatars */}
               <div className="flex items-center gap-4 mt-8">
                 <div className="flex -space-x-3">
-                  <Image src="/images/people/download (12).jfif" alt="" width={40} height={40} className="rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
-                  <Image src="/images/people/download (13).jfif" alt="" width={40} height={40} className="rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
-                  <Image src="/images/people/%23mensstyle %23fashion %23mensfashion %23affiliatelink %23sweaterweather.jfif" alt="" width={40} height={40} className="rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
-                  <Image src="/images/people/person-4.jfif" alt="" width={40} height={40} className="rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
+                  <Image src="/images/people/download (12).jfif" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
+                  <Image src="/images/people/download (13).jfif" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
+                  <Image src="/images/people/%23mensstyle %23fashion %23mensfashion %23affiliatelink %23sweaterweather.jfif" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
+                  <Image src="/images/people/person-4.jfif" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-white/80">Meet Our</p>
@@ -127,7 +127,7 @@ export function Testimonials() {
 
           {/* Right — Image with floating elements */}
           <motion.div
-            className="relative"
+            className="relative order-1 lg:order-2"
             initial="hidden"
             whileInView="visible"
             viewport={vp}

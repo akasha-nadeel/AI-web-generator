@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Play, Sparkles, Send, Users, Box, Wallet, Settings, MapPin } from "lucide-react";
 import Link from "next/link";
 
@@ -147,11 +148,50 @@ const rightCards = [
   </div>,
 ];
 
+const MOBILE_BG_IMAGES = [
+  "/images/ai-powered-card.jfif",
+  "/images/auth-left-bg.png",
+  "/images/ai-robot.png",
+];
+
 export function Hero() {
+  const [bgIndex, setBgIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBgIndex((prev) => (prev + 1) % MOBILE_BG_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="relative min-h-screen bg-[#0a0a0a] overflow-hidden pt-16">
-      {/* Subtle background */}
+      {/* Subtle background — desktop */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(120,119,198,0.04),transparent_50%)]" />
+
+      {/* Mobile background slideshow */}
+      <div className="lg:hidden absolute inset-0">
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={bgIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={MOBILE_BG_IMAGES[bgIndex]}
+              alt=""
+              fill
+              className="object-cover"
+              priority={bgIndex === 0}
+            />
+          </motion.div>
+        </AnimatePresence>
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-black/60 z-[1]" />
+      </div>
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-4 md:px-8 flex items-center min-h-[calc(100vh-64px)]">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-0 items-center w-full py-12 lg:py-0">
