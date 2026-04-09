@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{redirect_url}\" http://localhost:3000/sign-up)",
+      "Bash(curl -s http://localhost:3000/sign-up)",
+      "Bash(curl -sI http://localhost:3000/sign-up)",
+      "Bash(curl -sI -H \"Accept: text/html,application/xhtml+xml\" -H \"User-Agent: Mozilla/5.0\" http://localhost:3000/sign-up)",
+      "Bash(curl -sI -L -H \"Accept: text/html,application/xhtml+xml\" -H \"User-Agent: Mozilla/5.0\" http://localhost:3000/sign-up)",
+      "Bash(curl:*)",
+      "Bash(npx kill-port:*)",
+      "Bash(npm run:*)",
+      "Bash(npx next:*)",
+      "WebFetch(domain:fitbricks.framer.website)",
+      "Bash(grep -oE '--token-[a-f0-9-]+\\\\s*:\\\\s*[^;}\"]+' /tmp/fitbricks.html)",
+      "WebFetch(domain:dinevo.framer.website)",
+      "Bash(npx tsc:*)",
+      "Bash(ls \"C:\\\\Users\\\\User\\\\Downloads\"/*.jfif)",
+      "Bash(cp \"55 Modern A-Frame Home Designs_ The Definitive Guide for 2025.jfif\" about-1.jfif)",
+      "Bash(cp \"download \\(5\\).jfif\" about-2.jfif)",
+      "Bash(cp \"download \\(4\\).jfif\" about-3.jfif)",
+      "Bash(cp \"40 Times Designers Went All In And Designed The Most Fabulous Examples Of 'Modern Architecture'.jfif\" about-4.jfif)",
+      "Bash(cp \"House Ideas & Interiors _ Amazing 😍 _ Facebook.jfif\" about-5.jfif)",
+      "Bash(cp 40*.jfif about-4.jfif)",
+      "Bash(cp House*.jfif about-5.jfif)",
+      "Bash(cp \"download \\(3\\).jfif\" about-6.jfif)",
+      "Bash(cp \"download \\(6\\).jfif\" about-7.jfif)",
+      "Bash(cp The*.jfif about-8.jfif)",
+      "Bash(ls \"C:\\\\Users\\\\User\\\\Downloads\"/Untitled*)",
+      "Bash(ls \"C:\\\\Users\\\\User\\\\Desktop\"/Untitled*)",
+      "Bash(ls:*)",
+      "WebSearch",
+      "WebFetch(domain:michalsnik.github.io)",
+      "Bash(npm ls:*)",
+      "Bash(taskkill /PID 93484 /F)",
+      "Bash(node -e \"const clerk = require\\('@clerk/nextjs/server'\\); console.log\\(Object.keys\\(clerk\\).filter\\(k => k.includes\\('proxy'\\) || k.includes\\('Proxy'\\) || k.includes\\('middleware'\\) || k.includes\\('Middleware'\\)\\)\\)\")"
+    ]
+  }
+}
