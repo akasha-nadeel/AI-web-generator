@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import type { NextFetchEvent, NextRequest } from "next/server";
 
 const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
@@ -10,11 +11,16 @@ const isProtectedRoute = createRouteMatcher([
   "/billing(.*)",
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
+const handler = clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
     await auth.protect();
   }
 });
+
+// Next.js 16 expects a named `proxy` export
+export function proxy(request: NextRequest, event: NextFetchEvent) {
+  return handler(request, event);
+}
 
 export const config = {
   matcher: [
