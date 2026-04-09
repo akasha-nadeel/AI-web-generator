@@ -167,13 +167,15 @@ export function HowItWorks() {
               <h3 className={`text-lg font-semibold leading-snug mb-4 ${i === 0 ? "text-white" : "text-white"}`}>
                 {step.title}
               </h3>
-              <div className="w-28 h-36 rounded-xl overflow-hidden">
-                <img
-                  src={step.image}
-                  alt={step.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              {step.image && (
+                <div className="w-28 h-36 rounded-xl overflow-hidden">
+                  <img
+                    src={step.image}
+                    alt={step.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
               <span className="absolute bottom-4 right-6 text-7xl font-bold text-white/[0.04] leading-none select-none pointer-events-none">
                 {step.number}
               </span>
