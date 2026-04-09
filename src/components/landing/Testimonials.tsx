@@ -1,26 +1,69 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { Phone, HelpCircle } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { fadeLeft, fadeRight, ease, viewport as vp } from "@/lib/animations";
 
 const stats = [
   {
-    value: "10K+",
+    target: 10,
+    suffix: "K+",
     label: "Websites Built",
     desc: "Successfully",
   },
   {
-    value: "98%",
+    target: 98,
+    suffix: "%",
     label: "Customer",
     desc: "Satisfaction Rate",
   },
   {
-    value: "30s",
+    target: 30,
+    suffix: "s",
     label: "Average",
     desc: "Build Time",
   },
 ];
+
+function easeOutCubic(t: number) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+function CountUp({ target, suffix }: { target: number; suffix: string }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+
+  useEffect(() => {
+    if (!inView) return;
+    const duration = 2000;
+    let startTime: number | null = null;
+    let rafId: number;
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutCubic(progress);
+      setCount(Math.round(easedProgress * target));
+
+      if (progress < 1) {
+        rafId = requestAnimationFrame(animate);
+      }
+    };
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, [inView, target]);
+
+  return (
+    <span ref={ref}>
+      {count}
+      {suffix}
+    </span>
+  );
+}
 
 export function Testimonials() {
   return (
@@ -65,11 +108,11 @@ export function Testimonials() {
             {/* Stats */}
             <div className="space-y-0">
               {stats.map((s, i) => (
-                <div key={s.value}>
+                <div key={s.target}>
                   {i > 0 && <div className="h-px bg-white/[0.08]" />}
                   <div className="flex items-center gap-6 py-5">
                     <p className="text-5xl md:text-7xl font-light text-white min-w-[120px] md:min-w-[150px] tracking-tight">
-                      {s.value}
+                      <CountUp target={s.target} suffix={s.suffix} />
                     </p>
                     <div>
                       <p className="text-sm md:text-base font-normal text-white/60">{s.label}</p>

@@ -1,11 +1,19 @@
+"use client";
+
 import { SignIn } from "@clerk/nextjs";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 export default function SignInPage() {
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-black">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-black overflow-hidden">
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden flex-col">
+      <motion.div
+        initial={{ x: "-100%", opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+        className="hidden lg:flex lg:w-[45%] relative overflow-hidden flex-col"
+      >
         <Image
           src="/images/auth-left-bg.png"
           alt="Weavo"
@@ -34,10 +42,15 @@ export default function SignInPage() {
             Describe your business, pick your style, and let AI build your dream website in seconds.
           </p>
         </div>
-      </div>
+      </motion.div>
 
       {/* Right Panel - Sign In Form */}
-      <div className="flex-1 flex items-center justify-center bg-black p-6 lg:p-10 min-h-screen lg:min-h-0">
+      <motion.div
+        initial={{ x: "100%", opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
+        className="flex-1 flex items-center justify-center bg-black p-6 lg:p-10 min-h-screen lg:min-h-0"
+      >
         <SignIn
           forceRedirectUrl="/dashboard"
           appearance={{
@@ -86,7 +99,7 @@ export default function SignInPage() {
             },
           }}
         />
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -102,10 +102,10 @@ export function TrustedBy() {
             {[...tools, ...tools].map((tool, i) => (
               <div
                 key={`${tool.name}-${i}`}
-                className="flex-shrink-0 flex items-center gap-2.5 px-7 py-3.5 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] transition-colors"
+                className="flex-shrink-0 flex items-center gap-3 px-9 py-4.5 rounded-2xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] transition-colors"
               >
-                <span className="text-white/60">{tool.svg}</span>
-                <span className="text-sm font-semibold text-white/70 whitespace-nowrap">
+                <span className="text-white/60 [&_svg]:w-6 [&_svg]:h-6">{tool.svg}</span>
+                <span className="text-base font-semibold text-white/70 whitespace-nowrap">
                   {tool.name}
                 </span>
               </div>
