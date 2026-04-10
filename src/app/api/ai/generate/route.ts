@@ -25,13 +25,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check credits
-    if (user.credits_remaining <= 0) {
-      return NextResponse.json(
-        { error: "No credits remaining. Please upgrade your plan." },
-        { status: 402 }
-      );
-    }
+    // Check credits (bypassed during testing)
+    // if (user.credits_remaining <= 0) {
+    //   return NextResponse.json(
+    //     { error: "No credits remaining. Please upgrade your plan." },
+    //     { status: 402 }
+    //   );
+    // }
 
     const body = await req.json();
     const { businessName, industry, description, colorPalette, fontStyle, overallFeel, pages } = body;
@@ -132,8 +132,8 @@ export async function POST(req: NextRequest) {
       siteJson
     );
 
-    // Deduct credit
-    await deductCredit(user.id);
+    // Deduct credit (bypassed for testing)
+    // await deductCredit(user.id);
 
     // Log generation
     await logGeneration(

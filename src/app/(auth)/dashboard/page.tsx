@@ -86,7 +86,7 @@ export default function DashboardPage() {
   const { signOut } = useClerk();
   const [sites, setSites] = useState<Site[]>([]);
   const [trashedSites, setTrashedSites] = useState<Site[]>([]);
-  const [credits, setCredits] = useState(3);
+  const [credits, setCredits] = useState(999);
   const [plan, setPlan] = useState<"free" | "pro" | "business">("free");
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -254,7 +254,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto scrollbar-thin">
         {sidebarNavItems.map((item, idx) => (
           <div key={item.label}>
             <button
@@ -530,7 +530,7 @@ export default function DashboardPage() {
         </header>
 
         {/* Content area */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto scrollbar-thin">
           {activeNav === "Chat" ? (
             <AIChatSection credits={credits} plan={plan} />
           ) : (
