@@ -67,7 +67,7 @@ export function WizardShell({ children }: WizardShellProps) {
       <div className="hidden lg:flex lg:w-[42%] h-full relative overflow-hidden flex-col shrink-0">
         {/* Background Image */}
         <Image
-          src="/images/auth-left-bg.png"
+          src="/images/wizard-hero.jpg"
           alt="Weavo"
           fill
           className="object-cover"
