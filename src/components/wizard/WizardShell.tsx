@@ -6,6 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { MessageSquare } from "lucide-react";
 
+import { motion, AnimatePresence } from "framer-motion";
+
 const steps = [
   { number: 1, label: "Start" },
   { number: 2, label: "Inspiration" },
@@ -66,20 +68,37 @@ export function WizardShell({ children }: WizardShellProps) {
   const currentContent = leftPanelContent[step as keyof typeof leftPanelContent] || leftPanelContent[1];
 
   return (
-    <div className="h-screen bg-[#0a0a0a] flex flex-col lg:flex-row overflow-hidden">
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      transition={{ duration: 0.8 }}
+      className="h-screen bg-[#0a0a0a] flex flex-col lg:flex-row overflow-hidden"
+    >
       {/* Left Panel */}
       <div className="hidden lg:flex lg:w-[42%] h-full relative overflow-hidden flex-col shrink-0">
-        {/* Background Image */}
-        <Image
-          src={currentContent.image}
-          alt="Weavo"
-          fill
-          className="object-cover"
-          priority
-        />
+        {/* Background Image with Crossfade */}
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={currentContent.image}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={currentContent.image}
+              alt="Weavo"
+              fill
+              className="object-cover"
+              priority
+            />
+          </motion.div>
+        </AnimatePresence>
+        
         {/* Overlays */}
-        <div className="absolute inset-0 bg-[#0a0a0a]/10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/90 via-[#0a0a0a]/20 to-transparent" />
+        <div className="absolute inset-0 bg-[#0a0a0a]/10 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/90 via-[#0a0a0a]/20 to-transparent z-10" />
 
         {/* Brand & BETA Badge */}
         <div className="absolute top-6 left-8 z-20 flex items-center gap-3">
@@ -93,14 +112,23 @@ export function WizardShell({ children }: WizardShellProps) {
         </div>
 
         {/* Dynamic Text Content */}
-        <div className="absolute bottom-28 left-8 right-8 z-20 transition-all duration-500">
-          <h1 className="text-4xl xl:text-5xl font-bold text-white mb-4 leading-[1.1] tracking-tight">
-            {currentContent.title}
-          </h1>
-          <p className="text-white/70 text-base leading-relaxed max-w-sm">
-            {currentContent.subtitle}
-          </p>
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={step}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="absolute bottom-28 left-8 right-8 z-20"
+          >
+            <h1 className="text-4xl xl:text-5xl font-bold text-white mb-4 leading-[1.1] tracking-tight">
+              {currentContent.title}
+            </h1>
+            <p className="text-white/70 text-base leading-relaxed max-w-sm">
+              {currentContent.subtitle}
+            </p>
+          </motion.div>
+        </AnimatePresence>
 
         {/* Chat Bubble Widget (Mock) */}
         <div className="absolute bottom-6 left-8 z-20">
@@ -115,7 +143,7 @@ export function WizardShell({ children }: WizardShellProps) {
         <div className="max-w-[700px] w-full mx-auto px-6 py-10 md:py-14 flex-1 flex flex-col">
           
           {/* Step Indicators - Progress Bar Style */}
-          <div className="grid grid-cols-4 gap-2 md:gap-4 mb-16">
+          <div className="grid grid-cols-4 gap-2 md:gap-4 mb-16 relative z-10">
             {steps.map((s, i) => {
               const isActive = step === s.number;
               const isPast = step > s.number;
@@ -124,13 +152,13 @@ export function WizardShell({ children }: WizardShellProps) {
                   <div className="h-1.5 w-full rounded-full bg-white/[0.06] overflow-hidden">
                     <div 
                       className={cn(
-                        "h-full rounded-full transition-all duration-500 ease-in-out",
+                        "h-full rounded-full transition-all duration-700 ease-in-out",
                         isPast || isActive ? "bg-white w-full" : "w-0"
                       )} 
                     />
                   </div>
                   <span className={cn(
-                    "text-xs md:text-sm font-medium text-center transition-colors",
+                    "text-xs md:text-sm font-medium text-center transition-colors duration-500",
                     isActive || isPast ? "text-white" : "text-white/40"
                   )}>
                     {s.label}
@@ -141,11 +169,20 @@ export function WizardShell({ children }: WizardShellProps) {
           </div>
 
           {/* Dynamic Step Content */}
-          <div className="flex-1 flex flex-col">
-            {children}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={step}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="flex-1 flex flex-col min-h-0"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
