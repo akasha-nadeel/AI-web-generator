@@ -28,7 +28,8 @@ export function WizardShell({ children }: WizardShellProps) {
           with <span className="text-blue-400 font-extrabold">AI power</span>.
         </>
       ),
-      subtitle: "Describe your business, pick your style, and let AI build your website in seconds."
+      subtitle: "Describe your business, pick your style, and let AI build your website in seconds.",
+      image: "/images/auth-left-bg.jpg"
     },
     2: {
       title: (
@@ -37,7 +38,8 @@ export function WizardShell({ children }: WizardShellProps) {
           your <span className="text-blue-400 font-extrabold">inspiration</span>.
         </>
       ),
-      subtitle: "Upload screenshots, logos, or brand assets to give our AI the perfect starting point."
+      subtitle: "Upload screenshots, logos, or brand assets to give our AI the perfect starting point.",
+      image: "/images/wizard-hero.jpg"
     },
     3: {
       title: (
@@ -46,7 +48,8 @@ export function WizardShell({ children }: WizardShellProps) {
           <span className="text-blue-400 font-extrabold">visual identity</span>.
         </>
       ),
-      subtitle: "Select hand-picked color palettes, modern typography, and the overall feel of your brand."
+      subtitle: "Select hand-picked color palettes, modern typography, and the overall feel of your brand.",
+      image: "/images/auth-left-bg.jpg"
     },
     4: {
       title: (
@@ -55,7 +58,8 @@ export function WizardShell({ children }: WizardShellProps) {
           <span className="text-blue-400 font-extrabold">digital home</span>.
         </>
       ),
-      subtitle: "Choose the exact pages you need. Our AI will seamlessly interlink them for you."
+      subtitle: "Choose the exact pages you need. Our AI will seamlessly interlink them for you.",
+      image: "/images/auth-left-bg.jpg"
     }
   };
 
@@ -67,7 +71,7 @@ export function WizardShell({ children }: WizardShellProps) {
       <div className="hidden lg:flex lg:w-[42%] h-full relative overflow-hidden flex-col shrink-0">
         {/* Background Image */}
         <Image
-          src="/images/wizard-hero.jpg"
+          src={currentContent.image}
           alt="Weavo"
           fill
           className="object-cover"
