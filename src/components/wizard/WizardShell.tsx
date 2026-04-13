@@ -29,7 +29,7 @@ export function WizardShell({ children }: WizardShellProps) {
         </>
       ),
       subtitle: "Describe your business, pick your style, and let AI build your website in seconds.",
-      image: "/images/auth-left-bg.jpg"
+      image: "/images/wizard-hero-step1.jpg"
     },
     2: {
       title: (
