@@ -134,10 +134,10 @@ export function Features() {
             you create professional websites without writing a single line of code.
           </p>
           <a
-            href="#features"
+            href="#contact"
             className="inline-flex items-center justify-center px-7 py-3.5 bg-white text-black text-sm font-medium rounded-full hover:bg-white/90 transition-colors"
           >
-            All Features
+            Contact Us
           </a>
         </motion.div>
 

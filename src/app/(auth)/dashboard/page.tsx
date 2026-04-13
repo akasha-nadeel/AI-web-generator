@@ -29,6 +29,7 @@ import {
   AlertTriangle,
   ArrowRight,
   PanelLeft,
+  Infinity,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -43,7 +44,7 @@ import { cn } from "@/lib/utils";
 import { PLANS, INDUSTRIES, COLOR_PALETTES, FONT_STYLES, INDUSTRY_DEFAULT_PAGES } from "@/lib/constants";
 import { getTemplatePreview, getPreviewTheme } from "@/lib/templates/preview-data";
 import { assemblePreviewHtml } from "@/lib/assembler/assembler";
-import { useWizardStore } from "@/stores/wizardStore";
+import { TEMPLATE_DESIGN_DNA } from "@/lib/templates/design-dna";
 import { useRouter } from "next/navigation";
 import { Menu, Eye, ChevronRight } from "lucide-react";
 import { AIChatSection } from "@/components/dashboard/AIChatSection";
@@ -57,6 +58,7 @@ interface Site {
   status: string;
   created_at: string;
   updated_at: string;
+  site_json?: { html?: string } | null;
 }
 
 type ViewMode = "grid" | "list";
@@ -228,7 +230,11 @@ export default function DashboardPage() {
       {/* Brand header */}
       <div className="p-4 flex items-center justify-between">
         <Link href="/dashboard" onClick={() => { setActiveNav("Chat"); setMobileMenuOpen(false); }}>
-          <span className="text-xl font-bold text-white">Weavo</span>
+          <span className="flex items-center gap-1 text-xl font-bold text-white">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo.png" alt="Weavo Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center" />
+            Weavo
+          </span>
         </Link>
         <button
           onClick={() => { setSidebarCollapsed(true); setMobileMenuOpen(false); }}
@@ -287,9 +293,14 @@ export default function DashboardPage() {
           <DropdownMenuTrigger className="w-full focus:outline-none">
             <div className="flex items-center gap-3 p-3 hover:bg-white/[0.04] transition-colors cursor-pointer">
               {/* Avatar */}
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-sm font-semibold shrink-0">
-                {user?.fullName?.charAt(0)?.toUpperCase() || user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() || "U"}
-              </div>
+              {user?.imageUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={user.imageUrl} alt={user?.fullName || "User"} className="w-9 h-9 rounded-full object-cover shrink-0 border border-white/10" referrerPolicy="no-referrer" />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-sm font-semibold shrink-0">
+                  {user?.fullName?.charAt(0)?.toUpperCase() || user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() || "U"}
+                </div>
+              )}
               <div className="flex-1 min-w-0 text-left">
                 <p className="text-sm font-medium truncate">
                   {user?.fullName || "User"}
@@ -599,19 +610,16 @@ function SitesView({
       id: "restaurant",
       title: "Restaurant Template",
       desc: "Menu, reservations & gallery",
-      gradient: "from-amber-600 via-orange-500 to-red-500",
     },
     {
       id: "portfolio",
       title: "Portfolio Template",
       desc: "Showcase your creative work",
-      gradient: "from-blue-600 via-indigo-500 to-purple-500",
     },
     {
-      id: "saas",
-      title: "SaaS Template",
-      desc: "Features, pricing & sign-up",
-      gradient: "from-emerald-600 via-teal-500 to-cyan-500",
+      id: "fitness",
+      title: "Fitness Template",
+      desc: "Programs, trainers & membership",
     },
   ];
 
@@ -635,20 +643,7 @@ function SitesView({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {recommendedTemplates.map((t) => (
-              <Link
-                key={t.id}
-                href={`/wizard?template=${t.id}`}
-                className="group relative rounded-xl overflow-hidden aspect-[16/10] bg-gradient-to-br border border-white/[0.06] hover:border-white/[0.12] transition-all"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${t.gradient} opacity-80`} />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-                <div className="relative z-10 p-4 flex flex-col justify-end h-full">
-                  <p className="text-lg font-semibold text-white leading-tight">
-                    {t.title}
-                  </p>
-                  <p className="text-xs text-white/60 mt-1">{t.desc}</p>
-                </div>
-              </Link>
+              <RecommendedTemplateCard key={t.id} t={t} />
             ))}
           </div>
         </div>
@@ -704,7 +699,7 @@ function SitesView({
       ) : sites.length === 0 && searchQuery ? (
         <SearchEmpty query={searchQuery} />
       ) : viewMode === "grid" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {sites.map((site) => (
             <SiteGridCard key={site.id} site={site} onDelete={onDelete} />
           ))}
@@ -744,7 +739,7 @@ function TemplatesGallery({ selectedIndustry, onSelectIndustry }: { selectedIndu
             <div>
               <h2 className="text-lg font-semibold">Templates</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Start with a pre-built template — preview it live, then customize in the wizard
+                Pick a design you love — we&apos;ll generate a unique site inspired by its style
               </p>
             </div>
             <div className="relative w-full sm:w-64 shrink-0">
@@ -760,7 +755,7 @@ function TemplatesGallery({ selectedIndustry, onSelectIndustry }: { selectedIndu
           </div>
 
           {filteredIndustries.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredIndustries.map((industry) => (
                 <TemplateCard
                   key={industry.id}
@@ -793,12 +788,12 @@ function TemplateDetailView({
   onBack: () => void;
 }) {
   const router = useRouter();
-  const wizardStore = useWizardStore();
   const preview = getTemplatePreview(industryId);
   const theme = getPreviewTheme(industryId);
   const industry = INDUSTRIES.find((i) => i.id === industryId);
   const palette = preview ? COLOR_PALETTES.find((p) => p.id === preview.paletteId) : undefined;
   const font = preview ? FONT_STYLES.find((f) => f.id === preview.fontStyleId) : undefined;
+  const dna = TEMPLATE_DESIGN_DNA[industryId];
 
   // Group sections into pairs for display cards.
   // Nav/marquee sections are always prepended to the next content section
@@ -835,21 +830,16 @@ function TemplateDetailView({
   }, [preview, theme]);
 
   const handleUseTemplate = () => {
-    if (!preview || !theme) return;
-    wizardStore.reset();
-    wizardStore.setBusinessInfo("", preview.industryId, "");
-    wizardStore.setColorPalette({
-      primary: theme.primary,
-      secondary: theme.secondary,
-      accent: theme.accent,
-      bg: theme.bg,
-      text: theme.text,
-    });
-    wizardStore.setFontStyle(preview.fontStyleId);
-    wizardStore.setOverallFeel(preview.overallFeel);
+    if (!preview) return;
     const pages = INDUSTRY_DEFAULT_PAGES[preview.industryId] || ["Home", "About", "Contact"];
-    wizardStore.setSelectedPages(pages);
-    router.push("/wizard");
+    const params = new URLSearchParams({
+      prompt: `Create a stunning ${industry?.label || industryId} website. ${preview.description}`,
+      industry: preview.industryId,
+      mood: preview.overallFeel || "modern",
+      pages: pages.join(","),
+      templateId: industryId,
+    });
+    router.push(`/generate/new?${params.toString()}`);
   };
 
   if (!preview || !theme || !industry) return null;
@@ -871,6 +861,11 @@ function TemplateDetailView({
             <span className="text-muted-foreground font-normal"> — {industry.label} Template</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-2 max-w-2xl">{preview.description}</p>
+          {dna && (
+            <p className="text-xs text-muted-foreground/60 mt-1.5 max-w-2xl italic">
+              AI will generate a unique site inspired by this design&apos;s {dna.mood} style
+            </p>
+          )}
 
           {/* Meta pills */}
           <div className="flex items-center gap-2 mt-3 flex-wrap">
@@ -907,7 +902,8 @@ function TemplateDetailView({
             onClick={handleUseTemplate}
             className="flex items-center gap-2 h-10 px-5 rounded-full bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors"
           >
-            Use for Free
+            <Sparkles className="w-4 h-4" />
+            Generate Like This
           </button>
         </div>
       </div>
@@ -1001,6 +997,77 @@ function SectionScreenshot({ html, cardIndex }: { html: string; cardIndex: numbe
   );
 }
 
+function RecommendedTemplateCard({ t }: { t: { id: string; title: string; desc: string } }) {
+  const preview = getTemplatePreview(t.id);
+  const theme = getPreviewTheme(t.id);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setContainerWidth(entry.contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const previewHtml = useMemo(() => {
+    if (!preview || !theme) return "";
+    const heroSections: typeof preview.sections = [];
+    for (const s of preview.sections) {
+      heroSections.push(s);
+      if (!/nav|marquee|announcement/i.test(s.componentId)) break;
+    }
+    return assemblePreviewHtml(heroSections, theme, preview.siteName);
+  }, [preview, theme]);
+
+  const iframeRenderWidth = 1440;
+  const scale = containerWidth > 0 ? containerWidth / iframeRenderWidth : 0;
+  const thumbHeight = 180;
+  const iframeHeight = scale > 0 ? Math.ceil(thumbHeight / scale) : 900;
+
+  return (
+    <Link href={`/wizard?template=${t.id}`} className="block group cursor-pointer">
+      <div className="rounded-lg overflow-hidden border border-white/[0.06] bg-[#1e1e22] hover:border-white/[0.12] transition-colors duration-200">
+        <div
+          ref={containerRef}
+          className="relative overflow-hidden bg-[#2a2a2e]"
+          style={{ height: thumbHeight }}
+        >
+          {previewHtml && scale > 0 ? (
+            <iframe
+              srcDoc={previewHtml}
+              title={t.title}
+              className="border-0 pointer-events-none select-none block"
+              scrolling="no"
+              style={{
+                width: `${iframeRenderWidth}px`,
+                height: `${iframeHeight}px`,
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+                overflow: "hidden",
+              }}
+              tabIndex={-1}
+              loading="lazy"
+              sandbox="allow-same-origin"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[#2a2a2e] to-[#1e1e22]" />
+          )}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
+        </div>
+
+        <div className="px-3 py-2.5 flex flex-col justify-end">
+          <p className="text-[13px] font-medium text-foreground/90 truncate">{t.title}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{t.desc}</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 function TemplateCard({
   industry,
   onPreview,
@@ -1011,39 +1078,20 @@ function TemplateCard({
   const preview = getTemplatePreview(industry.id);
   const theme = getPreviewTheme(industry.id);
   const containerRef = useRef<HTMLDivElement>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [scale, setScale] = useState(0);
-  const [contentHeight, setContentHeight] = useState<number | null>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const observer = new ResizeObserver(([entry]) => {
-      setScale(entry.contentRect.width / 1440);
+      setContainerWidth(entry.contentRect.width);
     });
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
-  const handleLoad = useCallback(() => {
-    try {
-      const doc = iframeRef.current?.contentDocument;
-      if (doc?.body) {
-        let h = 0;
-        const children = doc.body.children;
-        for (let i = 0; i < children.length; i++) {
-          const rect = children[i].getBoundingClientRect();
-          h = Math.max(h, Math.ceil(rect.bottom));
-        }
-        if (h <= 0) h = doc.body.scrollHeight;
-        if (h > 0) setContentHeight(h);
-      }
-    } catch { /* ignore */ }
-  }, []);
-
   const previewHtml = useMemo(() => {
     if (!preview || !theme) return "";
-    // Only render nav/marquee + hero for the thumbnail card
     const heroSections: typeof preview.sections = [];
     for (const s of preview.sections) {
       heroSections.push(s);
@@ -1052,28 +1100,28 @@ function TemplateCard({
     return assemblePreviewHtml(heroSections, theme, preview.siteName);
   }, [preview, theme]);
 
-  const iframeH = contentHeight || 800;
-  const scaledH = scale > 0 ? iframeH * scale : 0;
+  const iframeRenderWidth = 1440;
+  const scale = containerWidth > 0 ? containerWidth / iframeRenderWidth : 0;
+  const thumbHeight = 180;
+  const iframeHeight = scale > 0 ? Math.ceil(thumbHeight / scale) : 900;
 
   return (
     <div className="group cursor-pointer" onClick={onPreview}>
-      <div className="relative rounded-2xl overflow-hidden border border-white/[0.06] hover:border-white/[0.14] transition-all duration-300 bg-[#1a1a1a]">
+      <div className="rounded-lg overflow-hidden border border-white/[0.06] bg-[#1e1e22] hover:border-white/[0.12] transition-colors duration-200">
         <div
           ref={containerRef}
-          className="overflow-hidden relative"
-          style={{ height: scaledH > 0 ? scaledH : undefined, minHeight: 120 }}
+          className="relative overflow-hidden bg-[#2a2a2e]"
+          style={{ height: thumbHeight }}
         >
           {previewHtml && scale > 0 ? (
             <iframe
-              ref={iframeRef}
               srcDoc={previewHtml}
               title={industry.label}
               className="border-0 pointer-events-none select-none block"
               scrolling="no"
-              onLoad={handleLoad}
               style={{
-                width: "1440px",
-                height: `${iframeH}px`,
+                width: `${iframeRenderWidth}px`,
+                height: `${iframeHeight}px`,
                 transform: `scale(${scale})`,
                 transformOrigin: "top left",
                 overflow: "hidden",
@@ -1083,14 +1131,17 @@ function TemplateCard({
               sandbox="allow-same-origin"
             />
           ) : (
-            <div className="w-full h-full bg-white/[0.03]" style={{ minHeight: 120 }} />
+            <div className="w-full h-full bg-gradient-to-br from-[#2a2a2e] to-[#1e1e22]" />
           )}
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
         </div>
-      </div>
 
-      <div className="pt-3 pb-1">
-        <h3 className="text-sm font-medium truncate">{industry.label}</h3>
-        <p className="text-xs text-muted-foreground mt-0.5">Free</p>
+        {/* Info row — matching SiteGridCard */}
+        <div className="px-3 py-2.5">
+          <h3 className="text-[13px] font-medium truncate text-foreground/90">{industry.label}</h3>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Free</p>
+        </div>
       </div>
     </div>
   );
@@ -1299,37 +1350,83 @@ function TrashedListRow({
 /* ===== SITE GRID CARD ===== */
 
 function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) => void }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  const siteHtml = site.site_json?.html || "";
+
   const formattedDate = new Date(site.updated_at).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
   });
 
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setContainerWidth(entry.contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Scale: render at 1440px, shrink to fit card width
+  const iframeRenderWidth = 1440;
+  const scale = containerWidth > 0 ? containerWidth / iframeRenderWidth : 0;
+  // Thumbnail area height (Figma-style ~180px)
+  const thumbHeight = 180;
+  // Iframe needs to be tall enough so that when scaled, it fills the thumbHeight
+  const iframeHeight = scale > 0 ? Math.ceil(thumbHeight / scale) : 900;
+
   return (
-    <div className="group rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-200">
-      <Link href={`/editor/${site.id}`} className="block p-3 pb-0">
-        <div className="aspect-[4/3] rounded-lg bg-gradient-to-br from-purple-900/20 via-blue-900/15 to-cyan-900/10 border border-white/[0.04] flex items-center justify-center overflow-hidden relative">
-          <div className="absolute inset-0 bg-grid opacity-30" />
-          <Globe className="w-8 h-8 text-white/10 relative z-10" />
-          <div className="absolute inset-0 bg-purple-600/0 group-hover:bg-purple-600/10 transition-colors flex items-center justify-center">
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity text-xs font-medium text-white/80 bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-sm">
-              Open editor
-            </span>
-          </div>
+    <div className="group rounded-lg overflow-hidden border border-white/[0.06] bg-[#1e1e22] hover:border-white/[0.12] transition-colors duration-200">
+      {/* Thumbnail */}
+      <Link href={`/editor/${site.id}`} className="block">
+        <div
+          ref={containerRef}
+          className="relative overflow-hidden bg-[#2a2a2e]"
+          style={{ height: thumbHeight }}
+        >
+          {siteHtml && scale > 0 ? (
+            <iframe
+              srcDoc={siteHtml}
+              title={site.name}
+              className="border-0 pointer-events-none select-none block"
+              scrolling="no"
+              style={{
+                width: `${iframeRenderWidth}px`,
+                height: `${iframeHeight}px`,
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+                overflow: "hidden",
+              }}
+              tabIndex={-1}
+              loading="lazy"
+              sandbox="allow-same-origin"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[#2a2a2e] to-[#1e1e22] flex items-center justify-center">
+              <Globe className="w-8 h-8 text-white/10" />
+            </div>
+          )}
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
         </div>
       </Link>
 
-      <div className="p-3 pt-2.5 flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <h3 className="text-sm font-medium truncate">{site.name}</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
+      {/* Info row — Figma style */}
+      <div className="px-3 py-2.5 flex items-center justify-between gap-2">
+        <Link href={`/editor/${site.id}`} className="min-w-0 flex-1">
+          <h3 className="text-[13px] font-medium truncate text-foreground/90">{site.name}</h3>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
             {site.industry && <span className="capitalize">{site.industry}</span>}
             {site.industry && " \u00B7 "}
             {formattedDate}
           </p>
-        </div>
+        </Link>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="p-1 rounded-md hover:bg-white/[0.08] transition-colors md:opacity-0 md:group-hover:opacity-100 shrink-0">
+          <DropdownMenuTrigger className="p-1 rounded-md hover:bg-white/[0.08] transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100 shrink-0 focus:outline-none">
             <MoreVertical className="w-4 h-4 text-muted-foreground" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40 bg-[rgba(20,20,40,0.95)] backdrop-blur-xl border-white/[0.1]">
@@ -1356,6 +1453,7 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
 /* ===== SITE LIST ROW ===== */
 
 function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) => void }) {
+  const siteHtml = site.site_json?.html || "";
   const formattedDate = new Date(site.updated_at).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -1366,9 +1464,30 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
     <div className="group flex items-center gap-4 px-3 py-2.5 rounded-lg hover:bg-white/[0.03] transition-colors">
       <Link
         href={`/editor/${site.id}`}
-        className="w-14 h-10 rounded-md bg-gradient-to-br from-purple-900/25 via-blue-900/15 to-cyan-900/10 border border-white/[0.06] flex items-center justify-center shrink-0"
+        className="w-16 h-11 rounded-md border border-white/[0.06] overflow-hidden shrink-0 relative"
       >
-        <Globe className="w-4 h-4 text-white/15" />
+        {siteHtml ? (
+          <iframe
+            srcDoc={siteHtml}
+            title={site.name}
+            className="border-0 pointer-events-none select-none block"
+            scrolling="no"
+            style={{
+              width: "1440px",
+              height: "990px",
+              transform: "scale(0.0444)",
+              transformOrigin: "top left",
+              overflow: "hidden",
+            }}
+            tabIndex={-1}
+            loading="lazy"
+            sandbox="allow-same-origin"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-purple-900/25 via-blue-900/15 to-cyan-900/10 flex items-center justify-center">
+            <Globe className="w-4 h-4 text-white/15" />
+          </div>
+        )}
       </Link>
 
       <Link href={`/editor/${site.id}`} className="flex-1 min-w-0">
@@ -1386,7 +1505,7 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
       <span className="text-xs text-muted-foreground w-24 text-right">{formattedDate}</span>
 
       <DropdownMenu>
-        <DropdownMenuTrigger className="p-1 rounded-md hover:bg-white/[0.08] transition-colors md:opacity-0 md:group-hover:opacity-100">
+        <DropdownMenuTrigger className="p-1 rounded-md hover:bg-white/[0.08] transition-colors md:opacity-0 md:group-hover:opacity-100 data-[state=open]:opacity-100 focus:outline-none">
           <MoreVertical className="w-4 h-4 text-muted-foreground" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40 bg-[rgba(20,20,40,0.95)] backdrop-blur-xl border-white/[0.1]">

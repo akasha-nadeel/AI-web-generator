@@ -2,10 +2,8 @@
 
 import { useWizardStore } from "@/stores/wizardStore";
 import { INDUSTRIES } from "@/lib/constants";
-import { GradientButton } from "@/components/shared/GradientButton";
 import { cn } from "@/lib/utils";
 import * as Icons from "lucide-react";
-import { ArrowRight } from "lucide-react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   UtensilsCrossed: Icons.UtensilsCrossed,
@@ -29,73 +27,95 @@ export function StepBusinessInfo() {
   const canProceed = businessName.trim() && industry && description.trim();
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-2">Tell us about your business</h2>
-      <p className="text-muted-foreground mb-8">
-        This helps our AI generate the perfect website for you.
+    <div className="flex-1 flex flex-col">
+      <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">Let's get started</h2>
+      <p className="text-white/60 text-base mb-10 leading-relaxed max-w-lg">
+        We just need a few details. These answers help us generate a starting point that feels right for you.
       </p>
 
-      {/* Industry selector */}
-      <div className="mb-6">
-        <label className="text-sm font-medium mb-3 block">
-          What industry are you in?
-        </label>
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3">
-          {INDUSTRIES.map((ind) => {
-            const Icon = iconMap[ind.icon] || Icons.Globe;
-            return (
-              <button
-                key={ind.id}
-                onClick={() => setBusinessInfo(businessName, ind.id, description)}
-                className={cn(
-                  "flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 rounded-xl border transition-all text-center cursor-pointer",
-                  industry === ind.id
-                    ? "border-purple-500 bg-purple-500/10 text-foreground"
-                    : "border-white/10 bg-white/5 text-muted-foreground hover:border-white/20 hover:bg-white/8"
-                )}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="text-xs">{ind.label}</span>
-              </button>
-            );
-          })}
+      <div className="space-y-10 flex-1">
+        {/* Business name */}
+        <div>
+          <label className="text-base font-semibold mb-3 block text-white/90">What is your website called?</label>
+          <input
+            type="text"
+            value={businessName}
+            onChange={(e) => setBusinessInfo(e.target.value, industry, description)}
+            placeholder="ie. Acme Studios"
+            className="w-full px-4 py-3.5 rounded-xl bg-transparent border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors"
+          />
+        </div>
+
+        {/* Description */}
+        <div>
+          <label className="text-base font-semibold mb-3 block text-white/90">
+            What is your website about?
+          </label>
+          <textarea
+            value={description}
+            onChange={(e) => setBusinessInfo(businessName, industry, e.target.value)}
+            placeholder="Describe your website in a sentence or two"
+            rows={3}
+            className="w-full px-4 py-3.5 rounded-xl bg-transparent border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors resize-none"
+          />
+          <p className="text-xs text-white/40 mt-2">
+            This won't be visible on the website but helps us understand your needs.
+          </p>
+        </div>
+
+        {/* Industry selector */}
+        <div>
+          <label className="text-base font-semibold mb-1 block text-white/90">
+            What category does your website fall under?
+          </label>
+          <p className="text-sm text-white/50 mb-4">Choose the category that best describes your website.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+            {INDUSTRIES.map((ind) => {
+              const Icon = iconMap[ind.icon] || Icons.Globe;
+              const isSelected = industry === ind.id;
+              return (
+                <button
+                  key={ind.id}
+                  onClick={() => setBusinessInfo(businessName, ind.id, description)}
+                  className={cn(
+                    "flex items-center gap-4 px-5 py-4 rounded-xl border transition-all text-left cursor-pointer group",
+                    isSelected
+                      ? "border-white/40 bg-white/[0.03]"
+                      : "border-white/10 hover:border-white/20 hover:bg-white/[0.02]"
+                  )}
+                >
+                  <div className={cn(
+                    "w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors",
+                    isSelected ? "border-blue-400" : "border-white/20 group-hover:border-white/40"
+                  )}>
+                    {isSelected && <div className="w-2 h-2 rounded-full bg-blue-400" />}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Icon className={cn("w-4 h-4", isSelected ? "text-blue-400" : "text-white/50")} />
+                    <span className={cn("text-sm", isSelected ? "text-white" : "text-white/70")}>{ind.label}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Business name */}
-      <div className="mb-6">
-        <label className="text-sm font-medium mb-2 block">Business name</label>
-        <input
-          type="text"
-          value={businessName}
-          onChange={(e) => setBusinessInfo(e.target.value, industry, description)}
-          placeholder="e.g. Sunrise Bakery"
-          className="w-full px-4 py-3 rounded-xl glass-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-        />
-      </div>
-
-      {/* Description */}
-      <div className="mb-8">
-        <label className="text-sm font-medium mb-2 block">
-          Describe your business (1-2 sentences)
-        </label>
-        <textarea
-          value={description}
-          onChange={(e) => setBusinessInfo(businessName, industry, e.target.value)}
-          placeholder="e.g. Family-owned bakery in Melbourne specializing in artisan breads and pastries"
-          rows={3}
-          className="w-full px-4 py-3 rounded-xl glass-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none"
-        />
-      </div>
-
-      <div className="flex justify-end">
-        <GradientButton
+      {/* Footer Buttons */}
+      <div className="mt-12 flex justify-between items-center pt-6 border-t border-white/5">
+        <div /> {/* Placeholder for back button if needed in future */}
+        <button
           onClick={() => canProceed && setStep(2)}
-          className={cn(!canProceed && "opacity-50 cursor-not-allowed")}
+          disabled={!canProceed}
+          className={cn(
+            "px-6 py-2.5 rounded-lg text-sm font-medium transition-colors",
+            canProceed 
+              ? "bg-white text-black hover:bg-white/90" 
+              : "bg-white/10 text-white/30 cursor-not-allowed"
+          )}
         >
           Next
-          <ArrowRight className="w-4 h-4" />
-        </GradientButton>
+        </button>
       </div>
     </div>
   );

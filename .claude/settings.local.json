@@ -32,7 +32,12 @@
       "WebFetch(domain:michalsnik.github.io)",
       "Bash(npm ls:*)",
       "Bash(taskkill /PID 93484 /F)",
-      "Bash(node -e \"const clerk = require\\('@clerk/nextjs/server'\\); console.log\\(Object.keys\\(clerk\\).filter\\(k => k.includes\\('proxy'\\) || k.includes\\('Proxy'\\) || k.includes\\('middleware'\\) || k.includes\\('Middleware'\\)\\)\\)\")"
+      "Bash(node -e \"const clerk = require\\('@clerk/nextjs/server'\\); console.log\\(Object.keys\\(clerk\\).filter\\(k => k.includes\\('proxy'\\) || k.includes\\('Proxy'\\) || k.includes\\('middleware'\\) || k.includes\\('Middleware'\\)\\)\\)\")",
+      "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" npx next build)",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(taskkill:*)",
+      "Bash(cmd:*)",
+      "WebFetch(domain:ai-web-generator-8qmb.vercel.app)"
     ]
   }
 }

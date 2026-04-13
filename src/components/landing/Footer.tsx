@@ -57,7 +57,9 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 md:gap-10 py-12 md:py-16">
           {/* Brand Column */}
           <div className="col-span-2">
-            <Link href="/" className="flex items-center mb-4">
+            <Link href="/" className="flex items-center gap-1 mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/logo.png" alt="Weavo Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center" />
               <span className="text-xl font-bold text-white">Weavo</span>
             </Link>
             <p className="text-sm text-white/40 mb-6 max-w-[200px]">

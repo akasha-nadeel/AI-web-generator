@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { getOrCreateUser, createSite, deductCredit, logGeneration } from "@/lib/supabase/queries";
-import { buildGenerationPrompt, buildUserPrompt } from "@/lib/ai/prompts/generation";
+import { getOrCreateUser, createSite, logGeneration } from "@/lib/supabase/queries";
+import { SYSTEM_PROMPT, buildUserPrompt } from "@/lib/ai/prompts/generation";
 import { rateLimit } from "@/lib/rate-limit";
+
+export const maxDuration = 120; // Allow up to 120s for AI generation (32k token responses need more time)
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,59 +27,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check credits (bypassed during testing)
-    // if (user.credits_remaining <= 0) {
-    //   return NextResponse.json(
-    //     { error: "No credits remaining. Please upgrade your plan." },
-    //     { status: 402 }
-    //   );
-    // }
-
     const body = await req.json();
-    const { businessName, industry, description, colorPalette, fontStyle, overallFeel, pages } = body;
+    const { prompt, industry, mood, pages, templateId } = body;
 
-    const systemPrompt = buildGenerationPrompt();
+    if (!prompt || !prompt.trim()) {
+      return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
+    }
+
     const userPrompt = buildUserPrompt({
-      businessName,
-      industry,
-      description,
-      colorPalette,
-      fontStyle,
-      overallFeel,
-      pages,
+      prompt: prompt.trim(),
+      industry: industry || "general",
+      mood: mood || "modern",
+      pages: pages || [],
+      templateId: templateId || undefined,
     });
 
-    // Try AI generation
-    let siteJson;
+    // Try AI generation — Anthropic first, then OpenAI, then Gemini
+    let generatedHtml: string | null = null;
+    let modelUsed = "unknown";
 
-    const apiKey = process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY;
-
-    if (process.env.OPENAI_API_KEY) {
-      // Use OpenAI
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          temperature: 0.7,
-          response_format: { type: "json_object" },
-        }),
-      });
-
-      const data = await response.json();
-      const content = data.choices?.[0]?.message?.content;
-      if (content) {
-        siteJson = JSON.parse(content);
-      }
-    } else if (process.env.ANTHROPIC_API_KEY) {
-      // Use Anthropic
+    if (process.env.ANTHROPIC_API_KEY) {
+      modelUsed = "claude-sonnet-4-20250514";
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -86,187 +56,164 @@ export async function POST(req: NextRequest) {
           "anthropic-version": "2023-06-01",
         },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 8000,
-          system: systemPrompt,
-          messages: [{ role: "user", content: userPrompt + "\n\nReturn ONLY valid JSON." }],
+          model: modelUsed,
+          max_tokens: 16384,
+          system: SYSTEM_PROMPT,
+          messages: [{ role: "user", content: userPrompt }],
         }),
       });
 
-      const data = await response.json();
-      const content = data.content?.[0]?.text;
-      if (content) {
-        // Extract JSON from response
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          siteJson = JSON.parse(jsonMatch[0]);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Anthropic API error:", errorData);
+      } else {
+        const data = await response.json();
+        const content = data.content?.[0]?.text;
+        if (content) {
+          generatedHtml = extractHtml(content);
         }
       }
+    } else if (process.env.OPENAI_API_KEY) {
+      modelUsed = "gpt-4o";
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: modelUsed,
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.7,
+          max_tokens: 16384,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("OpenAI API error:", errorData);
+      } else {
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content;
+        if (content) {
+          generatedHtml = extractHtml(content);
+        }
+      }
+    } else if (process.env.GEMINI_API_KEY) {
+      modelUsed = "gemini-2.0-flash";
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${modelUsed}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+            contents: [{ parts: [{ text: userPrompt }] }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 8192,
+            },
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Gemini API error:", errorData);
+      } else {
+        const data = await response.json();
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (content) {
+          generatedHtml = extractHtml(content);
+        }
+      }
+    } else {
+      return NextResponse.json(
+        { error: "No AI API key configured. Add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY to your environment variables." },
+        { status: 500 }
+      );
     }
 
-    if (!siteJson) {
-      // Fallback: generate a basic site structure without AI
-      siteJson = generateFallbackSite(businessName, industry, description, colorPalette, fontStyle, pages);
+    if (!generatedHtml) {
+      return NextResponse.json(
+        { error: "AI generation failed. Please try again." },
+        { status: 500 }
+      );
     }
 
-    // Create site in database
-    const fontMap: Record<string, { heading: string; body: string }> = {
-      modern: { heading: "Inter", body: "Inter" },
-      classic: { heading: "Playfair Display", body: "Lora" },
-      playful: { heading: "Poppins", body: "Nunito" },
-      bold: { heading: "Space Grotesk", body: "DM Sans" },
-    };
-    const fonts = fontMap[fontStyle] || fontMap.modern;
+    // Store the generated HTML in site_json as { html: "..." }
+    const siteData = { html: generatedHtml };
 
-    const themeJson = {
-      ...colorPalette,
-      fontHeading: fonts.heading,
-      fontBody: fonts.body,
-    };
+    // Extract a site name from the prompt
+    const siteName = extractSiteName(prompt);
 
     const site = await createSite(
       user.id,
-      businessName,
-      industry,
-      themeJson,
-      siteJson
+      siteName,
+      industry || "general",
+      {}, // theme_json — not needed anymore since HTML contains everything
+      siteData
     );
-
-    // Deduct credit (bypassed for testing)
-    // await deductCredit(user.id);
 
     // Log generation
     await logGeneration(
       site?.id || "",
       user.id,
-      `${businessName} - ${industry}`,
-      siteJson,
-      process.env.OPENAI_API_KEY ? "gpt-4o-mini" : "claude-sonnet"
+      prompt.slice(0, 200),
+      { model: modelUsed, promptLength: prompt.length },
+      modelUsed
     );
 
-    return NextResponse.json({ siteId: site?.id, siteJson });
+    return NextResponse.json({
+      siteId: site?.id,
+      html: generatedHtml,
+    });
   } catch (error) {
     console.error("Generation error:", error);
     return NextResponse.json(
-      { error: "Generation failed" },
+      { error: "Generation failed. Please try again." },
       { status: 500 }
     );
   }
 }
 
-function generateFallbackSite(
-  businessName: string,
-  industry: string,
-  description: string,
-  colorPalette: { primary: string; secondary: string; accent: string; bg: string; text: string },
-  fontStyle: string,
-  pages: string[]
-) {
-  const fontMap: Record<string, { heading: string; body: string }> = {
-    modern: { heading: "Inter", body: "Inter" },
-    classic: { heading: "Playfair Display", body: "Lora" },
-    playful: { heading: "Poppins", body: "Nunito" },
-    bold: { heading: "Space Grotesk", body: "DM Sans" },
-  };
-  const fonts = fontMap[fontStyle] || fontMap.modern;
+/**
+ * Extract clean HTML from AI response.
+ * Handles cases where the AI wraps HTML in markdown code fences.
+ */
+function extractHtml(content: string): string | null {
+  let html = content.trim();
 
-  return {
-    theme: {
-      ...colorPalette,
-      fontHeading: fonts.heading,
-      fontBody: fonts.body,
-    },
-    pages: pages.map((pageName, index) => ({
-      name: pageName,
-      slug: index === 0 ? "index" : pageName.toLowerCase().replace(/\s+/g, "-"),
-      sections: [
-        {
-          componentId: "nav-simple",
-          content: {
-            brand: businessName,
-            links: pages,
-            ctaText: "Contact Us",
-          },
-        },
-        ...(index === 0
-          ? [
-              {
-                componentId: "hero-centered",
-                content: {
-                  headline: `Welcome to ${businessName}`,
-                  subheadline: description,
-                  ctaText: "Learn More",
-                  ctaLink: "#contact",
-                },
-              },
-              {
-                componentId: "features-cards",
-                content: {
-                  title: "Our Services",
-                  features: [
-                    { title: "Quality Service", description: "We deliver exceptional quality in everything we do.", icon: "⭐" },
-                    { title: "Expert Team", description: "Our experienced team is here to help you succeed.", icon: "👥" },
-                    { title: "Fast Delivery", description: "Quick turnaround without compromising on quality.", icon: "🚀" },
-                  ],
-                },
-              },
-              {
-                componentId: "cta-simple",
-                content: {
-                  title: "Ready to Get Started?",
-                  subtitle: `Contact ${businessName} today and let's make something great together.`,
-                  ctaText: "Get in Touch",
-                },
-              },
-            ]
-          : pageName.toLowerCase() === "about"
-          ? [
-              {
-                componentId: "about-story",
-                content: {
-                  title: `About ${businessName}`,
-                  story: description,
-                  image: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=600&h=400&fit=crop",
-                  stats: [
-                    { number: "10+", label: "Years Experience" },
-                    { number: "500+", label: "Happy Clients" },
-                  ],
-                },
-              },
-            ]
-          : pageName.toLowerCase() === "contact"
-          ? [
-              {
-                componentId: "contact-split",
-                content: {
-                  title: "Get in Touch",
-                  subtitle: "We'd love to hear from you.",
-                  email: `hello@${businessName.toLowerCase().replace(/\s+/g, "")}.com`,
-                  phone: "+1 (555) 123-4567",
-                  address: "123 Business Ave, City, ST 12345",
-                },
-              },
-            ]
-          : [
-              {
-                componentId: "hero-centered",
-                content: {
-                  headline: pageName,
-                  subheadline: `Learn more about our ${pageName.toLowerCase()}.`,
-                  ctaText: "Contact Us",
-                  ctaLink: "#contact",
-                },
-              },
-            ]),
-        {
-          componentId: "footer-simple",
-          content: {
-            brand: businessName,
-            links: ["Home", "About", "Contact", "Privacy"],
-            copyright: `${new Date().getFullYear()} ${businessName}. All rights reserved.`,
-          },
-        },
-      ],
-    })),
-  };
+  // Remove markdown code fences if present
+  const codeBlockMatch = html.match(/```(?:html)?\s*\n?([\s\S]*?)\n?\s*```/);
+  if (codeBlockMatch) {
+    html = codeBlockMatch[1].trim();
+  }
+
+  // Validate it looks like HTML
+  if (html.includes("<!DOCTYPE html>") || html.includes("<html")) {
+    return html;
+  }
+
+  // Try to find HTML within the response
+  const htmlMatch = html.match(/(<!DOCTYPE html>[\s\S]*<\/html>)/i);
+  if (htmlMatch) {
+    return htmlMatch[1];
+  }
+
+  return null;
+}
+
+/**
+ * Extract a reasonable site name from the user's prompt.
+ */
+function extractSiteName(prompt: string): string {
+  // Take first ~50 chars, trim to last complete word
+  const truncated = prompt.slice(0, 50).trim();
+  const lastSpace = truncated.lastIndexOf(" ");
+  const name = lastSpace > 20 ? truncated.slice(0, lastSpace) : truncated;
+  return name || "My Website";
 }

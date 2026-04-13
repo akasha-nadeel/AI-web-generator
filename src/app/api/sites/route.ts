@@ -64,7 +64,7 @@ export async function PATCH(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const body = await req.json();
-    const { id, site_json, action } = body;
+    const { id, site_json, siteJson, action } = body;
     if (!id) return NextResponse.json({ error: "Missing site ID" }, { status: 400 });
 
     // Verify ownership
@@ -96,10 +96,14 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ success: true });
     }
 
-    // Normal update (site JSON)
+    // Normal update (site JSON) — support both property names
+    const jsonData = site_json || siteJson;
+    if (!jsonData) {
+      return NextResponse.json({ error: "Missing site data" }, { status: 400 });
+    }
     await supabase
       .from("sites")
-      .update({ site_json, updated_at: new Date().toISOString() })
+      .update({ site_json: jsonData, updated_at: new Date().toISOString() })
       .eq("id", id);
 
     return NextResponse.json({ success: true });

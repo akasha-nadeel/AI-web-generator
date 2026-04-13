@@ -28,10 +28,6 @@ import {
     ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { assemblePage } from "@/lib/assembler/assembler";
-import type { SiteJSON, ThemeConfig } from "@/lib/components/types";
-
-/* ===== CONSTANTS ===== */
 
 /* ===== TYPES ===== */
 
@@ -47,10 +43,10 @@ interface ChatMessage {
 const SUGGESTION_CHIPS: Record<string, string[]> = {
     default: [
         "Add a testimonials section",
-        "Change the color scheme",
-        "Make the hero section larger",
+        "Change the color scheme to dark mode",
+        "Make the hero section larger with a background image",
         "Add a pricing table",
-        "Improve the footer layout",
+        "Improve the footer with social links",
     ],
     agency: [
         "Add client logos section",
@@ -105,6 +101,135 @@ function Spinner({ size = 40, className = "" }: { size?: number; className?: str
     );
 }
 
+/* ===== GENERATION PROGRESS — Google AI Studio style ===== */
+
+const GENERATION_PHASES = [
+    { label: "Thinking", delay: 0 },
+    { label: "Designing", delay: 4000 },
+    { label: "Blueprinting", delay: 9000 },
+    { label: "Coding", delay: 15000 },
+    { label: "Tweaking", delay: 22000 },
+    { label: "Polishing", delay: 30000 },
+];
+
+const GENERATION_STEPS = [
+    { label: "Analyzing your prompt and requirements", delay: 0 },
+    { label: "Selecting optimal layout and structure", delay: 3000 },
+    { label: "Designing responsive components", delay: 7000 },
+    { label: "Applying design tokens and typography", delay: 11000 },
+    { label: "Building interactive elements and animations", delay: 16000 },
+    { label: "Generating production-ready code", delay: 22000 },
+    { label: "Running quality checks and optimization", delay: 28000 },
+];
+
+function GenerationProgress({ startTime }: { startTime: number }) {
+    const [currentPhase, setCurrentPhase] = useState(GENERATION_PHASES[0].label);
+    const [visibleSteps, setVisibleSteps] = useState(0);
+    const [elapsed, setElapsed] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            const now = Date.now() - startTime;
+            setElapsed(now);
+
+            // Phase word
+            let phase = GENERATION_PHASES[0].label;
+            for (const p of GENERATION_PHASES) {
+                if (now >= p.delay) phase = p.label;
+            }
+            setCurrentPhase(phase);
+
+            // Step checklist
+            let count = 0;
+            for (const step of GENERATION_STEPS) {
+                if (now >= step.delay) count++;
+            }
+            setVisibleSteps(count);
+        }, 300);
+
+        return () => clearInterval(timer);
+    }, [startTime]);
+
+    return (
+        <div className="space-y-3">
+            {/* Model name + elapsed time */}
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="text-foreground/70 font-medium">Weavo AI</span>
+                <span>•</span>
+                <span className="text-foreground/50">Running for {Math.floor(elapsed / 1000)}s</span>
+            </div>
+
+            {/* Animated phase word — single line like Google */}
+            <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-blue-400 shrink-0" />
+                <AnimatePresence mode="wait">
+                    <motion.span
+                        key={currentPhase}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.3 }}
+                        className="text-sm text-foreground/60"
+                    >
+                        {currentPhase}...
+                    </motion.span>
+                </AnimatePresence>
+            </div>
+
+            {/* Step-by-step checklist */}
+            <div className="space-y-1.5 pl-1 pt-1 border-t border-white/[0.04]">
+                {GENERATION_STEPS.slice(0, visibleSteps).map((step, i) => {
+                    const isLast = i === visibleSteps - 1;
+                    const isCompleted = i < visibleSteps - 1;
+
+                    return (
+                        <motion.div
+                            key={i}
+                            initial={{ opacity: 0, x: -8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3, ease: "easeOut" }}
+                            className="flex items-center gap-2"
+                        >
+                            {isCompleted ? (
+                                <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    className="w-3.5 h-3.5 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0"
+                                >
+                                    <svg className="w-2 h-2 text-emerald-400" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                                        <path d="M2 6l3 3 5-5" />
+                                    </svg>
+                                </motion.div>
+                            ) : (
+                                <svg className="w-3.5 h-3.5 animate-spin text-purple-400 shrink-0" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="50 14" />
+                                </svg>
+                            )}
+
+                            <span className={cn(
+                                "text-xs",
+                                isCompleted ? "text-foreground/40" : isLast ? "text-foreground/70" : "text-foreground/40"
+                            )}>
+                                {step.label}
+                            </span>
+                        </motion.div>
+                    );
+                })}
+            </div>
+
+            {/* Progress bar */}
+            <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                <motion.div
+                    className="h-full rounded-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400"
+                    initial={{ width: "0%" }}
+                    animate={{ width: `${Math.min((visibleSteps / GENERATION_STEPS.length) * 100, 95)}%` }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                />
+            </div>
+        </div>
+    );
+}
+
 /* ===== MAIN PAGE ===== */
 
 function GeneratePageContent() {
@@ -112,17 +237,16 @@ function GeneratePageContent() {
     const searchParams = useSearchParams();
     const params = useParams();
 
-    // Status: loading (spinner) → generating (spinner + chat) → preparing (chat + "preparing..." in preview) → done (chat + preview)
     const [status, setStatus] = useState<"loading" | "generating" | "preparing" | "done" | "error">("loading");
     const [errorMsg, setErrorMsg] = useState("");
     const [siteId, setSiteId] = useState<string | null>(null);
-    const [siteJson, setSiteJson] = useState<SiteJSON | null>(null);
+    const [siteHtml, setSiteHtml] = useState<string>("");
     const [chatInput, setChatInput] = useState("");
     const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isChatLoading, setIsChatLoading] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(true);
-    const [prevSiteJson, setPrevSiteJson] = useState<SiteJSON | null>(null);
+    const [prevHtml, setPrevHtml] = useState<string>("");
     const [showChanges, setShowChanges] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const hasStarted = useRef(false);
@@ -152,7 +276,7 @@ function GeneratePageContent() {
         }
     }, []);
 
-    // Resize: mousemove + mouseup on document (not on the handle)
+    // Resize: mousemove + mouseup on document
     useEffect(() => {
         if (!isDragging) return;
 
@@ -160,19 +284,16 @@ function GeneratePageContent() {
             const sidebar = sidebarRef.current;
             if (!sidebar) return;
             const vw = window.innerWidth;
-            const minW = Math.round(vw * 0.22);  // ~22% of viewport
-            const maxW = Math.round(vw * 0.42);  // ~42% of viewport
+            const minW = Math.round(vw * 0.22);
+            const maxW = Math.round(vw * 0.42);
             const newW = Math.min(Math.max(dragStartW.current + (e.clientX - dragStartX.current), minW), maxW);
             sidebar.style.width = `${newW}px`;
         };
 
         const onUp = () => setIsDragging(false);
 
-        // Attach to document so we never lose the drag even if cursor leaves the handle
         document.addEventListener("mousemove", onMove);
         document.addEventListener("mouseup", onUp);
-
-        // Block pointer events on everything underneath (especially the iframe)
         document.body.style.cursor = "col-resize";
         document.body.style.userSelect = "none";
         if (overlayRef.current) overlayRef.current.style.display = "block";
@@ -191,23 +312,11 @@ function GeneratePageContent() {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    // Build the live preview HTML from siteJson
-    const previewHtml = useMemo(() => {
-        if (!siteJson) return "";
-        try {
-            const firstPage = siteJson.pages[0];
-            if (!firstPage) return "";
-            return assemblePage(firstPage.name, "Preview", firstPage.sections, siteJson.theme);
-        } catch {
-            return "";
-        }
-    }, [siteJson]);
-
     const prompt = searchParams.get("prompt") || "";
     const industry = searchParams.get("industry") || "agency";
     const mood = searchParams.get("mood") || "minimal";
-    const fontStyle = searchParams.get("fontStyle") || "modern";
     const pages = searchParams.get("pages")?.split(",") || ["Home", "About", "Contact"];
+    const templateId = searchParams.get("templateId") || "";
     const routeSiteId = params.siteId as string;
 
     // Generate a new site via API
@@ -221,19 +330,11 @@ function GeneratePageContent() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    businessName: "My Website",
+                    prompt,
                     industry,
-                    description: prompt,
-                    colorPalette: {
-                        primary: "#7c3aed",
-                        secondary: "#4c1d95",
-                        accent: "#a78bfa",
-                        bg: "#0f0f23",
-                        text: "#eef2ff",
-                    },
-                    fontStyle,
-                    overallFeel: mood,
+                    mood,
                     pages,
+                    ...(templateId && { templateId }),
                 }),
             });
 
@@ -242,25 +343,22 @@ function GeneratePageContent() {
             if (!data.siteId) throw new Error("No site returned");
 
             setSiteId(data.siteId);
-            if (data.siteJson) setSiteJson(data.siteJson as SiteJSON);
+            if (data.html) setSiteHtml(data.html);
 
             const genElapsed = Math.round((Date.now() - chatStartTime.current) / 1000);
             setMessages((prev) => [
                 ...prev,
                 {
                     role: "ai",
-                    content: `Your website has been generated successfully! Here's what was built:\n\n• **Layout**: A fully responsive ${pages.length}-page structure with navigation and footer.\n• **Sections**: Hero, features, testimonials, and more — tailored to your description.\n• **Animations**: Integrated \`framer-motion\` for smooth scroll animations as the user navigates down the page.\n• **Responsive**: Fully mobile-friendly with a collapsible hamburger menu for smaller screens.\n\nThe app is ready to view in the preview window! Let me know if you'd like to adjust the colors, add more sections, or customize the copy.`,
+                    content: `Your website has been generated successfully! Here's what was built:\n\n• **Design**: A stunning, production-ready website with a "${mood}" mood.\n• **Typography**: Custom Google Font pairing with bold headings and readable body text.\n• **Layout**: Fully responsive design that looks great on mobile, tablet, and desktop.\n• **Animations**: Smooth scroll animations, hover effects, and micro-interactions.\n• **Content**: Professional, context-aware copy tailored to your request.\n\nThe site is ready to view in the preview window! Use the chat to make any changes.`,
                     status: "done",
                     elapsed: genElapsed,
                 },
             ]);
 
-            // Transition: generating → preparing → done
             setStatus("preparing");
-            // Update URL so refresh loads directly
             window.history.replaceState(null, "", `/generate/${data.siteId}`);
-            // Brief "preparing" phase then show preview
-            setTimeout(() => setStatus("done"), 2000);
+            setTimeout(() => setStatus("done"), 1500);
         } catch (err) {
             const errMessage = err instanceof Error ? err.message : "Something went wrong";
             setErrorMsg(errMessage);
@@ -270,7 +368,7 @@ function GeneratePageContent() {
                 { role: "ai", content: errMessage, status: "error", elapsed: Math.round((Date.now() - chatStartTime.current) / 1000) },
             ]);
         }
-    }, [prompt, industry, mood, fontStyle, pages]);
+    }, [prompt, industry, mood, pages, templateId]);
 
     // Load existing site from DB (for refresh/reload)
     const loadExistingSite = useCallback(async (id: string) => {
@@ -280,7 +378,9 @@ function GeneratePageContent() {
             const data = await res.json();
             if (data.site) {
                 setSiteId(data.site.id);
-                setSiteJson(data.site.site_json as SiteJSON);
+                // Support both new format (html in site_json) and raw site_json
+                const html = data.site.site_json?.html || "";
+                setSiteHtml(html);
                 setMessages([
                     { role: "ai", content: "Welcome back! Your website is ready. Use the chat to make changes.", status: "done", elapsed: 0 },
                 ]);
@@ -299,10 +399,8 @@ function GeneratePageContent() {
         hasStarted.current = true;
 
         if (routeSiteId === "new" && prompt) {
-            // New generation from dashboard
             startGeneration();
         } else if (routeSiteId && routeSiteId !== "new") {
-            // Reload/refresh — load existing site from DB
             loadExistingSite(routeSiteId);
         } else {
             router.push("/dashboard");
@@ -321,15 +419,13 @@ function GeneratePageContent() {
 
     // Follow-up chat — send message to modify the site
     const handleChatSend = async () => {
-        if (!chatInput.trim() || !siteJson || isChatLoading) return;
+        if (!chatInput.trim() || !siteHtml || isChatLoading) return;
 
         const userMsg = chatInput.trim();
         setChatInput("");
         setIsChatLoading(true);
 
-        // Add user message
         setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
-        // Add loading AI message
         setMessages((prev) => [...prev, { role: "ai", content: "", status: "loading" }]);
 
         const start = Date.now();
@@ -338,7 +434,7 @@ function GeneratePageContent() {
             const res = await fetch("/api/ai/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: userMsg, siteJson }),
+                body: JSON.stringify({ message: userMsg, html: siteHtml }),
             });
 
             const data = await res.json();
@@ -348,23 +444,21 @@ function GeneratePageContent() {
                 throw new Error(data.error || "Chat failed");
             }
 
-            if (data.siteJson) {
-                // Save current siteJson for Restore
-                setPrevSiteJson(siteJson);
-                setSiteJson(data.siteJson as SiteJSON);
+            if (data.html) {
+                setPrevHtml(siteHtml);
+                setSiteHtml(data.html);
                 setShowChanges(false);
 
-                // Also update the site in the database
+                // Auto-save to database
                 if (siteId) {
                     fetch("/api/sites", {
                         method: "PATCH",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ id: siteId, action: "updateJson", siteJson: data.siteJson }),
+                        body: JSON.stringify({ id: siteId, site_json: { html: data.html } }),
                     }).catch(() => {});
                 }
             }
 
-            // Replace loading message with done message
             setMessages((prev) => {
                 const updated = [...prev];
                 updated[updated.length - 1] = {
@@ -409,18 +503,17 @@ function GeneratePageContent() {
         return ["AI Features", ...chips.slice(0, 4)];
     }, [industry]);
 
-    // Handle suggestion chip click
     const handleSuggestionClick = (suggestion: string) => {
-        if (suggestion === "AI Features") return; // decorative chip
+        if (suggestion === "AI Features") return;
         setChatInput(suggestion);
     };
 
     // Handle restore to previous version
     const handleRestore = () => {
-        if (prevSiteJson) {
-            const current = siteJson;
-            setSiteJson(prevSiteJson);
-            setPrevSiteJson(current);
+        if (prevHtml) {
+            const current = siteHtml;
+            setSiteHtml(prevHtml);
+            setPrevHtml(current);
             setShowChanges(false);
             setMessages((prev) => [
                 ...prev,
@@ -429,7 +522,6 @@ function GeneratePageContent() {
         }
     };
 
-    // Scroll suggestions
     const scrollSuggestions = () => {
         if (suggestionsRef.current) {
             suggestionsRef.current.scrollBy({ left: 150, behavior: "smooth" });
@@ -452,9 +544,8 @@ function GeneratePageContent() {
         });
     };
 
-    const siteName = siteJson?.pages?.[0]?.sections?.find(
-        (s: { componentId: string; content: Record<string, unknown> }) => s.content?.brand
-    )?.content?.brand as string || "My Website";
+    // Extract site name from prompt
+    const siteName = prompt.slice(0, 40) || "My Website";
 
     // Full-screen spinner for initial load on refresh
     if (status === "loading") {
@@ -469,7 +560,6 @@ function GeneratePageContent() {
         <div className="min-h-screen bg-background flex flex-col">
             {/* ===== TOP HEADER BAR ===== */}
             <div className="h-12 border-b border-white/[0.06] bg-[rgba(10,10,25,0.6)] flex items-center justify-between px-3 md:px-5 shrink-0 z-20">
-                {/* Left — Back */}
                 <button
                     onClick={() => router.push("/dashboard")}
                     className="flex items-center gap-2 h-8 px-3 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all"
@@ -478,12 +568,10 @@ function GeneratePageContent() {
                     <span className="hidden sm:inline">Back to start</span>
                 </button>
 
-                {/* Center — Site name */}
                 <span className="text-sm font-medium text-foreground truncate max-w-[200px] md:max-w-xs">
                     {siteName}
                 </span>
 
-                {/* Right — Actions */}
                 <div className="flex items-center gap-1">
                     <button className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all">
                         <GitFork className="w-3.5 h-3.5" />
@@ -512,7 +600,6 @@ function GeneratePageContent() {
 
             {/* ===== MAIN LAYOUT — Sidebar + Content ===== */}
             <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
-                {/* Drag overlay — covers iframe so it can't steal mouse events */}
                 <div ref={overlayRef} className="hidden absolute inset-0 z-40" />
 
                 {/* ===== LEFT SIDEBAR — Chat ===== */}
@@ -520,13 +607,12 @@ function GeneratePageContent() {
                     ref={sidebarRef}
                     className="w-full lg:w-[360px] lg:h-[calc(100vh-3rem)] lg:sticky lg:top-12 border-b lg:border-b-0 bg-[rgba(10,10,25,0.5)] flex flex-col shrink-0"
                 >
-                    {/* Drag handle — sits between sidebar and content */}
+                    {/* Drag handle */}
                     <div
                         onMouseDown={onResizeStart}
                         onDoubleClick={onResizeReset}
                         className="hidden lg:flex absolute top-0 right-0 w-[6px] h-full cursor-col-resize z-50 items-center justify-center group translate-x-1/2"
                     >
-                        {/* Visible bar */}
                         <div
                             className={cn(
                                 "w-[3px] h-full transition-colors duration-100",
@@ -534,11 +620,9 @@ function GeneratePageContent() {
                             )}
                         />
                     </div>
+
                     {/* AI model header */}
                     <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-md bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-                        <Sparkles className="w-3 h-3 text-white" />
-                    </div>
                     <span className="text-sm font-medium text-foreground">Weavo AI</span>
                     <button className="p-1 rounded-md text-muted-foreground/50 hover:text-foreground hover:bg-white/[0.06] transition-all" title="Settings">
                         <Settings className="w-3.5 h-3.5" />
@@ -567,16 +651,13 @@ function GeneratePageContent() {
                     {messages.map((msg, i) => (
                         <div key={i}>
                             {msg.role === "user" ? (
-                                /* User bubble */
                                 <div className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-3">
                                     <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
                                         {msg.content}
                                     </p>
                                 </div>
                             ) : (
-                                /* AI response */
                                 <div className="space-y-2">
-                                    {/* AI label + timing */}
                                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                         <span className="text-purple-400 font-medium">Weavo AI</span>
                                         <span>•</span>
@@ -589,7 +670,6 @@ function GeneratePageContent() {
                                         )}
                                     </div>
 
-                                    {/* Loading indicator */}
                                     {msg.status === "loading" && (
                                         <div className="flex items-center gap-2">
                                             <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }}>
@@ -599,7 +679,6 @@ function GeneratePageContent() {
                                         </div>
                                     )}
 
-                                    {/* Error */}
                                     {msg.status === "error" && (
                                         <div className="text-sm text-red-400/80 leading-relaxed">
                                             <p>{msg.content}</p>
@@ -615,7 +694,6 @@ function GeneratePageContent() {
                                         </div>
                                     )}
 
-                                    {/* Content */}
                                     {msg.status === "done" && msg.content && (
                                         <motion.div
                                             initial={{ opacity: 0, y: 8 }}
@@ -636,9 +714,7 @@ function GeneratePageContent() {
                                                 return <p key={li}>{renderContent(line)}</p>;
                                             })}
 
-                                            {/* Action bar */}
                                             <div className="flex items-center gap-1 pt-2 border-t border-white/[0.06] mt-2 flex-wrap">
-                                                {/* Left actions */}
                                                 <button className="flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all">
                                                     <Flag className="w-3 h-3" />
                                                     Checkpoint
@@ -650,9 +726,8 @@ function GeneratePageContent() {
                                                     <ThumbsDown className="w-3.5 h-3.5" />
                                                 </button>
 
-                                                {/* Right actions */}
                                                 <div className="flex items-center gap-1 ml-auto">
-                                                    {prevSiteJson && (
+                                                    {prevHtml && (
                                                         <>
                                                             <button
                                                                 onClick={() => setShowChanges(!showChanges)}
@@ -689,7 +764,16 @@ function GeneratePageContent() {
                                 </div>
                             )}
                         </div>
-                    ))}
+                    ))}{/* Generation progress — shows animated steps during generation */}
+                    {(status === "generating" || status === "preparing") && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-3"
+                        >
+                            <GenerationProgress startTime={chatStartTime.current} />
+                        </motion.div>
+                    )}
                     <div ref={chatEndRef} />
                 </div>
 
@@ -697,7 +781,6 @@ function GeneratePageContent() {
                 {showSuggestions && status === "done" && (
                     <div className="px-3 pt-2 shrink-0">
                         <div className="flex items-center gap-1.5">
-                            {/* Refresh suggestions */}
                             <button
                                 className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-foreground hover:bg-white/[0.06] transition-all shrink-0"
                                 title="Refresh suggestions"
@@ -705,7 +788,6 @@ function GeneratePageContent() {
                                 <RefreshCw className="w-3 h-3" />
                             </button>
 
-                            {/* Chips row */}
                             <div
                                 ref={suggestionsRef}
                                 className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide flex-1"
@@ -727,7 +809,6 @@ function GeneratePageContent() {
                                 ))}
                             </div>
 
-                            {/* Scroll right */}
                             <button
                                 onClick={scrollSuggestions}
                                 className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-foreground hover:bg-white/[0.06] transition-all shrink-0"
@@ -736,7 +817,6 @@ function GeneratePageContent() {
                                 <ChevronRight className="w-3 h-3" />
                             </button>
 
-                            {/* Dismiss */}
                             <button
                                 onClick={() => setShowSuggestions(false)}
                                 className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground hover:bg-white/[0.06] transition-all shrink-0"
@@ -792,9 +872,8 @@ function GeneratePageContent() {
 
             {/* ===== MAIN CONTENT — Preview / Code ===== */}
             <div className="flex-1 flex flex-col min-w-0">
-                {/* Sub-bar: Preview/Code tabs + URL bar + actions */}
+                {/* Sub-bar */}
                 <div className="h-11 border-b border-white/[0.06] flex items-center gap-3 px-3 md:px-4 shrink-0">
-                    {/* Left — Preview / Code tabs */}
                     <div className="flex items-center gap-1 shrink-0">
                         <button
                             onClick={() => setActiveTab("preview")}
@@ -820,7 +899,6 @@ function GeneratePageContent() {
                         </button>
                     </div>
 
-                    {/* Center — URL bar (like Google AI Studio) */}
                     <div className="hidden md:flex flex-1 items-center justify-end gap-2">
                         <div className="flex items-center gap-2 h-7 px-3 rounded-lg bg-white/[0.04] border border-white/[0.06] max-w-xs">
                             <ExternalLink className="w-3 h-3 text-muted-foreground/50 shrink-0" />
@@ -829,7 +907,6 @@ function GeneratePageContent() {
                             </span>
                         </div>
 
-                        {/* Code toggle */}
                         <button
                             onClick={() => setActiveTab(activeTab === "code" ? "preview" : "code")}
                             className="p-1.5 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.06] transition-all"
@@ -838,11 +915,7 @@ function GeneratePageContent() {
                             <Code2 className="w-4 h-4" />
                         </button>
 
-                        {/* Fullscreen */}
                         <button
-                            onClick={() => {
-                                if (siteId) window.open(`/preview/${industry}`, "_blank");
-                            }}
                             className="p-1.5 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.06] transition-all"
                             title="Open fullscreen"
                         >
@@ -858,12 +931,10 @@ function GeneratePageContent() {
                         {activeTab === "preview" && (
                             <div className="flex-1 flex flex-col overflow-hidden">
                                 {status === "generating" ? (
-                                    /* Generating — clean centered spinner */
                                     <div className="flex-1 flex items-center justify-center">
                                         <Spinner size={44} />
                                     </div>
                                 ) : status === "preparing" ? (
-                                    /* Preparing — system resources text */
                                     <div className="flex-1 flex items-center justify-center">
                                         <motion.div
                                             initial={{ opacity: 0, y: 10 }}
@@ -875,7 +946,6 @@ function GeneratePageContent() {
                                         </motion.div>
                                     </div>
                                 ) : status === "error" ? (
-                                    /* Error state */
                                     <div className="flex-1 flex items-center justify-center p-8">
                                         <div className="text-center">
                                             <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-3">
@@ -892,16 +962,14 @@ function GeneratePageContent() {
                                             </button>
                                         </div>
                                     </div>
-                                ) : previewHtml ? (
-                                    /* Live preview iframe */
+                                ) : siteHtml ? (
                                     <iframe
-                                        srcDoc={previewHtml}
+                                        srcDoc={siteHtml}
                                         title="Website Preview"
                                         className={cn("flex-1 w-full border-0 bg-white", isDragging && "pointer-events-none")}
                                         sandbox="allow-same-origin allow-scripts"
                                     />
                                 ) : (
-                                    /* Done but no preview */
                                     <div className="flex-1 flex items-center justify-center">
                                         <Spinner size={36} />
                                     </div>
@@ -912,10 +980,19 @@ function GeneratePageContent() {
                         {/* CODE TAB */}
                         {activeTab === "code" && (
                             <div className="flex-1 overflow-auto scrollbar-thin bg-[#0d1117] p-4">
-                                {previewHtml ? (
-                                    <pre className="text-xs text-[#c9d1d9] font-mono leading-relaxed whitespace-pre-wrap break-all">
-                                        <code>{previewHtml}</code>
-                                    </pre>
+                                {siteHtml ? (
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => copyToClipboard(siteHtml)}
+                                            className="absolute top-2 right-2 flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-xs text-muted-foreground bg-white/[0.06] hover:bg-white/[0.1] transition-all"
+                                        >
+                                            <Copy className="w-3 h-3" />
+                                            Copy
+                                        </button>
+                                        <pre className="text-xs text-[#c9d1d9] font-mono leading-relaxed whitespace-pre-wrap break-all">
+                                            <code>{siteHtml}</code>
+                                        </pre>
+                                    </div>
                                 ) : (
                                     <div className="flex items-center justify-center h-full">
                                         {(status === "generating" || status === "preparing") ? (

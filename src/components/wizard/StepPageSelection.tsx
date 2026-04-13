@@ -3,10 +3,9 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useWizardStore } from "@/stores/wizardStore";
-import { GradientButton } from "@/components/shared/GradientButton";
 import { INDUSTRY_DEFAULT_PAGES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, Sparkles, Check, Plus } from "lucide-react";
+import { Sparkles, Check, Plus } from "lucide-react";
 import { useState } from "react";
 
 export function StepPageSelection() {
@@ -95,64 +94,81 @@ export function StepPageSelection() {
   };
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-2">Choose your pages</h2>
-      <p className="text-muted-foreground mb-8">
+    <div className="flex-1 flex flex-col">
+      <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">Choose your pages</h2>
+      <p className="text-white/60 text-base mb-10 leading-relaxed max-w-lg">
         Select the pages you need. We&apos;ve pre-selected recommended pages for
         your industry.
       </p>
 
-      {/* Page grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3 mb-6">
-        {allPages.map((page) => (
+      <div className="flex-1 space-y-8">
+        {/* Page chips */}
+        <div className="flex flex-wrap gap-3">
+          {allPages.map((page) => {
+            const isSelected = selectedPages.includes(page);
+            return (
+              <button
+                key={page}
+                onClick={() => togglePage(page)}
+                className={cn(
+                  "px-5 py-2.5 rounded-full border text-sm font-medium transition-all cursor-pointer flex items-center gap-2",
+                  isSelected
+                    ? "border-blue-400 bg-blue-400/10 text-white"
+                    : "border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:text-white/80"
+                )}
+              >
+                {isSelected && <Check className="w-3.5 h-3.5 text-blue-400" />}
+                {page}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Add custom page */}
+        <div className="flex gap-3 items-center">
+          <input
+            type="text"
+            value={customPage}
+            onChange={(e) => setCustomPage(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAddCustom()}
+            placeholder="Add custom page..."
+            className="flex-1 px-4 py-3 rounded-xl bg-transparent border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors"
+          />
           <button
-            key={page}
-            onClick={() => togglePage(page)}
-            className={cn(
-              "p-3 rounded-xl border transition-all text-sm cursor-pointer flex items-center justify-center gap-2",
-              selectedPages.includes(page)
-                ? "border-purple-500 bg-purple-500/10 text-foreground"
-                : "border-white/10 bg-white/5 text-muted-foreground hover:border-white/20"
-            )}
+            onClick={handleAddCustom}
+            className="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors shrink-0"
           >
-            {selectedPages.includes(page) && <Check className="w-3 h-3" />}
-            {page}
+            <Plus className="w-4 h-4 text-white/60" />
           </button>
-        ))}
+        </div>
+
+        <p className="text-sm text-white/50">
+          {selectedPages.length} page{selectedPages.length !== 1 ? "s" : ""}{" "}
+          selected
+        </p>
       </div>
 
-      {/* Add custom page */}
-      <div className="flex gap-2 mb-8">
-        <input
-          type="text"
-          value={customPage}
-          onChange={(e) => setCustomPage(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleAddCustom()}
-          placeholder="Add custom page..."
-          className="flex-1 px-4 py-2 rounded-xl glass-input text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-        />
-        <GradientButton variant="secondary" size="sm" onClick={handleAddCustom}>
-          <Plus className="w-4 h-4" />
-        </GradientButton>
-      </div>
-
-      <p className="text-xs text-muted-foreground mb-6">
-        {selectedPages.length} page{selectedPages.length !== 1 ? "s" : ""}{" "}
-        selected
-      </p>
-
-      <div className="flex justify-between">
-        <GradientButton variant="secondary" onClick={() => setStep(3)}>
-          <ArrowLeft className="w-4 h-4" />
+      {/* Footer Buttons */}
+      <div className="mt-12 flex justify-between items-center pt-6 border-t border-white/5 shrink-0">
+        <button
+          onClick={() => setStep(3)}
+          className="px-6 py-2.5 rounded-lg text-sm font-medium transition-colors border border-white/10 bg-transparent text-white hover:bg-white/5"
+        >
           Back
-        </GradientButton>
-        <GradientButton
+        </button>
+        <button
           onClick={handleGenerate}
-          className={cn(isGenerating && "opacity-70 pointer-events-none")}
+          disabled={isGenerating}
+          className={cn(
+            "px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2",
+            isGenerating
+              ? "bg-white/10 text-white/50 cursor-not-allowed"
+              : "bg-white text-black hover:bg-white/90"
+          )}
         >
           {isGenerating ? (
             <>
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
               Generating...
             </>
           ) : (
@@ -161,7 +177,7 @@ export function StepPageSelection() {
               Generate Website
             </>
           )}
-        </GradientButton>
+        </button>
       </div>
     </div>
   );

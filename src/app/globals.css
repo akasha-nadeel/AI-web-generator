@@ -307,3 +307,74 @@
 .animate-scroll-x {
   animation: scroll-x 25s linear infinite;
 }
+
+@keyframes rainbow-flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.animate-rainbow-flow {
+  animation: rainbow-flow 3s linear infinite;
+}
+
+/* ========================================
+   Gemini-style animated gradient border
+   ======================================== */
+
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes border-rotate {
+  0%   { --border-angle: 0deg; }
+  100% { --border-angle: 360deg; }
+}
+
+.gemini-border-wrap {
+  position: relative;
+  isolation: isolate;
+  /* Crisp border gradient — concentrated color spotlight */
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 0%,
+    transparent 10%,
+    rgba(66, 133, 244, 0.3) 18%,
+    #4285f4 25%,
+    #34a853 37%,
+    #a8c023 44%,
+    #fbbc04 50%,
+    #ea4335 58%,
+    rgba(234, 67, 53, 0.3) 65%,
+    transparent 72%,
+    transparent 100%
+  );
+  animation: border-rotate 5s linear infinite;
+}
+
+/* Soft outer glow layer */
+.gemini-border-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 0%,
+    transparent 10%,
+    rgba(66, 133, 244, 0.4) 18%,
+    rgba(66, 133, 244, 0.8) 25%,
+    rgba(52, 168, 83, 0.7) 37%,
+    rgba(168, 192, 35, 0.6) 44%,
+    rgba(251, 188, 4, 0.7) 50%,
+    rgba(234, 67, 53, 0.8) 58%,
+    rgba(234, 67, 53, 0.4) 65%,
+    transparent 72%,
+    transparent 100%
+  );
+  filter: blur(12px);
+  opacity: 0.5;
+  z-index: -1;
+  animation: border-rotate 5s linear infinite;
+}

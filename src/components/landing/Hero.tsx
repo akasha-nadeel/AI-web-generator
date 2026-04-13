@@ -164,7 +164,7 @@ export function Hero() {
   }, []);
 
   return (
-    <section className="relative min-h-screen bg-[#0a0a0a] overflow-hidden pt-16">
+    <section id="hero" className="relative min-h-screen bg-[#0a0a0a] overflow-hidden pt-16">
       {/* Subtle background — desktop */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(120,119,198,0.04),transparent_50%)]" />
 

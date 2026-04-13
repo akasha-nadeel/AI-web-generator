@@ -4,17 +4,17 @@ import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
+  Mic,
+  Plus,
   Sparkles,
-  ArrowUp,
   ChevronDown,
-  Paperclip,
-  Zap,
-  Globe,
-  Layout,
-  User,
-  ShoppingBag,
-  FileText,
+  ChevronRight,
   Wand2,
+  Globe,
+  ShoppingBag,
+  Briefcase,
+  Camera,
+  Utensils,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -22,77 +22,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { INDUSTRIES, INDUSTRY_DEFAULT_PAGES } from "@/lib/constants";
 import { fadeUp, ease } from "@/lib/animations";
-
-/* ===== TYPES ===== */
-
-interface AIChatSectionProps {
-  credits: number;
-  plan: "free" | "pro" | "business";
-}
-
-interface Category {
-  id: string;
-  label: string;
-  icon: typeof Globe;
-  industry: string;
-  placeholder: string;
-}
-
-/* ===== CONSTANTS ===== */
-
-const CATEGORIES: Category[] = [
-  {
-    id: "website",
-    label: "Website",
-    icon: Globe,
-    industry: "auto",
-    placeholder: "Describe the website you want to build...\ne.g. A modern restaurant site with online reservations, menu gallery, and chef profiles",
-  },
-  {
-    id: "landing",
-    label: "Landing Page",
-    icon: Layout,
-    industry: "saas",
-    placeholder: "Describe your landing page...\ne.g. A SaaS product launch page with hero, features, pricing, and sign-up form",
-  },
-  {
-    id: "portfolio",
-    label: "Portfolio",
-    icon: User,
-    industry: "portfolio",
-    placeholder: "Describe your portfolio site...\ne.g. A minimal creative portfolio showcasing photography and design work",
-  },
-  {
-    id: "store",
-    label: "Online Store",
-    icon: ShoppingBag,
-    industry: "ecommerce",
-    placeholder: "Describe your online store...\ne.g. A fashion boutique with product listings, lookbook gallery, and about page",
-  },
-  {
-    id: "blog",
-    label: "Blog",
-    icon: FileText,
-    industry: "blog",
-    placeholder: "Describe your blog site...\ne.g. A tech blog with featured articles, categories, and author profiles",
-  },
-  {
-    id: "freeform",
-    label: "Freeform",
-    icon: Wand2,
-    industry: "auto",
-    placeholder: "Describe anything you want to build...\nBe as creative and detailed as you like — the AI will figure out the rest",
-  },
-];
 
 const MOODS = [
   { id: "minimal", label: "Minimal" },
@@ -102,18 +34,76 @@ const MOODS = [
   { id: "editorial", label: "Editorial" },
 ];
 
+const SUGGESTION_CHIPS = [
+  {
+    icon: Globe,
+    label: "SaaS landing page",
+    prompt: "A modern SaaS landing page for a productivity tool with hero section, features grid, pricing plans, and testimonials",
+    color: "text-blue-400"
+  },
+  {
+    icon: ShoppingBag,
+    label: "E-commerce store",
+    prompt: "An elegant e-commerce fashion store with product showcase, lookbook gallery, shopping cart, and brand story section",
+    color: "text-emerald-400"
+  },
+  {
+    icon: Camera,
+    label: "Portfolio website",
+    prompt: "A creative portfolio website for a photographer with full-screen image galleries, about page, and contact form",
+    color: "text-purple-400"
+  },
+  {
+    icon: Utensils,
+    label: "Restaurant website",
+    prompt: "A stylish restaurant website with online menu, reservation system, chef profiles, and food gallery",
+    color: "text-orange-400"
+  },
+  {
+    icon: Briefcase,
+    label: "Agency website",
+    prompt: "A premium digital agency website with case studies, team section, services overview, and client testimonials",
+    color: "text-cyan-400"
+  },
+];
+
+/* ===== TYPES ===== */
+
+interface AIChatSectionProps {
+  credits: number;
+  plan: "free" | "pro" | "business";
+}
+
+/* ===== GEMINI-STYLE 4-POINT STAR ===== */
+
+function GeminiStar({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 28 28"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* 4-point star like Google AI Studio */}
+      <path
+        d="M14 0L16.8 11.2L28 14L16.8 16.8L14 28L11.2 16.8L0 14L11.2 11.2L14 0Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
 
 /* ===== MAIN COMPONENT ===== */
 
 export function AIChatSection({ credits, plan }: AIChatSectionProps) {
   const router = useRouter();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const [prompt, setPrompt] = useState("");
-  const [activeCategory, setActiveCategory] = useState("website");
+  const [error, setError] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
   const [selectedIndustry, setSelectedIndustry] = useState("auto");
   const [selectedMood, setSelectedMood] = useState("minimal");
-  const [error, setError] = useState("");
 
   // Auto-resize textarea
   const handleTextareaChange = useCallback(
@@ -122,92 +112,69 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
       setError("");
       const el = e.target;
       el.style.height = "auto";
-      el.style.height = `${Math.min(el.scrollHeight, 240)}px`;
+      el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
     },
     []
   );
 
-  // Get active category config
-  const category = CATEGORIES.find((c) => c.id === activeCategory) || CATEGORIES[0];
-
-  // Resolve the effective industry
-  const getEffectiveIndustry = useCallback(() => {
-    if (selectedIndustry !== "auto") return selectedIndustry;
-    if (category.industry !== "auto") return category.industry;
-    return "agency"; // fallback
-  }, [selectedIndustry, category.industry]);
-
-  // Handle category change
-  const handleCategoryChange = (catId: string) => {
-    setActiveCategory(catId);
-    const cat = CATEGORIES.find((c) => c.id === catId);
-    if (cat && cat.industry !== "auto") {
-      setSelectedIndustry(cat.industry);
-    } else {
-      setSelectedIndustry("auto");
-    }
-  };
-
-  // Handle Ctrl+Enter submit
+  // Handle Enter submit (Shift+Enter for new line)
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleGenerate();
     }
-  };
-
-  // Map mood to font style
-  const getMoodFontStyle = () => {
-    const map: Record<string, string> = {
-      minimal: "modern",
-      bold: "bold",
-      playful: "playful",
-      classic: "classic",
-      editorial: "editorial",
-    };
-    return map[selectedMood] || "modern";
   };
 
   // Main generation handler — redirect to generate page
   const handleGenerate = () => {
     if (!prompt.trim()) {
       setError("Please describe the website you want to build");
-      textareaRef.current?.focus();
+      inputRef.current?.focus();
       return;
     }
 
-    // Credit check bypassed for testing
-    // if (credits <= 0) {
-    //   setError("No credits remaining. Please upgrade your plan.");
-    //   return;
-    // }
-
-    const industry = getEffectiveIndustry();
-    const pages =
-      INDUSTRY_DEFAULT_PAGES[industry] || ["Home", "About", "Contact"];
-    const effectivePages =
-      activeCategory === "landing" ? ["Home"] : pages;
+    const industry = selectedIndustry === "auto" ? "agency" : selectedIndustry;
+    const pages = INDUSTRY_DEFAULT_PAGES[industry] || ["Home", "About", "Contact"];
 
     // Encode params and redirect to generate page
     const params = new URLSearchParams({
       prompt: prompt.trim(),
       industry,
       mood: selectedMood,
-      fontStyle: getMoodFontStyle(),
-      pages: effectivePages.join(","),
+      pages: pages.join(","),
     });
 
     router.push(`/generate/new?${params.toString()}`);
   };
 
-  // Get industry label for dropdown display
-  const getIndustryLabel = () => {
-    if (selectedIndustry === "auto") return "Auto-detect";
-    const ind = INDUSTRIES.find((i) => i.id === selectedIndustry);
-    return ind?.label || "Auto-detect";
+  // "I'm feeling lucky" — generate with a random prompt
+  const handleFeelingLucky = () => {
+    const luckyPrompts = [
+      "A modern portfolio for a creative designer with dark theme and smooth animations",
+      "A SaaS landing page for an AI productivity tool with gradient hero section",
+      "A restaurant website with online reservations, food gallery, and chef profiles",
+      "A fitness studio website with class schedules, trainer bios, and membership plans",
+      "A tech startup landing page with 3D illustrations and pricing section",
+      "An e-commerce fashion store with lookbook gallery and product showcase",
+      "A photography portfolio with full-screen image galleries and about page",
+      "A travel agency website with destination showcases, tours, and booking forms",
+    ];
+    const randomPrompt = luckyPrompts[Math.floor(Math.random() * luckyPrompts.length)];
+
+    const industry = selectedIndustry === "auto" ? "agency" : selectedIndustry;
+    const pages = INDUSTRY_DEFAULT_PAGES[industry] || ["Home", "About", "Contact"];
+
+    const params = new URLSearchParams({
+      prompt: randomPrompt,
+      industry,
+      mood: selectedMood,
+      pages: pages.join(","),
+    });
+
+    router.push(`/generate/new?${params.toString()}`);
   };
 
-  const canSubmit = prompt.trim().length > 0; // credits check bypassed for testing
+  const canSubmit = prompt.trim().length > 0;
 
   return (
     <div className="relative flex-1 flex flex-col">
@@ -218,43 +185,59 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
         transition={ease.smooth}
         className="flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-12 min-h-[calc(100vh-3.5rem)]"
       >
-        {/* Subtle background */}
-        <div className="absolute inset-0 bg-gradient-mesh opacity-30 pointer-events-none" />
-
-        {/* Hero heading */}
+        {/* Hero heading — Google AI Studio style */}
         <div className="relative z-10 text-center mb-8">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-3">
-            <span className="italic font-light text-white/60">Build </span>
-            <span className="gradient-text">with ideas</span>
+          <h1 className="text-3xl md:text-4xl lg:text-[2.6rem] font-normal tracking-tight leading-tight flex items-center justify-center gap-2.5"
+            style={{ color: '#c4c7c5' }}
+          >
+            <span>Build your ideas with Weavo</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo.png" alt="Weavo Logo" className="w-7 h-7 md:w-8 md:h-8 object-contain relative -top-1 opacity-70" />
           </h1>
-          <p className="text-muted-foreground text-sm md:text-base max-w-md mx-auto">
-            Describe your vision and let AI craft your website
-          </p>
         </div>
 
         {/* Main input area */}
-        <div className="relative z-10 w-full max-w-2xl">
-          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-[24px] overflow-hidden transition-all focus-within:border-purple-500/30 focus-within:bg-white/[0.04]">
+        <div className="relative z-10 w-full max-w-[780px]">
+          {/* Animated rainbow border wrapper — Google AI Studio style */}
+          <div
+            className={cn(
+              "gemini-border-wrap rounded-[18px] p-[2px] transition-opacity duration-500",
+              isFocused || canSubmit ? "opacity-100" : "opacity-70"
+            )}
+          >
+            {/* Inner card — solid bg so gradient only shows as border */}
+            <div
+              className={cn(
+                "relative z-10 rounded-[16px] overflow-hidden transition-all duration-300",
+                isFocused ? "bg-[#1c1a24]" : "bg-[#18161f]"
+              )}
+            >
+
             {/* Textarea */}
             <textarea
-              ref={textareaRef}
+              ref={inputRef}
               value={prompt}
               onChange={handleTextareaChange}
               onKeyDown={handleKeyDown}
-              placeholder={category.placeholder}
-              rows={3}
-              className="w-full bg-transparent text-foreground text-sm md:text-base placeholder:text-muted-foreground/60 resize-none focus:outline-none p-4 pb-2 min-h-[120px] max-h-[240px] scrollbar-thin"
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder="Describe an app and let Weavo do the rest"
+              rows={2}
+              className="w-full bg-transparent text-[15px] md:text-base resize-none focus:outline-none px-5 pt-5 pb-3 min-h-[88px] max-h-[200px] scrollbar-thin"
+              style={{
+                color: '#e3e3e3',
+              }}
             />
 
             {/* Toolbar */}
-            <div className="flex items-center justify-between gap-2 px-3 py-2.5 border-t border-white/[0.06]">
+            <div className="flex items-center justify-between gap-2 px-4 py-3">
               <div className="flex items-center gap-1.5">
                 {/* Industry dropdown */}
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-xs bg-white/[0.06] border border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-white/[0.1] transition-all">
+                  <DropdownMenuTrigger className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs bg-white/[0.06] border border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-white/[0.1] transition-all">
                     <Sparkles className="w-3 h-3" />
                     <span className="hidden sm:inline max-w-[100px] truncate">
-                      {getIndustryLabel()}
+                      {selectedIndustry === "auto" ? "Auto-detect" : INDUSTRIES.find(i => i.id === selectedIndustry)?.label || "Auto-detect"}
                     </span>
                     <ChevronDown className="w-3 h-3 opacity-50" />
                   </DropdownMenuTrigger>
@@ -264,10 +247,7 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
                   >
                     <DropdownMenuItem
                       onClick={() => setSelectedIndustry("auto")}
-                      className={cn(
-                        "text-xs",
-                        selectedIndustry === "auto" && "bg-white/[0.08]"
-                      )}
+                      className={cn("text-xs", selectedIndustry === "auto" && "bg-white/[0.08]")}
                     >
                       <Wand2 className="w-3.5 h-3.5 mr-2" />
                       Auto-detect
@@ -276,10 +256,7 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
                       <DropdownMenuItem
                         key={ind.id}
                         onClick={() => setSelectedIndustry(ind.id)}
-                        className={cn(
-                          "text-xs",
-                          selectedIndustry === ind.id && "bg-white/[0.08]"
-                        )}
+                        className={cn("text-xs", selectedIndustry === ind.id && "bg-white/[0.08]")}
                       >
                         {ind.label}
                       </DropdownMenuItem>
@@ -287,9 +264,9 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Mood/style dropdown */}
+                {/* Mood dropdown */}
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-xs bg-white/[0.06] border border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-white/[0.1] transition-all">
+                  <DropdownMenuTrigger className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs bg-white/[0.06] border border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-white/[0.1] transition-all">
                     <span className="capitalize">{selectedMood}</span>
                     <ChevronDown className="w-3 h-3 opacity-50" />
                   </DropdownMenuTrigger>
@@ -301,57 +278,43 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
                       <DropdownMenuItem
                         key={mood.id}
                         onClick={() => setSelectedMood(mood.id)}
-                        className={cn(
-                          "text-xs",
-                          selectedMood === mood.id && "bg-white/[0.08]"
-                        )}
+                        className={cn("text-xs", selectedMood === mood.id && "bg-white/[0.08]")}
                       >
                         {mood.label}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
-
-                {/* Attachment button */}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        disabled
-                        className="flex items-center justify-center w-7 h-7 rounded-lg text-muted-foreground/40 cursor-not-allowed"
-                      >
-                        <Paperclip className="w-3.5 h-3.5" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Image upload coming soon</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Credits badge */}
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Zap className="w-3 h-3" />
-                  <span>{credits}</span>
-                </div>
+                {/* Submit button (shows only when there's text) */}
+                {canSubmit && (
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    onClick={handleGenerate}
+                    className="flex items-center justify-center w-9 h-9 rounded-full transition-all hover:opacity-80"
+                    style={{ backgroundColor: '#8ab4f8', color: '#1a1a1a' }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </motion.button>
+                )}
 
-                {/* Send button */}
+                {/* I'm feeling lucky button — white pill like Google */}
                 <button
-                  onClick={handleGenerate}
-                  disabled={!canSubmit}
-                  className={cn(
-                    "flex items-center justify-center w-9 h-9 rounded-full transition-all",
-                    canSubmit
-                      ? "bg-gradient-to-r from-purple-600 via-blue-500 to-cyan-500 text-white hover:shadow-lg hover:shadow-purple-500/25 hover:scale-105 active:scale-95"
-                      : "bg-white/[0.06] text-muted-foreground/40 cursor-not-allowed"
-                  )}
+                  onClick={handleFeelingLucky}
+                  className="flex items-center gap-2 h-9 px-4 rounded-full text-sm font-medium transition-all hover:bg-white/[0.12] active:scale-[0.98] bg-white/[0.07] border border-white/[0.1] text-white/80"
                 >
-                  <ArrowUp className="w-4 h-4" />
+                  <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                  <span className="whitespace-nowrap">I&apos;m feeling lucky</span>
                 </button>
               </div>
             </div>
+          </div>
           </div>
 
           {/* Error message */}
@@ -365,29 +328,45 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
             </motion.p>
           )}
 
-          {/* Ctrl+Enter hint */}
-          <p className="text-[11px] text-muted-foreground/40 text-center mt-2">
-            Press <kbd className="px-1 py-0.5 rounded bg-white/[0.06] text-muted-foreground/60 font-mono text-[10px]">Ctrl</kbd> + <kbd className="px-1 py-0.5 rounded bg-white/[0.06] text-muted-foreground/60 font-mono text-[10px]">Enter</kbd> to generate
-          </p>
-        </div>
-
-        {/* Category pills */}
-        <div className="relative z-10 flex items-center gap-2 mt-8 overflow-x-auto pb-1 px-4 md:px-0 max-w-full scrollbar-hide">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => handleCategoryChange(cat.id)}
-              className={cn(
-                "flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm whitespace-nowrap border transition-all shrink-0",
-                activeCategory === cat.id
-                  ? "border-purple-500 bg-purple-500/10 text-foreground"
-                  : "border-white/[0.08] bg-white/[0.03] text-muted-foreground hover:border-white/[0.15] hover:text-foreground"
-              )}
+          {/* Suggestion chips — Gemini style */}
+          <div className="relative mt-4 group/chips">
+            <div
+              className="flex items-center gap-2.5 overflow-x-auto scrollbar-none pb-1 scroll-smooth"
+              id="suggestion-chips-scroll"
             >
-              <cat.icon className="w-3.5 h-3.5" />
-              {cat.label}
+              {SUGGESTION_CHIPS.map((chip) => (
+                <button
+                  key={chip.label}
+                  onClick={() => {
+                    setPrompt(chip.prompt);
+                    setError("");
+                    // Auto-resize textarea
+                    setTimeout(() => {
+                      if (inputRef.current) {
+                        inputRef.current.style.height = "auto";
+                        inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 160)}px`;
+                        inputRef.current.focus();
+                      }
+                    }, 0);
+                  }}
+                  className="flex items-center gap-2 shrink-0 h-9 px-4 rounded-full text-sm font-medium bg-white/[0.05] border border-white/[0.08] text-white/70 hover:bg-white/[0.1] hover:border-white/[0.15] hover:text-white/90 transition-all active:scale-[0.97]"
+                >
+                  <chip.icon className={cn("w-3.5 h-3.5", chip.color)} />
+                  <span className="whitespace-nowrap">{chip.label}</span>
+                </button>
+              ))}
+            </div>
+            {/* Scroll arrow indicator */}
+            <button
+              onClick={() => {
+                const el = document.getElementById('suggestion-chips-scroll');
+                if (el) el.scrollBy({ left: 200, behavior: 'smooth' });
+              }}
+              className="absolute right-0 top-0 h-9 w-10 flex items-center justify-center bg-gradient-to-l from-[#0e0c15] via-[#0e0c15]/90 to-transparent opacity-0 group-hover/chips:opacity-100 transition-opacity"
+            >
+              <ChevronRight className="w-4 h-4 text-white/50" />
             </button>
-          ))}
+          </div>
         </div>
       </motion.div>
     </div>

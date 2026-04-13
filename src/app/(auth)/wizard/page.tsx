@@ -8,7 +8,6 @@ import { StepBusinessInfo } from "@/components/wizard/StepBusinessInfo";
 import { StepInspiration } from "@/components/wizard/StepInspiration";
 import { StepStylePreferences } from "@/components/wizard/StepStylePreferences";
 import { StepPageSelection } from "@/components/wizard/StepPageSelection";
-import { AuthNavbar } from "@/components/dashboard/AuthNavbar";
 
 function WizardContent() {
   const searchParams = useSearchParams();
@@ -35,7 +34,6 @@ function WizardContent() {
 export default function WizardPage() {
   return (
     <div className="min-h-screen bg-background">
-      <AuthNavbar />
       <Suspense fallback={
         <div className="flex items-center justify-center py-20">
           <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
