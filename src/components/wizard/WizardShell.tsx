@@ -49,7 +49,7 @@ export function WizardShell({ children }: WizardShellProps) {
         </>
       ),
       subtitle: "Select hand-picked color palettes, modern typography, and the overall feel of your brand.",
-      image: "/images/auth-left-bg.jpg"
+      image: "/images/wizard-hero-step3.jpg"
     },
     4: {
       title: (
