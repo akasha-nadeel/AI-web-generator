@@ -139,7 +139,7 @@ export const agencyAbout: ComponentDefinition = {
   defaultContent: {
     label: "Why choose us",
     title: "The People Behind Every Pixel",
-    image: "/images/car-image.jfif",
+    image: "/images/car-image.jpg",
     description: "At A GenC\u00AE Studio, we unite creative thinkers, brand architects,",
     descFaded: "and digital craftspeople to deliver work that moves audiences and drives real business results.",
     statNumber: "260+",
@@ -781,7 +781,7 @@ export const agencyFooter: ComponentDefinition = {
     brand: "A GenC",
     email: "hello@agenc.studio",
     copyright: "2026 A GenC Studio. All Rights Reserved",
-    footerImage: "/images/footer-image.jfif",
+    footerImage: "/images/footer-image.jpg",
   },
   html: `<style>
 .aft{background:#f5f5f5;padding:80px 48px 0;overflow:hidden}

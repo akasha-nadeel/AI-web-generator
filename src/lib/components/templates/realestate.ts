@@ -320,7 +320,7 @@ export const realestateTeam: ComponentDefinition = {
     brand: "Dwello",
     brandTag: "Real Estate made easy.",
     members: [
-      { image: "/images/team-member-1.jfif", name: "Mark", role: "Real Estate Agent" },
+      { image: "/images/team-member-1.jpg", name: "Mark", role: "Real Estate Agent" },
       { image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=600&fit=crop", name: "Zack", role: "Real Estate Advisor" },
       { image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=600&fit=crop", name: "Idris", role: "Property Consultant" },
     ],
@@ -437,11 +437,11 @@ export const realestateAbout: ComponentDefinition = {
     stat5Desc: "Years of Experience",
     stat6Num: "100.",
     stat6Desc: "Satisfied Clients",
-    aboutImage1: "/images/images-about-us/about-4.jfif",
-    statBg2: "/images/images-about-us/about-3.jfif",
-    statBg3: "/images/images-about-us/about-7.jfif",
-    statBg5: "/images/images-about-us/about-2.jfif",
-    statBg6: "/images/images-about-us/about-1.jfif",
+    aboutImage1: "/images/images-about-us/about-4.jpg",
+    statBg2: "/images/images-about-us/about-3.jpg",
+    statBg3: "/images/images-about-us/about-7.jpg",
+    statBg5: "/images/images-about-us/about-2.jpg",
+    statBg6: "/images/images-about-us/about-1.jpg",
   },
   html: `<style>
 .ra{padding:100px 48px;background:#1a1a1a}

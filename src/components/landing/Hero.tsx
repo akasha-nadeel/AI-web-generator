@@ -57,7 +57,7 @@ const leftCards = [
 
   /* Color card */
   <div key="color" className="rounded-2xl h-[clamp(13rem,19vw,18rem)] shrink-0 overflow-hidden relative">
-    <Image src="/images/beautiful-themes-card.jfif" alt="Beautiful Themes" fill className="object-cover object-[center_80%]" />
+    <Image src="/images/beautiful-themes-card.jpg" alt="Beautiful Themes" fill className="object-cover object-[center_80%]" />
     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-5 pt-12">
       <p className="text-white/90 text-sm font-medium">Beautiful Themes</p>
       <p className="text-white/50 text-xs mt-1">12+ color palettes</p>
@@ -101,7 +101,7 @@ const rightCards = [
 
   /* Person/feature card */
   <div key="person" className="rounded-2xl h-[clamp(13rem,19vw,18rem)] shrink-0 relative overflow-hidden">
-    <Image src="/images/ai-powered-card.jfif" alt="AI Powered" fill className="object-cover" />
+    <Image src="/images/ai-powered-card.jpg" alt="AI Powered" fill className="object-cover" />
     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 pt-10">
       <p className="text-white text-sm font-semibold">AI-Powered</p>
     </div>
@@ -138,7 +138,7 @@ const rightCards = [
 
   /* Warm gradient card */
   <div key="warm" className="rounded-2xl h-[clamp(9rem,12vw,11rem)] shrink-0 relative overflow-hidden">
-    <Image src="/images/export-card.jfif" alt="Export Anywhere" fill className="object-cover object-center" />
+    <Image src="/images/export-card.jpg" alt="Export Anywhere" fill className="object-cover object-center" />
     <div className="absolute inset-0 bg-black/15" />
     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-5 pt-10">
       <p className="text-white/90 text-sm font-medium">Export Anywhere</p>
@@ -148,7 +148,7 @@ const rightCards = [
 ];
 
 const MOBILE_BG_IMAGES = [
-  "/images/ai-powered-card.jfif",
+  "/images/ai-powered-card.jpg",
   "/images/auth-left-bg.png",
   "/images/ai-robot.png",
 ];
