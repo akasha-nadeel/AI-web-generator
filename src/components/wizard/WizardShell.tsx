@@ -59,7 +59,7 @@ export function WizardShell({ children }: WizardShellProps) {
         </>
       ),
       subtitle: "Choose the exact pages you need. Our AI will seamlessly interlink them for you.",
-      image: "/images/auth-left-bg.jpg"
+      image: "/images/wizard-hero-step4.jpg"
     }
   };
 
