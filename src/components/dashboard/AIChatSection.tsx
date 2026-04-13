@@ -187,12 +187,12 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
       >
         {/* Hero heading — Google AI Studio style */}
         <div className="relative z-10 text-center mb-8">
-          <h1 className="text-3xl md:text-4xl lg:text-[2.6rem] font-normal tracking-tight leading-tight flex items-center justify-center gap-2.5"
+          <h1 className="text-3xl md:text-4xl lg:text-[2.6rem] font-normal tracking-tight leading-tight flex items-center justify-center gap-1"
             style={{ color: '#c4c7c5' }}
           >
             <span>Build your ideas with Weavo</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo.png" alt="Weavo Logo" className="w-7 h-7 md:w-8 md:h-8 object-contain relative -top-1 opacity-70" />
+            <img src="/images/logo.png" alt="Weavo Logo" className="w-16 h-16 md:w-20 md:h-20 object-contain opacity-70" />
           </h1>
         </div>
 
