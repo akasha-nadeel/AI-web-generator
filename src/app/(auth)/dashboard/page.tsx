@@ -384,7 +384,7 @@ export default function DashboardPage() {
 
             {/* Log out */}
             <DropdownMenuItem
-              onClick={() => signOut({ redirectUrl: "/" })}
+              onClick={() => signOut(() => window.location.href = "/")}
               className="flex items-center gap-3 text-sm text-red-400 focus:text-red-400"
             >
               <LogOut className="w-4 h-4" />
