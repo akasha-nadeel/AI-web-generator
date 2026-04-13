@@ -863,7 +863,7 @@ function TemplateDetailView({
           <p className="text-sm text-muted-foreground mt-2 max-w-2xl">{preview.description}</p>
           {dna && (
             <p className="text-xs text-muted-foreground/60 mt-1.5 max-w-2xl italic">
-              AI will generate a unique site inspired by this design&apos;s {dna.mood} style
+              AI will generate a unique site inspired by {dna.name}&apos;s style
             </p>
           )}
 

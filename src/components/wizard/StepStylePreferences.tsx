@@ -66,7 +66,7 @@ export function StepStylePreferences() {
                       key={i}
                       className={cn(
                         "w-7 h-7 md:w-8 md:h-8 rounded-full border shadow-inner",
-                        color === '#ffffff' || color === '#f8fafc' 
+                        (color as string) === '#ffffff' || (color as string) === '#f8fafc' 
                           ? "border-white/20" 
                           : "border-transparent" // Prevent invisible white borders
                       )}
