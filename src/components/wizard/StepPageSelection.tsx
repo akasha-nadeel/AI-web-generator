@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useWizardStore } from "@/stores/wizardStore";
 import { INDUSTRY_DEFAULT_PAGES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { Sparkles, Check, Plus } from "lucide-react";
-import { useState } from "react";
 
 export function StepPageSelection() {
   const router = useRouter();
@@ -16,13 +15,10 @@ export function StepPageSelection() {
     setSelectedPages,
     togglePage,
     setStep,
-    isGenerating,
-    setIsGenerating,
     businessName,
     description,
-    colorPalette,
-    fontStyle,
     overallFeel,
+    inspirationImages,
   } = useWizardStore();
 
   const [customPage, setCustomPage] = useState("");
@@ -60,37 +56,29 @@ export function StepPageSelection() {
     }
   };
 
-  const handleGenerate = async () => {
-    setIsGenerating(true);
+  const handleGenerate = () => {
+    // Build a rich prompt from wizard data
+    const prompt = `Build a ${overallFeel} ${industry} website for "${businessName}". ${description}`;
 
-    try {
-      const res = await fetch("/api/ai/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          businessName,
-          industry,
-          description,
-          colorPalette,
-          fontStyle,
-          overallFeel,
-          pages: selectedPages,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (data.siteId) {
-        router.push(`/editor/${data.siteId}`);
-      } else {
-        // If AI is not connected yet, redirect to dashboard
-        router.push("/dashboard");
-      }
-    } catch {
-      router.push("/dashboard");
-    } finally {
-      setIsGenerating(false);
+    // Store inspiration images in sessionStorage so the generate page picks them up
+    if (inspirationImages.length > 0) {
+      try {
+        sessionStorage.setItem(
+          "pixora_inspiration_images",
+          JSON.stringify(inspirationImages)
+        );
+      } catch { /* storage full — proceed without images */ }
     }
+
+    // Navigate to generate page with URL params — same flow as dashboard
+    const params = new URLSearchParams({
+      prompt: prompt.trim(),
+      industry,
+      mood: overallFeel || "modern",
+      pages: selectedPages.join(","),
+    });
+
+    router.push(`/generate/new?${params.toString()}`);
   };
 
   return (
@@ -158,25 +146,10 @@ export function StepPageSelection() {
         </button>
         <button
           onClick={handleGenerate}
-          disabled={isGenerating}
-          className={cn(
-            "px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2",
-            isGenerating
-              ? "bg-white/10 text-white/50 cursor-not-allowed"
-              : "bg-white text-black hover:bg-white/90"
-          )}
+          className="px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 bg-white text-black hover:bg-white/90"
         >
-          {isGenerating ? (
-            <>
-              <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4" />
-              Generate Website
-            </>
-          )}
+          <Sparkles className="w-4 h-4" />
+          Generate Website
         </button>
       </div>
     </div>

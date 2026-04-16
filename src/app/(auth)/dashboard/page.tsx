@@ -45,7 +45,7 @@ import { PLANS, INDUSTRIES, COLOR_PALETTES, FONT_STYLES, INDUSTRY_DEFAULT_PAGES 
 import { getTemplatePreview, getPreviewTheme } from "@/lib/templates/preview-data";
 import { assemblePreviewHtml } from "@/lib/assembler/assembler";
 import { TEMPLATE_DESIGN_DNA } from "@/lib/templates/design-dna";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Menu, Eye, ChevronRight } from "lucide-react";
 import { AIChatSection } from "@/components/dashboard/AIChatSection";
 
@@ -84,6 +84,8 @@ const INDUSTRY_DESCRIPTIONS: Record<string, string> = {
 /* ===== MAIN COMPONENT ===== */
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useUser();
   const { signOut } = useClerk();
   const [sites, setSites] = useState<Site[]>([]);
@@ -98,6 +100,14 @@ export default function DashboardPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  
+  // Use a query parameter to determine if the modal should be shown.
+  // This allows the browser's back button to function correctly.
+  const [showFlowModal, setShowFlowModal] = useState(!searchParams.get("view"));
+
+  useEffect(() => {
+    setShowFlowModal(!searchParams.get("view"));
+  }, [searchParams]);
 
   // Fetch active sites
   const fetchSites = useCallback(async () => {
@@ -229,7 +239,7 @@ export default function DashboardPage() {
     <>
       {/* Brand header */}
       <div className="p-4 flex items-center justify-between">
-        <Link href="/dashboard" onClick={() => { setActiveNav("Chat"); setMobileMenuOpen(false); }}>
+        <Link href="/dashboard?view=app" onClick={() => { setActiveNav("Chat"); setMobileMenuOpen(false); }}>
           <span className="flex items-center gap-1 text-xl font-bold text-white">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/logo.png" alt="Weavo Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center" />
@@ -397,9 +407,23 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* ===== MOBILE SIDEBAR DRAWER ===== */}
-      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+    <>
+      {showFlowModal ? (
+        <FlowSelectionScreen 
+          onSelect={(flow) => {
+            if (flow === "chat") {
+              setShowFlowModal(false);
+              router.push("/dashboard?view=app");
+              setActiveNav("Chat");
+            } else {
+              router.push("/wizard");
+            }
+          }} 
+        />
+      ) : (
+        <div className="min-h-screen bg-background flex">
+          {/* ===== MOBILE SIDEBAR DRAWER ===== */}
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" showCloseButton={false} className="w-[280px] p-0 bg-[rgba(10,10,25,0.97)] border-white/[0.06] flex flex-col">
           <SheetTitle className="sr-only">Navigation</SheetTitle>
           {sidebarContent}
@@ -491,7 +515,7 @@ export default function DashboardPage() {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <Link href="/dashboard" className="flex items-center gap-1.5">
+            <Link href="/dashboard?view=app" className="flex items-center gap-1.5">
               <span className="text-base font-bold text-white">Weavo</span>
             </Link>
           </div>
@@ -577,6 +601,8 @@ export default function DashboardPage() {
         </main>
       </div>
     </div>
+      )}
+    </>
   );
 }
 
@@ -1586,6 +1612,91 @@ function SkeletonGrid({ viewMode }: { viewMode: ViewMode }) {
           </div>
         )
       )}
+    </div>
+  );
+}
+
+/* ===== FLOW SELECTION SCREEN ===== */
+
+function FlowSelectionScreen({ onSelect }: { onSelect: (flow: 'chat' | 'wizard') => void }) {
+  const [isExiting, setIsExiting] = useState(false);
+
+  const handleSelect = (flow: 'chat' | 'wizard') => {
+    setIsExiting(true);
+    setTimeout(() => {
+      onSelect(flow);
+    }, 400); // Wait for animation to complete
+  };
+
+  return (
+    <div className={cn(
+      "fixed inset-0 z-[100] bg-[#0a0a0a] text-white flex flex-col overflow-y-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+      isExiting ? "opacity-0 scale-105 pointer-events-none filter blur-sm" : "opacity-100 scale-100 filter-none"
+    )}>
+      {/* Header */}
+      <div className="flex items-center justify-between p-6">
+        <div className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/logo.png" alt="Weavo" className="w-8 h-8 object-contain" />
+          <span className="font-bold text-xl tracking-tight">Weavo</span>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 max-w-6xl mx-auto w-full relative">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-center">Choose your creative flow.</h1>
+        <p className="text-muted-foreground text-center mb-12">No pressure. Switch anytime in Settings.</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
+          {/* Card 1: Chat AI */}
+          <div 
+            onClick={() => handleSelect('chat')}
+            className="group cursor-pointer rounded-2xl border border-white/[0.08] bg-[#111111] p-8 hover:border-white/[0.2] transition-all hover:bg-[#161616] flex flex-col relative overflow-hidden"
+          >
+            {/* Subtle background glow */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+
+            <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white/[0.06] border border-white/[0.05] text-xs font-medium mb-6 self-start relative z-10">
+              Chat AI
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-10 relative z-10">Conversational Builder</h2>
+            {/* Mock Visual */}
+            <div className="h-56 mt-auto rounded-xl bg-[#0a0a0a] border border-white/[0.04] flex items-center justify-center relative overflow-hidden z-10">
+               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:16px_16px]" />
+               {/* Abstract Chat Representation */}
+               <div className="flex flex-col gap-4 w-full px-8 opacity-80 group-hover:opacity-100 transition-all duration-500 transform group-hover:scale-105">
+                 <div className="w-3/4 h-10 rounded-2xl rounded-bl-sm bg-gradient-to-r from-purple-500/20 to-purple-500/10 border border-purple-500/20 self-start backdrop-blur-sm" />
+                 <div className="w-2/3 h-10 rounded-2xl rounded-br-sm bg-white/[0.06] border border-white/[0.08] self-end backdrop-blur-sm" />
+                 <div className="w-5/6 h-10 rounded-2xl rounded-bl-sm bg-gradient-to-r from-purple-500/20 to-purple-500/10 border border-purple-500/20 self-start backdrop-blur-sm" />
+               </div>
+            </div>
+          </div>
+
+          {/* Card 2: Wizard */}
+          <div 
+            onClick={() => handleSelect('wizard')}
+            className="group cursor-pointer rounded-2xl border border-white/[0.08] bg-[#111111] p-8 hover:border-white/[0.2] transition-all hover:bg-[#161616] flex flex-col relative overflow-hidden"
+          >
+            {/* Subtle background glow */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+
+            <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white/[0.06] border border-white/[0.05] text-xs font-medium mb-6 self-start relative z-10">
+              Wizard
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-10 relative z-10">Guided Setup Wizard</h2>
+            {/* Mock Visual */}
+            <div className="h-56 mt-auto rounded-xl bg-[#0a0a0a] border border-white/[0.04] flex items-center justify-center relative overflow-hidden z-10">
+               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:16px_16px]" />
+               {/* Abstract Wizard Representation */}
+               <div className="flex items-center justify-center gap-4 opacity-80 group-hover:opacity-100 transition-all duration-500 transform group-hover:scale-105 w-full">
+                 <div className="w-20 h-28 rounded-lg bg-white/[0.04] border border-white/[0.08] shadow-lg transform -rotate-12 translate-y-4 backdrop-blur-sm" />
+                 <div className="w-24 h-32 rounded-lg bg-gradient-to-b from-white/[0.15] to-white/[0.05] border border-white/[0.2] shadow-2xl z-10 backdrop-blur-sm" />
+                 <div className="w-20 h-28 rounded-lg bg-white/[0.04] border border-white/[0.08] shadow-lg transform rotate-12 translate-y-4 backdrop-blur-sm" />
+               </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

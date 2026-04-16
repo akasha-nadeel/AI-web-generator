@@ -9,8 +9,16 @@ import { CTA } from "@/components/landing/CTA";
 import { FAQ } from "@/components/landing/FAQ";
 import { Contact } from "@/components/landing/Contact";
 import { Footer } from "@/components/landing/Footer";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const { userId } = await auth();
+
+  if (userId) {
+    redirect("/dashboard");
+  }
+
   return (
     <>
       <Navbar />

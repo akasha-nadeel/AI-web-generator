@@ -1,10 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getOrCreateUser, createSite, logGeneration } from "@/lib/supabase/queries";
-import { SYSTEM_PROMPT, buildUserPrompt } from "@/lib/ai/prompts/generation";
+import {
+  SYSTEM_PROMPT,
+  buildUserPrompt,
+  buildSystemPrompt,
+  buildFocusedUserPrompt,
+  AI_CLASSIFY_PROMPT,
+  parseAIClassification,
+  mergeClassifications,
+  type Classification,
+} from "@/lib/ai/prompts/generation";
 import { rateLimit } from "@/lib/rate-limit";
+import { extractDesignDNA, formatDesignBriefForPrompt, type DesignBrief } from "@/lib/ai/prompts/modules/design-extractor";
+import { findBestPattern } from "@/lib/ai/design-library";
 
 export const maxDuration = 120; // Allow up to 120s for AI generation (32k token responses need more time)
+
+interface ImagePayload {
+  data: string; // base64 data URL (data:image/png;base64,...)
+  type: string; // e.g. "image/png"
+}
+
+/**
+ * Strip the data URL prefix and return raw base64 + media type.
+ */
+function parseDataUrl(dataUrl: string): { base64: string; mediaType: string } {
+  const match = dataUrl.match(/^data:(image\/\w+);base64,(.+)$/);
+  if (match) {
+    return { mediaType: match[1], base64: match[2] };
+  }
+  return { mediaType: "image/png", base64: dataUrl };
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,26 +55,187 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { prompt, industry, mood, pages, templateId } = body;
+    const { prompt, industry, mood, pages, templateId, images } = body as {
+      prompt: string;
+      industry: string;
+      mood: string;
+      pages?: string[];
+      templateId?: string;
+      images?: ImagePayload[];
+    };
 
     if (!prompt || !prompt.trim()) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
     }
 
-    const userPrompt = buildUserPrompt({
-      prompt: prompt.trim(),
-      industry: industry || "general",
-      mood: mood || "modern",
-      pages: pages || [],
-      templateId: templateId || undefined,
+    const hasImages = images && images.length > 0;
+    const trimmedPrompt = prompt.trim();
+    const effectiveIndustry = industry || "general";
+    const effectiveMood = mood || "modern";
+
+    // ── Step 1: Classify & Build Focused Prompt ──────────────────────
+    // Rule-based classification (instant, free)
+    let { systemPrompt: focusedSystemPrompt, classification } = buildSystemPrompt({
+      prompt: trimmedPrompt,
+      industry: effectiveIndustry,
+      mood: effectiveMood,
     });
 
-    // Try AI generation — Anthropic first, then OpenAI, then Gemini
+    // For template-based generation, use legacy prompt (templates override everything)
+    const isTemplateMode = !!templateId;
+    const activeSystemPrompt = isTemplateMode ? SYSTEM_PROMPT : focusedSystemPrompt;
+
+    // Build the user prompt
+    const userPrompt = isTemplateMode
+      ? buildUserPrompt({
+          prompt: trimmedPrompt,
+          industry: effectiveIndustry,
+          mood: effectiveMood,
+          pages: pages || [],
+          templateId,
+        })
+      : buildFocusedUserPrompt({
+          prompt: trimmedPrompt,
+          industry: effectiveIndustry,
+          mood: effectiveMood,
+          pages: pages || [],
+          classification,
+        });
+
+    // ── Step 2: Optional AI Classification (for low-confidence cases) ──
+    // If confidence is low and we have an API key, refine classification
+    if (!isTemplateMode && classification.confidence < 0.6 && process.env.ANTHROPIC_API_KEY) {
+      try {
+        const classifyResponse = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+          },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 300,
+            temperature: 0,
+            system: AI_CLASSIFY_PROMPT,
+            messages: [{ role: "user", content: `Request: "${trimmedPrompt}"\nIndustry: ${effectiveIndustry}\nMood: ${effectiveMood}` }],
+          }),
+        });
+
+        if (classifyResponse.ok) {
+          const classifyData = await classifyResponse.json();
+          const aiText = classifyData.content?.[0]?.text;
+          if (aiText) {
+            const aiOverride = parseAIClassification(aiText);
+            if (aiOverride) {
+              classification = mergeClassifications(classification, aiOverride);
+              // Re-assemble with refined classification
+              const { assembleSystemPrompt: assemble } = await import("@/lib/ai/prompts/modules/assembler");
+              focusedSystemPrompt = assemble(classification);
+            }
+          }
+        }
+      } catch (e) {
+        // AI classification failed — proceed with rule-based (graceful fallback)
+        console.warn("AI classification failed, using rule-based:", e);
+      }
+    }
+
+    const finalSystemPrompt = isTemplateMode ? SYSTEM_PROMPT : focusedSystemPrompt;
+
+    console.log(`[Generate] UI: ${classification.uiType}, Style: ${classification.layoutStyle}, Color: ${classification.colorMode}, Confidence: ${classification.confidence.toFixed(2)}, Prompt size: ${finalSystemPrompt.length} chars`);
+
+    // ── Step 2.5: Design DNA Extraction (when images are uploaded) ───
+    let designBrief: DesignBrief | null = null;
+    if (hasImages) {
+      const extractionProvider = process.env.ANTHROPIC_API_KEY
+        ? "anthropic" as const
+        : process.env.OPENAI_API_KEY
+          ? "openai" as const
+          : process.env.GEMINI_API_KEY
+            ? "gemini" as const
+            : null;
+      const extractionKey =
+        process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY;
+
+      if (extractionProvider && extractionKey) {
+        designBrief = await extractDesignDNA(images, extractionKey, extractionProvider);
+        if (designBrief) {
+          console.log(`[Generate] Design DNA extracted: ${designBrief.colorMode} mode, patterns: ${designBrief.signaturePatterns.length}, mood: ${designBrief.moodKeywords}`);
+        }
+      }
+    }
+
+    // ── Step 2.75: Library Pattern Matching (when no user images) ─────
+    // If no images were uploaded and no brief extracted, check the design
+    // library for a matching pattern based on industry + mood.
+    if (!designBrief && !hasImages) {
+      try {
+        const match = await findBestPattern(effectiveIndustry, effectiveMood, trimmedPrompt);
+        if (match) {
+          designBrief = match.brief;
+          console.log(`[Generate] Library match found: "${match.name}" (${match.industries.join(", ")})`);
+        }
+      } catch (e) {
+        // Library query failed — proceed without design guidance (graceful)
+        console.warn("[Generate] Design library query failed:", e);
+      }
+    }
+
+    // Build the final user prompt text based on what information is available
+    let finalUserPrompt: string;
+
+    if (hasImages && designBrief) {
+      // User uploaded images + extraction succeeded → text brief only (no images sent to AI)
+      finalUserPrompt = `${formatDesignBriefForPrompt(designBrief)}\n\n${userPrompt}`;
+    } else if (hasImages && !designBrief) {
+      // User uploaded images + extraction failed → generic fallback with images
+      finalUserPrompt = `REFERENCE IMAGE(S) ATTACHED ABOVE.
+Analyze the reference image(s) carefully. Study the exact:
+- Layout structure (hero, navigation, content sections, grids, carousels)
+- Color scheme (background colors, text colors, accent colors)
+- Typography (font styles, sizes, weights, heading treatments)
+- UI patterns (cards, buttons, spacing, borders, shadows)
+- Visual mood and design language
+- Component arrangement and information hierarchy
+
+Generate a website that closely matches the design patterns, visual style, and layout shown in the reference image(s), while incorporating the user's specific request below.
+
+${userPrompt}`;
+    } else if (designBrief) {
+      // No user images, but library match found → inject brief as style guide
+      finalUserPrompt = `DESIGN STYLE GUIDE (use as design direction — if the user's request below contradicts any pattern, follow the user's request instead):
+
+${formatDesignBriefForPrompt(designBrief)}
+
+${userPrompt}`;
+    } else {
+      // No images, no library match → plain prompt
+      finalUserPrompt = userPrompt;
+    }
+
+    // ── Step 3: Generate Website ─────────────────────────────────────
     let generatedHtml: string | null = null;
     let modelUsed = "unknown";
 
     if (process.env.ANTHROPIC_API_KEY) {
       modelUsed = "claude-sonnet-4-20250514";
+
+      // Build message content — images only when extraction failed, otherwise text-only
+      const userContent: Array<{ type: string; [key: string]: unknown }> = [];
+
+      if (hasImages && !designBrief) {
+        // Fallback: extraction failed, send raw images to generation AI
+        for (const img of images) {
+          const { base64, mediaType } = parseDataUrl(img.data);
+          userContent.push({
+            type: "image",
+            source: { type: "base64", media_type: mediaType, data: base64 },
+          });
+        }
+      }
+      userContent.push({ type: "text", text: finalUserPrompt });
+
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -58,8 +246,8 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           model: modelUsed,
           max_tokens: 16384,
-          system: SYSTEM_PROMPT,
-          messages: [{ role: "user", content: userPrompt }],
+          system: finalSystemPrompt,
+          messages: [{ role: "user", content: userContent }],
         }),
       });
 
@@ -75,6 +263,19 @@ export async function POST(req: NextRequest) {
       }
     } else if (process.env.OPENAI_API_KEY) {
       modelUsed = "gpt-4o";
+
+      const userContent: Array<{ type: string; [key: string]: unknown }> = [];
+
+      if (hasImages && !designBrief) {
+        for (const img of images) {
+          userContent.push({
+            type: "image_url",
+            image_url: { url: img.data, detail: "high" },
+          });
+        }
+      }
+      userContent.push({ type: "text", text: finalUserPrompt });
+
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -84,8 +285,8 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           model: modelUsed,
           messages: [
-            { role: "system", content: SYSTEM_PROMPT },
-            { role: "user", content: userPrompt },
+            { role: "system", content: finalSystemPrompt },
+            { role: "user", content: userContent },
           ],
           temperature: 0.7,
           max_tokens: 16384,
@@ -104,17 +305,30 @@ export async function POST(req: NextRequest) {
       }
     } else if (process.env.GEMINI_API_KEY) {
       modelUsed = "gemini-2.0-flash";
+
+      const parts: Array<{ text?: string; inline_data?: { mime_type: string; data: string } }> = [];
+
+      if (hasImages && !designBrief) {
+        for (const img of images) {
+          const { base64, mediaType } = parseDataUrl(img.data);
+          parts.push({
+            inline_data: { mime_type: mediaType, data: base64 },
+          });
+        }
+      }
+      parts.push({ text: finalUserPrompt });
+
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${modelUsed}:generateContent?key=${process.env.GEMINI_API_KEY}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-            contents: [{ parts: [{ text: userPrompt }] }],
+            system_instruction: { parts: [{ text: finalSystemPrompt }] },
+            contents: [{ parts }],
             generationConfig: {
               temperature: 0.7,
-              maxOutputTokens: 8192,
+              maxOutputTokens: 16384,
             },
           }),
         }
@@ -163,7 +377,20 @@ export async function POST(req: NextRequest) {
       site?.id || "",
       user.id,
       prompt.slice(0, 200),
-      { model: modelUsed, promptLength: prompt.length },
+      {
+        model: modelUsed,
+        promptLength: prompt.length,
+        hasImages: !!hasImages,
+        imageCount: images?.length || 0,
+        classification: {
+          uiType: classification.uiType,
+          layoutStyle: classification.layoutStyle,
+          colorMode: classification.colorMode,
+          confidence: classification.confidence,
+        },
+        designBriefExtracted: !!designBrief,
+        systemPromptSize: finalSystemPrompt.length,
+      },
       modelUsed
     );
 

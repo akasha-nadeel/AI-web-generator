@@ -37,7 +37,11 @@
       "Bash(taskkill /F /IM node.exe)",
       "Bash(taskkill:*)",
       "Bash(cmd:*)",
-      "WebFetch(domain:ai-web-generator-8qmb.vercel.app)"
+      "WebFetch(domain:ai-web-generator-8qmb.vercel.app)",
+      "Bash(node -e \"const { SYSTEM_PROMPT, buildUserPrompt } = require\\('./src/lib/ai/prompts/generation.ts'\\); console.log\\('FAIL'\\)\")",
+      "Bash(npx tsx:*)",
+      "Bash(node -e ':*)",
+      "Bash(npx supabase *)"
     ]
   }
 }

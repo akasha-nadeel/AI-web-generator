@@ -192,6 +192,36 @@ export interface Database {
         };
         Relationships: [];
       };
+      design_patterns: {
+        Row: {
+          id: string;
+          name: string;
+          industries: string[];
+          moods: string[];
+          color_mode: string;
+          brief_json: Record<string, unknown>;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          industries: string[];
+          moods: string[];
+          color_mode?: string;
+          brief_json: Record<string, unknown>;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          industries?: string[];
+          moods?: string[];
+          color_mode?: string;
+          brief_json?: Record<string, unknown>;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
   };
 }

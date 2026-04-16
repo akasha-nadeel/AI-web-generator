@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Mic,
-  Plus,
   Sparkles,
   ChevronDown,
   ChevronRight,
@@ -15,6 +13,8 @@ import {
   Briefcase,
   Camera,
   Utensils,
+  ImageIcon,
+  X,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -95,15 +95,23 @@ function GeminiStar({ className }: { className?: string }) {
 
 /* ===== MAIN COMPONENT ===== */
 
+interface AttachedImage {
+  data: string; // base64 data URL
+  name: string;
+  type: string;
+}
+
 export function AIChatSection({ credits, plan }: AIChatSectionProps) {
   const router = useRouter();
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const [prompt, setPrompt] = useState("");
   const [error, setError] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [selectedIndustry, setSelectedIndustry] = useState("auto");
   const [selectedMood, setSelectedMood] = useState("minimal");
+  const [attachedImages, setAttachedImages] = useState<AttachedImage[]>([]);
 
   // Auto-resize textarea
   const handleTextareaChange = useCallback(
@@ -125,9 +133,60 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
     }
   };
 
+  // Image upload handling
+  const handleImageUpload = useCallback((files: FileList | null) => {
+    if (!files) return;
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowed = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif"];
+
+    Array.from(files).forEach((file) => {
+      if (!allowed.includes(file.type)) return;
+      if (file.size > maxSize) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setAttachedImages((prev) => [
+            ...prev,
+            { data: e.target!.result as string, name: file.name, type: file.type },
+          ]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    if (imageInputRef.current) imageInputRef.current.value = "";
+  }, []);
+
+  const removeAttachedImage = useCallback((index: number) => {
+    setAttachedImages((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  // Paste image from clipboard
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      const imageFiles: File[] = [];
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith("image/")) {
+          const file = items[i].getAsFile();
+          if (file) imageFiles.push(file);
+        }
+      }
+      if (imageFiles.length > 0) {
+        const dt = new DataTransfer();
+        imageFiles.forEach((f) => dt.items.add(f));
+        handleImageUpload(dt.files);
+      }
+    };
+    document.addEventListener("paste", handlePaste);
+    return () => document.removeEventListener("paste", handlePaste);
+  }, [handleImageUpload]);
+
   // Main generation handler — redirect to generate page
   const handleGenerate = () => {
-    if (!prompt.trim()) {
+    if (!prompt.trim() && attachedImages.length === 0) {
       setError("Please describe the website you want to build");
       inputRef.current?.focus();
       return;
@@ -136,9 +195,21 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
     const industry = selectedIndustry === "auto" ? "agency" : selectedIndustry;
     const pages = INDUSTRY_DEFAULT_PAGES[industry] || ["Home", "About", "Contact"];
 
+    // Store images in sessionStorage so the generate page can pick them up
+    if (attachedImages.length > 0) {
+      try {
+        sessionStorage.setItem(
+          "pixora_inspiration_images",
+          JSON.stringify(attachedImages.map((img) => img.data))
+        );
+      } catch { /* storage full — proceed without images */ }
+    }
+
+    const finalPrompt = prompt.trim() || "Generate a website that matches the uploaded reference image(s)";
+
     // Encode params and redirect to generate page
     const params = new URLSearchParams({
-      prompt: prompt.trim(),
+      prompt: finalPrompt,
       industry,
       mood: selectedMood,
       pages: pages.join(","),
@@ -174,7 +245,7 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
     router.push(`/generate/new?${params.toString()}`);
   };
 
-  const canSubmit = prompt.trim().length > 0;
+  const canSubmit = prompt.trim().length > 0 || attachedImages.length > 0;
 
   return (
     <div className="relative flex-1 flex flex-col">
@@ -213,6 +284,16 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
               )}
             >
 
+            {/* Hidden file input */}
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+              multiple
+              className="hidden"
+              onChange={(e) => handleImageUpload(e.target.files)}
+            />
+
             {/* Textarea */}
             <textarea
               ref={inputRef}
@@ -221,17 +302,79 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
               onKeyDown={handleKeyDown}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder="Describe an app and let Weavo do the rest"
+              placeholder={attachedImages.length > 0 ? "Describe what you want based on the image..." : "Describe an app and let Weavo do the rest"}
               rows={2}
               className="w-full bg-transparent text-[15px] md:text-base resize-none focus:outline-none px-5 pt-5 pb-3 min-h-[88px] max-h-[200px] scrollbar-thin"
               style={{
                 color: '#e3e3e3',
               }}
+              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleImageUpload(e.dataTransfer.files);
+              }}
             />
+
+            {/* Attached images preview — Gemini style */}
+            <AnimatePresence>
+              {attachedImages.length > 0 && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex flex-wrap gap-2 px-4 pb-2">
+                    {attachedImages.map((img, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className="relative group flex items-center gap-2.5 rounded-xl bg-white/[0.06] border border-white/[0.08] pr-3 overflow-hidden"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={img.data}
+                          alt={img.name}
+                          className="w-[52px] h-[52px] object-cover"
+                        />
+                        <div className="py-1.5 min-w-0">
+                          <p className="text-[11px] text-white/70 truncate max-w-[120px]">{img.name}</p>
+                          <p className="text-[10px] text-white/30 uppercase">{img.type.split("/")[1]}</p>
+                        </div>
+                        <button
+                          onClick={() => removeAttachedImage(idx)}
+                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3 text-white" />
+                        </button>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Toolbar */}
             <div className="flex items-center justify-between gap-2 px-4 py-3">
               <div className="flex items-center gap-1.5">
+                {/* Image upload button */}
+                <button
+                  onClick={() => imageInputRef.current?.click()}
+                  className={cn(
+                    "flex items-center justify-center w-8 h-8 rounded-lg border transition-all",
+                    attachedImages.length > 0
+                      ? "border-blue-400/30 bg-blue-400/10 text-blue-400"
+                      : "border-white/[0.08] bg-white/[0.06] text-muted-foreground hover:text-foreground hover:bg-white/[0.1]"
+                  )}
+                  title="Upload reference image"
+                >
+                  <ImageIcon className="w-3.5 h-3.5" />
+                </button>
+
                 {/* Industry dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs bg-white/[0.06] border border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-white/[0.1] transition-all">
