@@ -1,20 +1,48 @@
 /**
  * Curated image library organized by category.
- * Each entry is a pre-formatted prompt section string.
+ * Each entry is either a pre-formatted prompt section string OR a
+ * structured `LabeledSection` with per-photo descriptions. Labeled
+ * sections give the AI content hints so it can match a specific photo
+ * to the right section (e.g. pick "tiramisu dessert" for the dessert
+ * card, not a random pasta shot).
  */
 
-export const IMAGE_SECTIONS: Record<string, string> = {
+export type LabeledPhoto = { id: string; desc: string };
+export type LabeledSection = { title: string; photos: LabeledPhoto[] };
+export type ImageSection = string | LabeledSection;
+
+export const IMAGE_SECTIONS: Record<string, ImageSection> = {
   "gym-venue": `**Gym/Fitness — Venue & Equipment:**
 photo-1534438327276-14e5300c3a48, photo-1571019614242-c5c5dee9f50b, photo-1549060279-7e168fcee0c2, photo-1540497077202-7c8a3999166f, photo-1517836357463-d25dfeac3438, photo-1576678927484-cc907957088c, photo-1593079831268-3381b0db4a77, photo-1558611848-73f7eb4001a1`,
 
   "gym-people": `**Gym/Fitness — People Working Out:**
 photo-1581009146145-b5ef050c2e1e, photo-1583454110551-21f2fa2afe61, photo-1550345332-09e3ac987658, photo-1574680096145-d05b474e2155, photo-1597452485669-2c7bb5fef90d`,
 
-  "restaurant-venue": `**Restaurant/Food — Venue & Ambiance:**
-photo-1517248135467-4c7edcad34c4, photo-1414235077428-338989a2e8c0, photo-1555396273-367ea4eb4db5, photo-1537047902294-62a40c20a6ae, photo-1552566626-52f8b828add9`,
+  "restaurant-venue": {
+    title: "Restaurant/Food — Venue & Ambiance",
+    photos: [
+      { id: "photo-1517248135467-4c7edcad34c4", desc: "restaurant dining room, warm ambient lighting" },
+      { id: "photo-1414235077428-338989a2e8c0", desc: "dinner table setting, cozy candlelit atmosphere" },
+      { id: "photo-1555396273-367ea4eb4db5", desc: "bistro interior, bar seating" },
+      { id: "photo-1537047902294-62a40c20a6ae", desc: "elegant fine-dining table setting, white cloth" },
+      { id: "photo-1552566626-52f8b828add9", desc: "rustic café interior, wood tones" },
+    ],
+  },
 
-  "restaurant-food": `**Restaurant/Food — Dishes:**
-photo-1504674900247-0877df9cc836, photo-1567620905732-2d1ec7ab7445, photo-1565299624946-b28f40a0ae38, photo-1565958011703-44f9829ba187, photo-1482049016688-2d3e1b311543, photo-1476224203421-9ac39bcb3327, photo-1473093295043-cdd812d0e601, photo-1432139555190-58524dae6a55, photo-1414235077428-338989a2e8c0`,
+  "restaurant-food": {
+    title: "Restaurant/Food — Dishes",
+    photos: [
+      { id: "photo-1504674900247-0877df9cc836", desc: "plated dish overhead, rustic styling" },
+      { id: "photo-1567620905732-2d1ec7ab7445", desc: "burger and fries, casual dining close-up" },
+      { id: "photo-1565299624946-b28f40a0ae38", desc: "pizza with basil and toppings, close-up" },
+      { id: "photo-1565958011703-44f9829ba187", desc: "elegant plated main course, fine dining" },
+      { id: "photo-1482049016688-2d3e1b311543", desc: "gourmet tasting dish, artful presentation" },
+      { id: "photo-1476224203421-9ac39bcb3327", desc: "fresh salad bowl, vibrant greens and fruit" },
+      { id: "photo-1473093295043-cdd812d0e601", desc: "pasta dish, red sauce and herbs" },
+      { id: "photo-1432139555190-58524dae6a55", desc: "breakfast brunch spread, pancakes and coffee" },
+      { id: "photo-1414235077428-338989a2e8c0", desc: "dining table with plated meal, warm ambiance" },
+    ],
+  },
 
   "tech": `**Tech/SaaS:**
 photo-1551434678-e076c223a692, photo-1460925895917-afdab827c52f, photo-1519389950473-47ba0277781c, photo-1504384308090-c894fdcc538d, photo-1531297484001-80022131f5a1, photo-1550751827-4bd374c3f58b, photo-1518770660439-4636190af475, photo-1488590528505-98d2b5aba04b`,
@@ -40,8 +68,20 @@ photo-1540555700478-4be289fbec6d, photo-1544161515-4ab6ce6db874, photo-150765231
   "fashion": `**Fashion/Clothing:**
 photo-1558171813-01ed3d751c0e, photo-1445205170230-053b83016050, photo-1490481651871-ab68de25d43d, photo-1469334031218-e382a71b716b, photo-1483985988355-763728e1935b, photo-1485462537746-965f33f7f6a7, photo-1509631179647-0177331693ae`,
 
-  "cinema": `**Cinema/Entertainment/Streaming Thumbnails (look like movie stills):**
-photo-1489599849927-2ee91cede3ba, photo-1536440136628-849c177e76a1, photo-1440404653325-ab127d49abc1, photo-1478720568477-152d9b164e26, photo-1485846234645-a62644f84728, photo-1524985069026-dd778a71c7b4, photo-1594909122845-11baa439b7bf, photo-1616530940355-351fabd9524b, photo-1585951237313-1979e4df7385`,
+  "cinema": {
+    title: "Cinema/Entertainment/Streaming Thumbnails (look like movie stills)",
+    photos: [
+      { id: "photo-1489599849927-2ee91cede3ba", desc: "movie theater red seats, empty auditorium" },
+      { id: "photo-1536440136628-849c177e76a1", desc: "vintage cinema marquee, film reel feel" },
+      { id: "photo-1440404653325-ab127d49abc1", desc: "cinematic city lights at night, atmospheric" },
+      { id: "photo-1478720568477-152d9b164e26", desc: "dark moody scene, film-still composition" },
+      { id: "photo-1485846234645-a62644f84728", desc: "concert crowd, dramatic stage lighting" },
+      { id: "photo-1524985069026-dd778a71c7b4", desc: "popcorn bucket, cinema snack close-up" },
+      { id: "photo-1594909122845-11baa439b7bf", desc: "film projector beam, dark theater interior" },
+      { id: "photo-1616530940355-351fabd9524b", desc: "dramatic portrait, cinematic lighting" },
+      { id: "photo-1585951237313-1979e4df7385", desc: "movie clapperboard and film reels, production" },
+    ],
+  },
 
   "nature": `**Nature/Landscapes — Cinematic & Atmospheric:**
 photo-1470071459604-3b5ec3a7fe05, photo-1441974231531-c6227db76b6e, photo-1472214103451-9374bd1c798e, photo-1506905925346-21bda4d32df4, photo-1519681393784-d120267933ba, photo-1500534314263-a3c090dab376, photo-1518173946687-a4c04699c559, photo-1465056836900-8f1e940b2dc8, photo-1433086966358-54859d0ed716, photo-1470252649378-9c29740c9fa8, photo-1501854140801-50d01698950b, photo-1464822759023-fed622ff2c3b, photo-1486870591958-9b9d0d1dda99, photo-1518837695005-2083093ee35b, photo-1507400492013-162706c8c05e, photo-1475924156734-496f6cac6ec1`,
@@ -58,8 +98,17 @@ photo-1478760329108-5c3ed9d495a0, photo-1451187580459-43490279c0fa, photo-141924
   "music": `**Music/Events/Concerts:**
 photo-1493225457124-a3eb161ffa5f, photo-1470229722913-7c0e2dbbafd3, photo-1511671782779-c97d3d27a1d4, photo-1514320291840-2e0a9bf2a9ae, photo-1459749411175-04bf5292ceea, photo-1501386761578-eac5c94b800a`,
 
-  "food-coffee": `**Food/Coffee/Cafe:**
-photo-1495474472287-4d71bcdd2085, photo-1501339847302-ac426a4a7cbb, photo-1442512595331-e89e73853f31, photo-1554118811-1e0d58224f24, photo-1559305616-3f99cd43e353, photo-1511920170033-f8396924c348`,
+  "food-coffee": {
+    title: "Food/Coffee/Cafe",
+    photos: [
+      { id: "photo-1495474472287-4d71bcdd2085", desc: "latte art in white mug, overhead view" },
+      { id: "photo-1501339847302-ac426a4a7cbb", desc: "espresso pour and coffee beans" },
+      { id: "photo-1442512595331-e89e73853f31", desc: "cafe counter with pastries" },
+      { id: "photo-1554118811-1e0d58224f24", desc: "cozy cafe interior with people" },
+      { id: "photo-1559305616-3f99cd43e353", desc: "iced coffee drink, cold brew styling" },
+      { id: "photo-1511920170033-f8396924c348", desc: "coffee cup with dessert, flat lay" },
+    ],
+  },
 
   "education": `**Education/Learning:**
 photo-1523050854058-8df90110c9f1, photo-1503676260728-1c00da094a0b, photo-1524178232363-1fb2b075b655, photo-1427504494785-3a9ca7044f45, photo-1481627834876-b7833e8f5570, photo-1488190211105-8b0e65b80b4e`,
@@ -153,15 +202,48 @@ const PEXELS_MAP: Record<string, string> = {
 };
 
 /**
+ * Render one section for the prompt. Labeled sections emit each photo
+ * on its own line with a description so the AI can match content to
+ * section (e.g. dessert card → tiramisu photo). String sections fall
+ * through untouched for backward compatibility.
+ */
+function renderSection(section: ImageSection): string {
+  if (typeof section === "string") return section;
+  const lines = section.photos.map((p) => `- ${p.id} — ${p.desc}`).join("\n");
+  return `**${section.title}:**\n${lines}`;
+}
+
+/**
+ * Return the first photo ID in a category. Used as a fallback when the
+ * AI emits a hallucinated or dead photo ID — the validator swaps in
+ * this known-good ID from the same category.
+ */
+export function getCategoryFallbackId(category: string): string | null {
+  const section = IMAGE_SECTIONS[category];
+  if (!section) return null;
+  if (typeof section === "string") {
+    const match = section.match(/photo-[a-z0-9]+/);
+    return match ? match[0] : null;
+  }
+  return section.photos[0]?.id ?? null;
+}
+
+/** Last-resort fallback when no category context is available. */
+export const UNIVERSAL_FALLBACK_PHOTO = "photo-1557683316-973673baf926";
+
+/**
  * Build the image section of the prompt for given categories.
  */
 export function buildImagePrompt(categories: string[]): string {
   const unsplashSections: string[] = [];
   const pexelsCategories = new Set<string>();
+  let hasLabeledSections = false;
 
   for (const cat of categories) {
-    if (IMAGE_SECTIONS[cat]) {
-      unsplashSections.push(IMAGE_SECTIONS[cat]);
+    const section = IMAGE_SECTIONS[cat];
+    if (section) {
+      unsplashSections.push(renderSection(section));
+      if (typeof section !== "string") hasLabeledSections = true;
     }
     // Also grab matching Pexels
     const pexelsCat = PEXELS_MAP[cat];
@@ -170,9 +252,13 @@ export function buildImagePrompt(categories: string[]): string {
     }
   }
 
+  const matchingHint = hasLabeledSections
+    ? `\n- When a photo has a description, pick the one whose description best matches the section's content (e.g. a "desserts" card should use a dessert-described photo, not a random dish).`
+    : "";
+
   let prompt = `#### Image URL Format
 - Unsplash: \`https://images.unsplash.com/photo-PHOTOID?auto=format&fit=crop&q=80&w=WIDTH\`
-- ONLY use photo IDs from the lists below. NEVER invent or guess photo IDs — made-up IDs return broken images.
+- ONLY use photo IDs from the lists below. NEVER invent or guess photo IDs — made-up IDs return broken images.${matchingHint}
 - Add \`loading="lazy"\` and \`class="object-cover"\` on all images.
 
 #### Curated Image Library

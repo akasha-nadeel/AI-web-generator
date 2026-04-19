@@ -1,10 +1,14 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { OutOfCreditsModal } from "@/components/ui/OutOfCreditsModal";
 
 export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <OutOfCreditsModal />
+    </>
+  );
 }

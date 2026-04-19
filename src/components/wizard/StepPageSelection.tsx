@@ -1,24 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useWizardStore } from "@/stores/wizardStore";
 import { INDUSTRY_DEFAULT_PAGES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { Sparkles, Check, Plus } from "lucide-react";
+import { ArrowRight, Check, Plus } from "lucide-react";
 
 export function StepPageSelection() {
-  const router = useRouter();
   const {
     industry,
     selectedPages,
     setSelectedPages,
     togglePage,
     setStep,
-    businessName,
-    description,
-    overallFeel,
-    inspirationImages,
   } = useWizardStore();
 
   const [customPage, setCustomPage] = useState("");
@@ -56,30 +50,7 @@ export function StepPageSelection() {
     }
   };
 
-  const handleGenerate = () => {
-    // Build a rich prompt from wizard data
-    const prompt = `Build a ${overallFeel} ${industry} website for "${businessName}". ${description}`;
-
-    // Store inspiration images in sessionStorage so the generate page picks them up
-    if (inspirationImages.length > 0) {
-      try {
-        sessionStorage.setItem(
-          "pixora_inspiration_images",
-          JSON.stringify(inspirationImages)
-        );
-      } catch { /* storage full — proceed without images */ }
-    }
-
-    // Navigate to generate page with URL params — same flow as dashboard
-    const params = new URLSearchParams({
-      prompt: prompt.trim(),
-      industry,
-      mood: overallFeel || "modern",
-      pages: selectedPages.join(","),
-    });
-
-    router.push(`/generate/new?${params.toString()}`);
-  };
+  const handleNext = () => setStep(5);
 
   return (
     <div className="flex-1 flex flex-col">
@@ -145,11 +116,11 @@ export function StepPageSelection() {
           Back
         </button>
         <button
-          onClick={handleGenerate}
+          onClick={handleNext}
           className="px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 bg-white text-black hover:bg-white/90"
         >
-          <Sparkles className="w-4 h-4" />
-          Generate Website
+          Next
+          <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     </div>

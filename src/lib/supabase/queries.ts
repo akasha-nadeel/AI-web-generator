@@ -1,5 +1,6 @@
 import { createServerClient } from "./server";
 import type { Database } from "./types";
+import { FREE_CREDITS } from "@/lib/constants";
 
 type UserRow = Database["public"]["Tables"]["users"]["Row"];
 
@@ -20,6 +21,25 @@ export async function createUser(clerkId: string, email: string, name: string | 
     .insert({ clerk_id: clerkId, email, name })
     .select()
     .single();
+
+  // Log the signup bonus so the transaction history matches the balance.
+  // The 30 credits themselves come from the users.credits_remaining DB default,
+  // so we only write the audit row here.
+  if (data) {
+    const { error: txError } = await supabase
+      .from("credit_transactions")
+      .insert({
+        user_id: data.id,
+        amount: FREE_CREDITS,
+        type: "signup_bonus",
+        balance_after: data.credits_remaining,
+        metadata: { source: "signup" },
+      });
+    if (txError) {
+      console.warn("[createUser] signup bonus log failed:", txError.message);
+    }
+  }
+
   return data;
 }
 
@@ -81,24 +101,6 @@ export async function updateSite(siteId: string, updates: Record<string, unknown
 export async function deleteSite(siteId: string) {
   const supabase = createServerClient();
   await supabase.from("sites").delete().eq("id", siteId);
-}
-
-export async function deductCredit(userId: string) {
-  const supabase = createServerClient();
-  const { data: user } = await supabase
-    .from("users")
-    .select("credits_remaining")
-    .eq("id", userId)
-    .single();
-
-  if (!user || user.credits_remaining <= 0) return false;
-
-  await supabase
-    .from("users")
-    .update({ credits_remaining: user.credits_remaining - 1 })
-    .eq("id", userId);
-
-  return true;
 }
 
 export async function logGeneration(siteId: string, userId: string, promptSummary: string, resultJson: Record<string, unknown>, model: string) {

@@ -1,7 +1,42 @@
+export type CreditTransactionType =
+  | "signup_bonus"
+  | "pack_purchase"
+  | "generation"
+  | "refund"
+  | "admin_grant";
+
 export interface Database {
   public: {
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      deduct_credits_atomic: {
+        Args: {
+          p_user_id: string;
+          p_amount: number;
+          p_type: CreditTransactionType;
+          p_metadata?: Record<string, unknown>;
+        };
+        Returns: {
+          success: boolean;
+          new_balance?: number;
+          reason?: string;
+          balance?: number;
+        };
+      };
+      add_credits_atomic: {
+        Args: {
+          p_user_id: string;
+          p_amount: number;
+          p_type: CreditTransactionType;
+          p_metadata?: Record<string, unknown>;
+        };
+        Returns: {
+          success: boolean;
+          new_balance?: number;
+          reason?: string;
+        };
+      };
+    };
     Tables: {
       users: {
         Row: {
@@ -11,6 +46,7 @@ export interface Database {
           name: string | null;
           plan: "free" | "pro" | "business";
           credits_remaining: number;
+          has_ever_paid: boolean;
           created_at: string;
         };
         Insert: {
@@ -20,6 +56,7 @@ export interface Database {
           name?: string | null;
           plan?: "free" | "pro" | "business";
           credits_remaining?: number;
+          has_ever_paid?: boolean;
           created_at?: string;
         };
         Update: {
@@ -29,6 +66,37 @@ export interface Database {
           name?: string | null;
           plan?: "free" | "pro" | "business";
           credits_remaining?: number;
+          has_ever_paid?: boolean;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      credit_transactions: {
+        Row: {
+          id: string;
+          user_id: string;
+          amount: number;
+          type: CreditTransactionType;
+          balance_after: number;
+          metadata: Record<string, unknown>;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          amount: number;
+          type: CreditTransactionType;
+          balance_after: number;
+          metadata?: Record<string, unknown>;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          amount?: number;
+          type?: CreditTransactionType;
+          balance_after?: number;
+          metadata?: Record<string, unknown>;
           created_at?: string;
         };
         Relationships: [];

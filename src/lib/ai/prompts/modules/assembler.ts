@@ -158,7 +158,11 @@ function buildSpacingRules(c: Classification): string {
 - Dark overlay ONLY when hero image is bright. Dark images need NO overlay.
 
 #### Mobile Responsiveness
-- **Nav:** Desktop: logo + links + CTA visible. Mobile: logo + hamburger, toggleable menu with JS
+- **Nav structure (CRITICAL — follow exactly):**
+  - Desktop nav links: \`<nav class="hidden md:flex items-center gap-8">...</nav>\`
+  - Hamburger button: \`<button class="md:hidden" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">☰</button>\`
+  - Mobile menu panel: \`<div id="mobile-menu" class="hidden md:hidden">...</div>\`
+  - The mobile menu panel MUST start with \`class="hidden"\` — NEVER render it visible on initial load. JS toggles visibility. Adding \`md:hidden\` ensures it NEVER shows on desktop even when toggled.
 - **Typography:** Hero: \`text-3xl sm:text-4xl md:text-5xl lg:text-6xl\`. Body: \`text-sm md:text-base\`
 - **Sections:** \`py-16 md:py-24 lg:py-32\`. Always \`px-4\` minimum on mobile.
 - **Grids:** 3-col: \`grid-cols-1 md:grid-cols-2 lg:grid-cols-3\`. 4-col: \`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4\`
@@ -221,6 +225,7 @@ function buildForbiddenPatterns(c: Classification): string {
     `DO NOT make every section the same background — alternate between shades`,
     `DO NOT allow horizontal scrolling on the page body — add overflow-x: hidden to html/body`,
     `DO NOT use portrait/headshot photos for venue images or vice versa — match photo type to context`,
+    `DO NOT render the mobile menu panel without the "hidden" class on initial load — it MUST be hidden by default, JS toggles it`,
   ];
 
   if (c.uiType === "app") {

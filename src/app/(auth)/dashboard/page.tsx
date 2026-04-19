@@ -45,9 +45,10 @@ import { PLANS, INDUSTRIES, COLOR_PALETTES, FONT_STYLES, INDUSTRY_DEFAULT_PAGES 
 import { getTemplatePreview, getPreviewTheme } from "@/lib/templates/preview-data";
 import { assemblePreviewHtml } from "@/lib/assembler/assembler";
 import { TEMPLATE_DESIGN_DNA } from "@/lib/templates/design-dna";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Menu, Eye, ChevronRight } from "lucide-react";
-import { AIChatSection } from "@/components/dashboard/AIChatSection";
+import { CreditCounter } from "@/components/ui/CreditCounter";
+import { useCreditsStore } from "@/stores/creditsStore";
 
 /* ===== TYPES ===== */
 
@@ -62,7 +63,7 @@ interface Site {
 }
 
 type ViewMode = "grid" | "list";
-type NavView = "Chat" | "Recents" | "All Projects" | "Templates" | "Trash";
+type NavView = "Recents" | "All Projects" | "Templates" | "Trash";
 type SortMode = "updated" | "created" | "name";
 
 /* ===== INDUSTRY ICON MAP ===== */
@@ -85,7 +86,6 @@ const INDUSTRY_DESCRIPTIONS: Record<string, string> = {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { user } = useUser();
   const { signOut } = useClerk();
   const [sites, setSites] = useState<Site[]>([]);
@@ -94,20 +94,12 @@ export default function DashboardPage() {
   const [plan, setPlan] = useState<"free" | "pro" | "business">("free");
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [activeNav, setActiveNav] = useState<NavView>("Chat");
+  const [activeNav, setActiveNav] = useState<NavView>("Recents");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortMode, setSortMode] = useState<SortMode>("updated");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
-  
-  // Use a query parameter to determine if the modal should be shown.
-  // This allows the browser's back button to function correctly.
-  const [showFlowModal, setShowFlowModal] = useState(!searchParams.get("view"));
-
-  useEffect(() => {
-    setShowFlowModal(!searchParams.get("view"));
-  }, [searchParams]);
 
   // Fetch active sites
   const fetchSites = useCallback(async () => {
@@ -118,6 +110,15 @@ export default function DashboardPage() {
         setSites(data.sites || []);
         setCredits(data.credits ?? 3);
         setPlan(data.plan || "free");
+        // Keep the global credit counter in the navbar in sync with what
+        // the dashboard just fetched. Avoids divergent readings between the
+        // sidebar dropdown meter and the header badge.
+        if (typeof data.credits === "number") {
+          useCreditsStore.getState().setBalance(data.credits);
+        }
+        if (data.plan) {
+          useCreditsStore.getState().setPlan(data.plan);
+        }
       }
     } catch {
       // API not connected yet
@@ -227,7 +228,6 @@ export default function DashboardPage() {
   const creditPercentage = (credits / totalCredits) * 100;
 
   const sidebarNavItems: { label: NavView; icon: typeof Clock }[] = [
-    { label: "Chat", icon: Sparkles },
     { label: "Recents", icon: Clock },
     { label: "All Projects", icon: FolderOpen },
     { label: "Templates", icon: FileText },
@@ -239,7 +239,7 @@ export default function DashboardPage() {
     <>
       {/* Brand header */}
       <div className="p-4 flex items-center justify-between">
-        <Link href="/dashboard?view=app" onClick={() => { setActiveNav("Chat"); setMobileMenuOpen(false); }}>
+        <Link href="/dashboard" onClick={() => { setActiveNav("Recents"); setMobileMenuOpen(false); }}>
           <span className="flex items-center gap-1 text-xl font-bold text-white">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/logo.png" alt="Weavo Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center" />
@@ -271,29 +271,36 @@ export default function DashboardPage() {
 
       {/* Navigation */}
       <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto scrollbar-thin">
-        {sidebarNavItems.map((item, idx) => (
-          <div key={item.label}>
-            <button
-              onClick={() => { setActiveNav(item.label); setSearchQuery(""); setMobileMenuOpen(false); if (item.label === "Templates") setSelectedTemplateId(null); }}
-              className={cn(
-                "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
-                item.label === "Chat" && activeNav === "Chat"
-                  ? "bg-purple-500/10 text-foreground border border-purple-500/20"
-                  : activeNav === item.label
-                    ? "bg-white/[0.08] text-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
-              )}
-            >
-              <item.icon className={cn("w-4 h-4", item.label === "Chat" && "text-purple-400")} />
-              {item.label === "Chat" ? "AI Builder" : item.label}
-              {item.label === "Trash" && trashedSites.length > 0 && (
-                <span className="ml-auto text-[10px] bg-white/[0.08] px-1.5 py-0.5 rounded-full">
-                  {trashedSites.length}
-                </span>
-              )}
-            </button>
-            {idx === 0 && <div className="my-1.5 mx-3 border-t border-white/[0.06]" />}
-          </div>
+        {/* New Site — primary CTA, wizard is the only generation flow */}
+        <Link
+          href="/wizard"
+          onClick={() => setMobileMenuOpen(false)}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all bg-purple-500/10 text-foreground border border-purple-500/20 hover:bg-purple-500/15"
+        >
+          <Plus className="w-4 h-4 text-purple-400" />
+          New Site
+        </Link>
+        <div className="my-1.5 mx-3 border-t border-white/[0.06]" />
+
+        {sidebarNavItems.map((item) => (
+          <button
+            key={item.label}
+            onClick={() => { setActiveNav(item.label); setSearchQuery(""); setMobileMenuOpen(false); if (item.label === "Templates") setSelectedTemplateId(null); }}
+            className={cn(
+              "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
+              activeNav === item.label
+                ? "bg-white/[0.08] text-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
+            )}
+          >
+            <item.icon className="w-4 h-4" />
+            {item.label}
+            {item.label === "Trash" && trashedSites.length > 0 && (
+              <span className="ml-auto text-[10px] bg-white/[0.08] px-1.5 py-0.5 rounded-full">
+                {trashedSites.length}
+              </span>
+            )}
+          </button>
         ))}
       </nav>
 
@@ -408,20 +415,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      {showFlowModal ? (
-        <FlowSelectionScreen 
-          onSelect={(flow) => {
-            if (flow === "chat") {
-              setShowFlowModal(false);
-              router.push("/dashboard?view=app");
-              setActiveNav("Chat");
-            } else {
-              router.push("/wizard");
-            }
-          }} 
-        />
-      ) : (
-        <div className="min-h-screen bg-background flex">
+      <div className="min-h-screen bg-background flex">
           {/* ===== MOBILE SIDEBAR DRAWER ===== */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" showCloseButton={false} className="w-[280px] p-0 bg-[rgba(10,10,25,0.97)] border-white/[0.06] flex flex-col">
@@ -453,30 +447,36 @@ export default function DashboardPage() {
             <PanelLeft className="w-5 h-5" />
           </button>
 
+          {/* New Site icon — primary CTA */}
+          <Link
+            href="/wizard"
+            title="New Site"
+            className="p-2 rounded-lg bg-purple-500/10 text-foreground hover:bg-purple-500/15 transition-all"
+          >
+            <Plus className="w-5 h-5 text-purple-400" />
+          </Link>
+          <div className="my-1 w-5 border-t border-white/[0.06]" />
+
           {/* Nav icons */}
-          {sidebarNavItems.map((item, idx) => (
-            <div key={item.label} className="flex flex-col items-center">
-              <button
-                onClick={() => { setActiveNav(item.label); setSearchQuery(""); if (item.label === "Templates") setSelectedTemplateId(null); }}
-                title={item.label === "Chat" ? "AI Builder" : item.label}
-                className={cn(
-                  "p-2 rounded-lg transition-all relative",
-                  item.label === "Chat" && activeNav === "Chat"
-                    ? "bg-purple-500/10 text-foreground"
-                    : activeNav === item.label
-                      ? "bg-white/[0.08] text-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
-                )}
-              >
-                <item.icon className={cn("w-5 h-5", item.label === "Chat" && "text-purple-400")} />
-                {item.label === "Trash" && trashedSites.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-white/[0.15] text-[8px] flex items-center justify-center">
-                    {trashedSites.length}
-                  </span>
-                )}
-              </button>
-              {idx === 0 && <div className="my-1 w-5 border-t border-white/[0.06]" />}
-            </div>
+          {sidebarNavItems.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => { setActiveNav(item.label); setSearchQuery(""); if (item.label === "Templates") setSelectedTemplateId(null); }}
+              title={item.label}
+              className={cn(
+                "p-2 rounded-lg transition-all relative",
+                activeNav === item.label
+                  ? "bg-white/[0.08] text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
+              )}
+            >
+              <item.icon className="w-5 h-5" />
+              {item.label === "Trash" && trashedSites.length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-white/[0.15] text-[8px] flex items-center justify-center">
+                  {trashedSites.length}
+                </span>
+              )}
+            </button>
           ))}
 
           {/* Spacer */}
@@ -515,7 +515,7 @@ export default function DashboardPage() {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <Link href="/dashboard?view=app" className="flex items-center gap-1.5">
+            <Link href="/dashboard" className="flex items-center gap-1.5">
               <span className="text-base font-bold text-white">Weavo</span>
             </Link>
           </div>
@@ -525,6 +525,7 @@ export default function DashboardPage() {
 
           {/* Desktop: Action pills — right side */}
           <div className="hidden md:flex items-center gap-2">
+            <CreditCounter />
             <button
               onClick={() => { setActiveNav("Templates"); setSelectedTemplateId(null); }}
               className={cn(
@@ -548,6 +549,7 @@ export default function DashboardPage() {
 
           {/* Mobile: avatar + new site */}
           <div className="flex items-center gap-2 md:hidden">
+            <CreditCounter compact />
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xs font-semibold"
@@ -566,10 +568,7 @@ export default function DashboardPage() {
 
         {/* Content area */}
         <main className="flex-1 overflow-y-auto scrollbar-thin">
-          {activeNav === "Chat" ? (
-            <AIChatSection credits={credits} plan={plan} />
-          ) : (
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-6">
+          <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-6">
               {activeNav === "Templates" ? (
                 <TemplatesGallery selectedIndustry={selectedTemplateId} onSelectIndustry={setSelectedTemplateId} />
               ) : activeNav === "Trash" ? (
@@ -597,13 +596,72 @@ export default function DashboardPage() {
                 />
               )}
             </div>
-          )}
         </main>
       </div>
     </div>
-      )}
     </>
   );
+}
+
+/* ===== THUMBNAIL HELPERS ===== */
+
+// Injects CSS + a tiny script into stored site HTML so that the iframe
+// thumbnail shows only the hero section instead of the full page. We can't
+// reliably identify the hero via CSS selectors alone because the hero isn't
+// always the first <section> (some pages put an announcement bar or nav
+// as a <section>), so we use JS to pick the first "tall" top-level block
+// after the document loads.
+function buildHeroSrcDoc(html: string): string {
+  if (!html) return "";
+  const injection = `<style id="__pixora_thumb_style__">
+    html, body { margin: 0 !important; padding: 0 !important; overflow: hidden !important; }
+    /* Kill entrance animations so the hero is visible the instant it mounts */
+    .animate, .animate-fade, .animate-scale { opacity: 1 !important; animation: none !important; transform: none !important; }
+  </style>
+  <script id="__pixora_thumb_script__">
+  (function () {
+    function isolateHero() {
+      try {
+        var root = document.querySelector('main') || document.body;
+        if (!root) return;
+        var kids = Array.prototype.filter.call(root.children, function (el) {
+          var tag = el.tagName.toLowerCase();
+          return tag !== 'script' && tag !== 'style' && tag !== 'link' && tag !== 'noscript';
+        });
+        // The hero is the first top-level block tall enough to be "main content".
+        // 240px threshold skips announcement bars, sticky navs, and marquees.
+        var heroIdx = -1;
+        for (var i = 0; i < kids.length; i++) {
+          if (kids[i].offsetHeight >= 240) { heroIdx = i; break; }
+        }
+        if (heroIdx === -1) return;
+        var hero = kids[heroIdx];
+        // Hide siblings after the hero
+        for (var j = heroIdx + 1; j < kids.length; j++) {
+          kids[j].style.display = 'none';
+        }
+        // If hero lives inside <main>, hide <main>'s siblings too
+        if (root !== document.body) {
+          var bodyKids = document.body.children;
+          var rootIdx = Array.prototype.indexOf.call(bodyKids, root);
+          for (var k = rootIdx + 1; k < bodyKids.length; k++) {
+            bodyKids[k].style.display = 'none';
+          }
+        }
+        // Force hero to fill the iframe viewport so no white gap below
+        hero.style.minHeight = '100vh';
+      } catch (e) {}
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () { requestAnimationFrame(isolateHero); });
+    } else {
+      requestAnimationFrame(isolateHero);
+    }
+  })();
+  </script>`;
+  if (/<\/head>/i.test(html)) return html.replace(/<\/head>/i, `${injection}</head>`);
+  if (/<body[^>]*>/i.test(html)) return html.replace(/<body[^>]*>/i, (m) => `${m}${injection}`);
+  return injection + html;
 }
 
 /* ===== SITES VIEW (Recents / All Projects) ===== */
@@ -1380,6 +1438,7 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
   const [containerWidth, setContainerWidth] = useState(0);
 
   const siteHtml = site.site_json?.html || "";
+  const heroSrcDoc = useMemo(() => buildHeroSrcDoc(siteHtml), [siteHtml]);
 
   const formattedDate = new Date(site.updated_at).toLocaleDateString("en-US", {
     month: "short",
@@ -1396,12 +1455,13 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
     return () => observer.disconnect();
   }, []);
 
-  // Scale: render at 1440px, shrink to fit card width
+  // Render the iframe at a width of 1440 and set the viewport height equal
+  // to the visible crop area (thumbHeight / scale). Combined with the
+  // isolation script that forces the hero to min-h-100vh, the hero fills
+  // the iframe exactly — no leakage from sections below.
   const iframeRenderWidth = 1440;
   const scale = containerWidth > 0 ? containerWidth / iframeRenderWidth : 0;
-  // Thumbnail area height (Figma-style ~180px)
   const thumbHeight = 180;
-  // Iframe needs to be tall enough so that when scaled, it fills the thumbHeight
   const iframeHeight = scale > 0 ? Math.ceil(thumbHeight / scale) : 900;
 
   return (
@@ -1413,9 +1473,9 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
           className="relative overflow-hidden bg-[#2a2a2e]"
           style={{ height: thumbHeight }}
         >
-          {siteHtml && scale > 0 ? (
+          {heroSrcDoc && scale > 0 ? (
             <iframe
-              srcDoc={siteHtml}
+              srcDoc={heroSrcDoc}
               title={site.name}
               className="border-0 pointer-events-none select-none block"
               scrolling="no"
@@ -1428,7 +1488,7 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
               }}
               tabIndex={-1}
               loading="lazy"
-              sandbox="allow-same-origin"
+              sandbox="allow-scripts"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#2a2a2e] to-[#1e1e22] flex items-center justify-center">
@@ -1480,6 +1540,7 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
 
 function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) => void }) {
   const siteHtml = site.site_json?.html || "";
+  const heroSrcDoc = useMemo(() => buildHeroSrcDoc(siteHtml), [siteHtml]);
   const formattedDate = new Date(site.updated_at).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -1492,9 +1553,9 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
         href={`/editor/${site.id}`}
         className="w-16 h-11 rounded-md border border-white/[0.06] overflow-hidden shrink-0 relative"
       >
-        {siteHtml ? (
+        {heroSrcDoc ? (
           <iframe
-            srcDoc={siteHtml}
+            srcDoc={heroSrcDoc}
             title={site.name}
             className="border-0 pointer-events-none select-none block"
             scrolling="no"
@@ -1507,7 +1568,7 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
             }}
             tabIndex={-1}
             loading="lazy"
-            sandbox="allow-same-origin"
+            sandbox="allow-scripts"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-purple-900/25 via-blue-900/15 to-cyan-900/10 flex items-center justify-center">
@@ -1616,87 +1677,3 @@ function SkeletonGrid({ viewMode }: { viewMode: ViewMode }) {
   );
 }
 
-/* ===== FLOW SELECTION SCREEN ===== */
-
-function FlowSelectionScreen({ onSelect }: { onSelect: (flow: 'chat' | 'wizard') => void }) {
-  const [isExiting, setIsExiting] = useState(false);
-
-  const handleSelect = (flow: 'chat' | 'wizard') => {
-    setIsExiting(true);
-    setTimeout(() => {
-      onSelect(flow);
-    }, 400); // Wait for animation to complete
-  };
-
-  return (
-    <div className={cn(
-      "fixed inset-0 z-[100] bg-[#0a0a0a] text-white flex flex-col overflow-y-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-      isExiting ? "opacity-0 scale-105 pointer-events-none filter blur-sm" : "opacity-100 scale-100 filter-none"
-    )}>
-      {/* Header */}
-      <div className="flex items-center justify-between p-6">
-        <div className="flex items-center gap-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/logo.png" alt="Weavo" className="w-8 h-8 object-contain" />
-          <span className="font-bold text-xl tracking-tight">Weavo</span>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 max-w-6xl mx-auto w-full relative">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-center">Choose your creative flow.</h1>
-        <p className="text-muted-foreground text-center mb-12">No pressure. Switch anytime in Settings.</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
-          {/* Card 1: Chat AI */}
-          <div 
-            onClick={() => handleSelect('chat')}
-            className="group cursor-pointer rounded-2xl border border-white/[0.08] bg-[#111111] p-8 hover:border-white/[0.2] transition-all hover:bg-[#161616] flex flex-col relative overflow-hidden"
-          >
-            {/* Subtle background glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
-
-            <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white/[0.06] border border-white/[0.05] text-xs font-medium mb-6 self-start relative z-10">
-              Chat AI
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-10 relative z-10">Conversational Builder</h2>
-            {/* Mock Visual */}
-            <div className="h-56 mt-auto rounded-xl bg-[#0a0a0a] border border-white/[0.04] flex items-center justify-center relative overflow-hidden z-10">
-               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:16px_16px]" />
-               {/* Abstract Chat Representation */}
-               <div className="flex flex-col gap-4 w-full px-8 opacity-80 group-hover:opacity-100 transition-all duration-500 transform group-hover:scale-105">
-                 <div className="w-3/4 h-10 rounded-2xl rounded-bl-sm bg-gradient-to-r from-purple-500/20 to-purple-500/10 border border-purple-500/20 self-start backdrop-blur-sm" />
-                 <div className="w-2/3 h-10 rounded-2xl rounded-br-sm bg-white/[0.06] border border-white/[0.08] self-end backdrop-blur-sm" />
-                 <div className="w-5/6 h-10 rounded-2xl rounded-bl-sm bg-gradient-to-r from-purple-500/20 to-purple-500/10 border border-purple-500/20 self-start backdrop-blur-sm" />
-               </div>
-            </div>
-          </div>
-
-          {/* Card 2: Wizard */}
-          <div 
-            onClick={() => handleSelect('wizard')}
-            className="group cursor-pointer rounded-2xl border border-white/[0.08] bg-[#111111] p-8 hover:border-white/[0.2] transition-all hover:bg-[#161616] flex flex-col relative overflow-hidden"
-          >
-            {/* Subtle background glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
-
-            <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white/[0.06] border border-white/[0.05] text-xs font-medium mb-6 self-start relative z-10">
-              Wizard
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-10 relative z-10">Guided Setup Wizard</h2>
-            {/* Mock Visual */}
-            <div className="h-56 mt-auto rounded-xl bg-[#0a0a0a] border border-white/[0.04] flex items-center justify-center relative overflow-hidden z-10">
-               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:16px_16px]" />
-               {/* Abstract Wizard Representation */}
-               <div className="flex items-center justify-center gap-4 opacity-80 group-hover:opacity-100 transition-all duration-500 transform group-hover:scale-105 w-full">
-                 <div className="w-20 h-28 rounded-lg bg-white/[0.04] border border-white/[0.08] shadow-lg transform -rotate-12 translate-y-4 backdrop-blur-sm" />
-                 <div className="w-24 h-32 rounded-lg bg-gradient-to-b from-white/[0.15] to-white/[0.05] border border-white/[0.2] shadow-2xl z-10 backdrop-blur-sm" />
-                 <div className="w-20 h-28 rounded-lg bg-white/[0.04] border border-white/[0.08] shadow-lg transform rotate-12 translate-y-4 backdrop-blur-sm" />
-               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}

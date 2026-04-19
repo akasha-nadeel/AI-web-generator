@@ -8,6 +8,11 @@ export const PLANS = {
     price: 0,
     sites: 1,
     generations: 3,
+    model: {
+      label: "Standard",
+      name: "Claude Sonnet 4.6",
+      detail: "Streamlined design engine",
+    },
     features: [
       "1 website",
       "3 AI generations",
@@ -20,6 +25,11 @@ export const PLANS = {
     price: 9,
     sites: 5,
     generations: 50,
+    model: {
+      label: "Pro",
+      name: "Claude Sonnet 4.6",
+      detail: "Full design library + patterns",
+    },
     features: [
       "5 websites",
       "50 AI generations/month",
@@ -33,6 +43,11 @@ export const PLANS = {
     price: 19,
     sites: -1, // unlimited
     generations: 150,
+    model: {
+      label: "Premium",
+      name: "Claude Opus 4.7",
+      detail: "Maximum design intelligence",
+    },
     features: [
       "Unlimited websites",
       "150 AI generations/month",
@@ -45,6 +60,77 @@ export const PLANS = {
 } as const;
 
 export type PlanType = keyof typeof PLANS;
+
+export const FREE_CREDITS = 30;
+
+export const MODEL_COSTS = {
+  haiku: {
+    id: "haiku",
+    label: "Fast",
+    name: "Claude Haiku 4.5",
+    apiModel: "claude-haiku-4-5-20251001",
+    detail: "Quick drafts, simple layouts",
+    credits: 5,
+    requiresPayment: false,
+  },
+  sonnet: {
+    id: "sonnet",
+    label: "Balanced",
+    name: "Claude Sonnet 4.6",
+    apiModel: "claude-sonnet-4-6",
+    detail: "Full design library, recommended default",
+    credits: 15,
+    requiresPayment: true,
+  },
+  opus: {
+    id: "opus",
+    label: "Premium",
+    name: "Claude Opus 4.7",
+    apiModel: "claude-opus-4-7",
+    detail: "Maximum design intelligence",
+    credits: 40,
+    requiresPayment: true,
+  },
+} as const;
+
+export type ModelKey = keyof typeof MODEL_COSTS;
+
+export function canUseModel(plan: string, modelKey: ModelKey): boolean {
+  const model = MODEL_COSTS[modelKey];
+  if (!model.requiresPayment) return true;
+  return plan !== "free";
+}
+
+export const CREDIT_PACKS = [
+  {
+    id: "starter",
+    name: "Starter",
+    credits: 100,
+    price: 5,
+    popular: false,
+    description: "Test the waters. Enough for a first real site.",
+  },
+  {
+    id: "popular",
+    name: "Popular",
+    credits: 300,
+    price: 12,
+    popular: true,
+    description: "Best balance. Build a few sites and iterate.",
+    savingsLabel: "Save 20%",
+  },
+  {
+    id: "studio",
+    name: "Studio",
+    credits: 800,
+    price: 25,
+    popular: false,
+    description: "For heavy users building multiple projects.",
+    savingsLabel: "Save 37%",
+  },
+] as const;
+
+export type CreditPackId = (typeof CREDIT_PACKS)[number]["id"];
 
 export const INDUSTRIES = [
   { id: "restaurant", label: "Restaurant & Food", icon: "UtensilsCrossed" },

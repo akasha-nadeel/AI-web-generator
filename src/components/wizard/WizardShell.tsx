@@ -13,6 +13,7 @@ const steps = [
   { number: 2, label: "Inspiration" },
   { number: 3, label: "Style" },
   { number: 4, label: "Pages" },
+  { number: 5, label: "Model" },
 ];
 
 interface WizardShellProps {
@@ -61,6 +62,16 @@ export function WizardShell({ children }: WizardShellProps) {
         </>
       ),
       subtitle: "Choose the exact pages you need. Our AI will seamlessly interlink them for you.",
+      image: "/images/wizard-hero-step4.jpg"
+    },
+    5: {
+      title: (
+        <>
+          Pick the engine<br />
+          that <span className="text-blue-400 font-extrabold">builds it</span>.
+        </>
+      ),
+      subtitle: "Choose an AI model. Faster costs fewer credits, premium delivers richer designs.",
       image: "/images/wizard-hero-step4.jpg"
     }
   };
@@ -143,7 +154,7 @@ export function WizardShell({ children }: WizardShellProps) {
         <div className="max-w-[700px] w-full mx-auto px-6 py-10 md:py-14 flex-1 flex flex-col">
           
           {/* Step Indicators - Progress Bar Style */}
-          <div className="grid grid-cols-4 gap-2 md:gap-4 mb-16 relative z-10">
+          <div className="grid grid-cols-5 gap-2 md:gap-4 mb-16 relative z-10">
             {steps.map((s, i) => {
               const isActive = step === s.number;
               const isPast = step > s.number;

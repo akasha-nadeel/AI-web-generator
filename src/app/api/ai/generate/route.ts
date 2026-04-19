@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getOrCreateUser, createSite, logGeneration } from "@/lib/supabase/queries";
+import { deductCredits, getCreditBalance } from "@/lib/supabase/credits";
 import {
   SYSTEM_PROMPT,
   buildUserPrompt,
@@ -14,6 +15,8 @@ import {
 import { rateLimit } from "@/lib/rate-limit";
 import { extractDesignDNA, formatDesignBriefForPrompt, type DesignBrief } from "@/lib/ai/prompts/modules/design-extractor";
 import { findBestPattern } from "@/lib/ai/design-library";
+import { MODEL_COSTS, canUseModel, type ModelKey } from "@/lib/constants";
+import { validateAndFixImages } from "@/lib/ai/image-validator";
 
 export const maxDuration = 120; // Allow up to 120s for AI generation (32k token responses need more time)
 
@@ -55,17 +58,65 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { prompt, industry, mood, pages, templateId, images } = body as {
+    const { prompt, industry, mood, pages, templateId, images, model: requestedModel } = body as {
       prompt: string;
       industry: string;
       mood: string;
       pages?: string[];
       templateId?: string;
       images?: ImagePayload[];
+      model?: ModelKey;
     };
 
     if (!prompt || !prompt.trim()) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
+    }
+
+    // ── Model selection + payment gate ─────────────────────────────
+    // Default: haiku for free-plan users, sonnet for paid. If the user
+    // explicitly picks a locked model on the free plan, reject with a
+    // clear upsell so the client can show a "buy credits" modal.
+    const modelKey: ModelKey =
+      requestedModel && requestedModel in MODEL_COSTS
+        ? requestedModel
+        : user.plan === "free"
+          ? "haiku"
+          : "sonnet";
+
+    if (!canUseModel(user.plan, modelKey)) {
+      return NextResponse.json(
+        {
+          error: "This model requires a credit pack. Upgrade to unlock Sonnet and Opus.",
+          code: "MODEL_REQUIRES_PAYMENT",
+          requestedModel: modelKey,
+          availableOnFree: ["haiku"],
+        },
+        { status: 402 }
+      );
+    }
+
+    const selectedModel = MODEL_COSTS[modelKey];
+
+    // ── Credit balance pre-check ────────────────────────────────────
+    // Reject early (before any AI cost is incurred) if the user can't
+    // afford this generation. The actual deduction happens after a
+    // successful generation — deducting here would require refund logic
+    // on AI failures, which adds complexity we don't need yet.
+    const currentBalance = await getCreditBalance(user.id);
+    if (currentBalance === null) {
+      return NextResponse.json({ error: "User record missing" }, { status: 404 });
+    }
+    if (currentBalance < selectedModel.credits) {
+      return NextResponse.json(
+        {
+          error: `Not enough credits. This generation needs ${selectedModel.credits} credits, you have ${currentBalance}.`,
+          code: "INSUFFICIENT_CREDITS",
+          required: selectedModel.credits,
+          balance: currentBalance,
+          model: modelKey,
+        },
+        { status: 402 }
+      );
     }
 
     const hasImages = images && images.length > 0;
@@ -114,7 +165,7 @@ export async function POST(req: NextRequest) {
             "anthropic-version": "2023-06-01",
           },
           body: JSON.stringify({
-            model: "claude-sonnet-4-20250514",
+            model: "claude-haiku-4-5-20251001",
             max_tokens: 300,
             temperature: 0,
             system: AI_CLASSIFY_PROMPT,
@@ -219,7 +270,7 @@ ${userPrompt}`;
     let modelUsed = "unknown";
 
     if (process.env.ANTHROPIC_API_KEY) {
-      modelUsed = "claude-sonnet-4-20250514";
+      modelUsed = selectedModel.apiModel;
 
       // Build message content — images only when extraction failed, otherwise text-only
       const userContent: Array<{ type: string; [key: string]: unknown }> = [];
@@ -236,6 +287,17 @@ ${userPrompt}`;
       }
       userContent.push({ type: "text", text: finalUserPrompt });
 
+      // Prompt caching: mark the system prompt as cacheable. Cache hits on
+      // repeat requests (within 5 min) with the SAME assembled system prompt
+      // — i.e. same classification. Cuts input cost ~90% on cache reads.
+      const systemBlocks = [
+        {
+          type: "text",
+          text: finalSystemPrompt,
+          cache_control: { type: "ephemeral" as const },
+        },
+      ];
+
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -245,8 +307,8 @@ ${userPrompt}`;
         },
         body: JSON.stringify({
           model: modelUsed,
-          max_tokens: 16384,
-          system: finalSystemPrompt,
+          max_tokens: 32000,
+          system: systemBlocks,
           messages: [{ role: "user", content: userContent }],
         }),
       });
@@ -259,6 +321,18 @@ ${userPrompt}`;
         const content = data.content?.[0]?.text;
         if (content) {
           generatedHtml = extractHtml(content);
+        }
+        const usage = data.usage || {};
+        const cacheRead = usage.cache_read_input_tokens ?? 0;
+        const cacheWrite = usage.cache_creation_input_tokens ?? 0;
+        const inputTokens = usage.input_tokens ?? 0;
+        const outputTokens = usage.output_tokens ?? 0;
+        const stopReason = data.stop_reason;
+        console.log(
+          `[Generate] Tokens — input: ${inputTokens}, output: ${outputTokens}, cache_read: ${cacheRead}, cache_write: ${cacheWrite}, stop: ${stopReason}`
+        );
+        if (stopReason === "max_tokens") {
+          console.warn(`[Generate] ⚠ Output hit max_tokens cap (${outputTokens} tokens). HTML will be truncated — footer/sections may be cut off.`);
         }
       }
     } else if (process.env.OPENAI_API_KEY) {
@@ -289,7 +363,7 @@ ${userPrompt}`;
             { role: "user", content: userContent },
           ],
           temperature: 0.7,
-          max_tokens: 16384,
+          max_tokens: 32000,
         }),
       });
 
@@ -328,7 +402,7 @@ ${userPrompt}`;
             contents: [{ parts }],
             generationConfig: {
               temperature: 0.7,
-              maxOutputTokens: 16384,
+              maxOutputTokens: 32000,
             },
           }),
         }
@@ -357,6 +431,17 @@ ${userPrompt}`;
         { status: 500 }
       );
     }
+
+    // Catch hallucinated/dead photo IDs before they reach the browser.
+    const validation = await validateAndFixImages(generatedHtml);
+    if (validation.swapped > 0) {
+      console.warn(
+        `[Generate] Image validation — checked ${validation.checked}, swapped ${validation.swapped} broken URLs`
+      );
+    } else {
+      console.log(`[Generate] Image validation — checked ${validation.checked}, all OK`);
+    }
+    generatedHtml = validation.html;
 
     // Store the generated HTML in site_json as { html: "..." }
     const siteData = { html: generatedHtml };
@@ -394,9 +479,28 @@ ${userPrompt}`;
       modelUsed
     );
 
+    // ── Deduct credits (after successful generation) ────────────────
+    // Safe by design: the atomic RPC row-locks the user, so two parallel
+    // successful generations can't both read the same stale balance.
+    const deductResult = await deductCredits(
+      user.id,
+      selectedModel.credits,
+      "generation",
+      {
+        siteId: site?.id,
+        modelKey,
+        apiModel: selectedModel.apiModel,
+      }
+    );
+    const creditsRemaining = deductResult.success
+      ? deductResult.newBalance
+      : currentBalance;
+
     return NextResponse.json({
       siteId: site?.id,
       html: generatedHtml,
+      creditsRemaining,
+      model: modelKey,
     });
   } catch (error) {
     console.error("Generation error:", error);

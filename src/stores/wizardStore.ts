@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { ModelKey } from "@/lib/constants";
 
 interface WizardState {
   step: number;
@@ -16,6 +17,7 @@ interface WizardState {
   fontStyle: string;
   overallFeel: string;
   selectedPages: string[];
+  modelKey: ModelKey;
   isGenerating: boolean;
 
   setStep: (step: number) => void;
@@ -27,6 +29,7 @@ interface WizardState {
   setOverallFeel: (feel: string) => void;
   setSelectedPages: (pages: string[]) => void;
   togglePage: (page: string) => void;
+  setModelKey: (key: ModelKey) => void;
   setIsGenerating: (generating: boolean) => void;
   reset: () => void;
 }
@@ -47,6 +50,7 @@ const initialState = {
   fontStyle: "modern",
   overallFeel: "minimal",
   selectedPages: ["Home"],
+  modelKey: "haiku" as ModelKey,
   isGenerating: false,
 };
 
@@ -82,6 +86,8 @@ export const useWizardStore = create<WizardState>((set) => ({
         ? state.selectedPages.filter((p) => p !== page)
         : [...state.selectedPages, page],
     })),
+
+  setModelKey: (modelKey) => set({ modelKey }),
 
   setIsGenerating: (isGenerating) => set({ isGenerating }),
 

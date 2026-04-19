@@ -8,6 +8,7 @@ import { StepBusinessInfo } from "@/components/wizard/StepBusinessInfo";
 import { StepInspiration } from "@/components/wizard/StepInspiration";
 import { StepStylePreferences } from "@/components/wizard/StepStylePreferences";
 import { StepPageSelection } from "@/components/wizard/StepPageSelection";
+import { StepModelSelection } from "@/components/wizard/StepModelSelection";
 
 function WizardContent() {
   const searchParams = useSearchParams();
@@ -27,6 +28,7 @@ function WizardContent() {
       {step === 2 && <StepInspiration />}
       {step === 3 && <StepStylePreferences />}
       {step === 4 && <StepPageSelection />}
+      {step === 5 && <StepModelSelection />}
     </WizardShell>
   );
 }

@@ -29,6 +29,8 @@ import {
     ImageIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCreditsStore } from "@/stores/creditsStore";
+import { CreditCounter } from "@/components/ui/CreditCounter";
 
 /* ===== TYPES ===== */
 
@@ -327,6 +329,7 @@ function GeneratePageContent() {
     const mood = searchParams.get("mood") || "minimal";
     const pages = searchParams.get("pages")?.split(",") || ["Home", "About", "Contact"];
     const templateId = searchParams.get("templateId") || "";
+    const model = searchParams.get("model") || "";
     const routeSiteId = params.siteId as string;
 
     // Generate a new site via API
@@ -345,6 +348,7 @@ function GeneratePageContent() {
                     mood,
                     pages,
                     ...(templateId && { templateId }),
+                    ...(model && { model }),
                     ...(initialImages && initialImages.length > 0 && {
                         images: initialImages.map((img) => ({
                             data: img.data,
@@ -355,11 +359,24 @@ function GeneratePageContent() {
             });
 
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Generation failed");
+            if (!res.ok) {
+                if (res.status === 402 && data.code === "INSUFFICIENT_CREDITS") {
+                    useCreditsStore.getState().openOutOfCredits({
+                        required: data.required ?? 0,
+                        balance: data.balance ?? 0,
+                        model: data.model,
+                    });
+                    useCreditsStore.getState().refresh();
+                }
+                throw new Error(data.error || "Generation failed");
+            }
             if (!data.siteId) throw new Error("No site returned");
 
             setSiteId(data.siteId);
             if (data.html) setSiteHtml(data.html);
+            if (typeof data.creditsRemaining === "number") {
+                useCreditsStore.getState().setBalance(data.creditsRemaining);
+            }
 
             const genElapsed = Math.round((Date.now() - chatStartTime.current) / 1000);
             setMessages((prev) => [
@@ -684,6 +701,7 @@ function GeneratePageContent() {
                 </span>
 
                 <div className="flex items-center gap-1">
+                    <CreditCounter compact className="mr-1" />
                     <button className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all">
                         <GitFork className="w-3.5 h-3.5" />
                         Remix
