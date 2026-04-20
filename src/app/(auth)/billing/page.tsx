@@ -53,6 +53,7 @@ const FREE_CARD: PackCard = {
 
 const PACK_FEATURES: Record<string, string[]> = {
   starter: [
+    "Lifetime Pro access included",
     "100 AI credits",
     "Credits never expire",
     "All three models available",
@@ -60,6 +61,7 @@ const PACK_FEATURES: Record<string, string[]> = {
     "Unsplash integration",
   ],
   popular: [
+    "Lifetime Pro access included",
     "300 AI credits",
     "Credits never expire",
     "All three models available",
@@ -68,6 +70,7 @@ const PACK_FEATURES: Record<string, string[]> = {
     "Priority generation",
   ],
   studio: [
+    "Lifetime Pro access included",
     "800 AI credits",
     "Credits never expire",
     "All three models available",
@@ -272,24 +275,62 @@ export default function BillingPage() {
           </div>
         </div>
 
-        {/* Why credits strip */}
-        <div className="mb-8 inline-flex items-start gap-2.5 px-4 py-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] max-w-2xl">
-          <span
-            className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0 mt-[1px]"
-            style={{ color: ACCENT }}
+        {/* Free users: prominent upgrade hero. Pro users: small cost-rationale strip. */}
+        {plan === "free" ? (
+          <div
+            className="mb-8 rounded-3xl p-7 md:p-9 flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #181808 0%, #0e0e0e 100%)",
+              borderColor: `${ACCENT}40`,
+              borderWidth: "1px",
+              borderStyle: "solid",
+            }}
           >
-            Why credits
-          </span>
-          <span className="text-[12.5px] text-white/60 leading-snug text-left">
-            Each site costs us{" "}
-            <span className="text-white/85 font-semibold">$0.07–$1.05</span> in AI
-            compute. Packs cover that plus hosting and payment fees — no hidden
-            markup.
-          </span>
-        </div>
+            {/* Soft accent glow */}
+            <div
+              className="absolute -right-24 -top-24 w-72 h-72 rounded-full opacity-[0.18] blur-3xl pointer-events-none"
+              style={{ background: ACCENT }}
+            />
+
+            <div className="flex-1 relative z-10">
+              <div className="flex items-center gap-2 mb-2.5">
+                <Sparkles className="w-5 h-5" style={{ color: ACCENT }} strokeWidth={2.5} />
+                <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+                  Unlock all AI models — for life
+                </h2>
+              </div>
+              <p className="text-sm md:text-[15px] text-white/65 leading-relaxed max-w-2xl">
+                Buy any pack to upgrade to Pro. Use Sonnet and Opus on every generation, forever — even if your credits run out, your Pro access never does.
+              </p>
+            </div>
+
+            <a
+              href="#packs"
+              className="shrink-0 inline-flex items-center justify-center px-7 py-3 rounded-full text-sm font-semibold text-black hover:opacity-90 transition-opacity whitespace-nowrap relative z-10"
+              style={{ backgroundColor: ACCENT }}
+            >
+              View packs
+            </a>
+          </div>
+        ) : (
+          <div className="mb-8 inline-flex items-start gap-2.5 px-4 py-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] max-w-2xl">
+            <span
+              className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0 mt-[1px]"
+              style={{ color: ACCENT }}
+            >
+              Why credits
+            </span>
+            <span className="text-[12.5px] text-white/60 leading-snug text-left">
+              Each site costs us{" "}
+              <span className="text-white/85 font-semibold">$0.07–$1.05</span> in AI
+              compute. Packs cover that plus hosting and payment fees — no hidden
+              markup.
+            </span>
+          </div>
+        )}
 
         {/* Pricing cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div id="packs" className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {cards.map((card) => (
             <div
               key={card.id}

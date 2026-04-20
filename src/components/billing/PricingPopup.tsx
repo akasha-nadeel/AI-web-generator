@@ -50,6 +50,7 @@ const FREE_CARD: PackCard = {
 
 const PACK_FEATURES: Record<string, string[]> = {
   starter: [
+    "Lifetime Pro access included",
     "100 AI credits",
     "Credits never expire",
     "All three models available",
@@ -57,6 +58,7 @@ const PACK_FEATURES: Record<string, string[]> = {
     "Unsplash integration",
   ],
   popular: [
+    "Lifetime Pro access included",
     "300 AI credits",
     "Credits never expire",
     "All three models available",
@@ -65,6 +67,7 @@ const PACK_FEATURES: Record<string, string[]> = {
     "Priority generation",
   ],
   studio: [
+    "Lifetime Pro access included",
     "800 AI credits",
     "Credits never expire",
     "All three models available",
