@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
           email,
           name,
           plan: "free",
-          credits_remaining: 3,
+          credits_remaining: 30,
         },
         { onConflict: "clerk_id" }
       );

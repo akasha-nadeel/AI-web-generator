@@ -92,6 +92,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "credit grant failed" }, { status: 500 });
   }
 
+  if (user.plan === "free") {
+    const { error: planError } = await supabase
+      .from("users")
+      .update({ plan: "paid" })
+      .eq("id", user.id);
+    if (planError) {
+      console.error("[paddle webhook] plan upgrade failed", planError);
+    }
+  }
+
   console.log(
     `[paddle webhook] +${totalCredits} credits to user ${user.id} (${pack.id}, txn ${txn.id})`
   );
