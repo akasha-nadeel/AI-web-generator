@@ -4,8 +4,6 @@ import { useWizardStore } from "@/stores/wizardStore";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
-import { MessageSquare } from "lucide-react";
-
 import { motion, AnimatePresence } from "framer-motion";
 
 const steps = [
@@ -141,12 +139,6 @@ export function WizardShell({ children }: WizardShellProps) {
           </motion.div>
         </AnimatePresence>
 
-        {/* Chat Bubble Widget (Mock) */}
-        <div className="absolute bottom-6 left-8 z-20">
-          <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-xl cursor-pointer hover:scale-105 transition-transform">
-            <MessageSquare className="w-5 h-5 text-black fill-black" />
-          </div>
-        </div>
       </div>
 
       {/* Right Panel */}
