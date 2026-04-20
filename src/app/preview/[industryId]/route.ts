@@ -26,8 +26,9 @@ export async function GET(
     .eq("id", industryId)
     .single();
 
-  if (site?.site_json?.html) {
-    return new NextResponse(site.site_json.html, {
+  const html = (site?.site_json as { html?: string } | null)?.html;
+  if (html) {
+    return new NextResponse(html, {
       headers: { "Content-Type": "text/html; charset=utf-8" },
     });
   }
