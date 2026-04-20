@@ -185,17 +185,13 @@ export function AppShell({ children }: AppShellProps) {
               </div>
             </div>
 
-            {planKey === "free" && (
-              <>
-                <DropdownMenuSeparator className="bg-white/[0.06]" />
-                <DropdownMenuItem asChild>
-                  <Link href="/billing" className="flex items-center gap-3 text-sm">
-                    <ArrowUpRight className="w-4 h-4" />
-                    Upgrade plan
-                  </Link>
-                </DropdownMenuItem>
-              </>
-            )}
+            <DropdownMenuSeparator className="bg-white/[0.06]" />
+            <DropdownMenuItem asChild>
+              <Link href="/billing" className="flex items-center gap-3 text-sm">
+                <ArrowUpRight className="w-4 h-4" />
+                {planKey === "free" ? "Upgrade plan" : "Buy credits"}
+              </Link>
+            </DropdownMenuItem>
 
             <DropdownMenuSeparator className="bg-white/[0.06]" />
 

@@ -364,18 +364,14 @@ export default function DashboardPage() {
               </Link>
             </DropdownMenuItem>
 
-            {/* Upgrade plan */}
-            {plan === "free" && (
-              <>
-                <DropdownMenuSeparator className="bg-white/[0.06]" />
-                <DropdownMenuItem asChild>
-                  <Link href="/billing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-sm">
-                    <ArrowUpRight className="w-4 h-4" />
-                    Upgrade plan
-                  </Link>
-                </DropdownMenuItem>
-              </>
-            )}
+            {/* Upgrade plan / Buy more credits */}
+            <DropdownMenuSeparator className="bg-white/[0.06]" />
+            <DropdownMenuItem asChild>
+              <Link href="/billing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-sm">
+                <ArrowUpRight className="w-4 h-4" />
+                {plan === "free" ? "Upgrade plan" : "Buy credits"}
+              </Link>
+            </DropdownMenuItem>
 
             <DropdownMenuSeparator className="bg-white/[0.06]" />
 
