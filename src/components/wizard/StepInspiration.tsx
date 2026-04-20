@@ -30,7 +30,7 @@ export function StepInspiration() {
   return (
     <div className="flex-1 flex flex-col">
       <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">Add inspiration <span className="text-white/40 font-normal">(optional)</span></h2>
-      <p className="text-white/60 text-base mb-10 leading-relaxed max-w-lg">
+      <p className="text-white/60 text-base mb-7 leading-relaxed max-w-lg">
         Upload screenshots of websites you like, your logo, or product photos.
         Our AI will match the style.
       </p>
@@ -81,7 +81,7 @@ export function StepInspiration() {
       </div>
 
       {/* Footer Buttons */}
-      <div className="mt-12 flex justify-between items-center pt-6 border-t border-white/5">
+      <div className="mt-8 flex justify-between items-center pt-5 border-t border-white/5">
         <button
           onClick={() => setStep(1)}
           className="px-6 py-2.5 rounded-lg text-sm font-medium transition-colors border border-white/10 bg-transparent text-white hover:bg-white/5"

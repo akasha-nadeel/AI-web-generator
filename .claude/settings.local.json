@@ -41,7 +41,17 @@
       "Bash(node -e \"const { SYSTEM_PROMPT, buildUserPrompt } = require\\('./src/lib/ai/prompts/generation.ts'\\); console.log\\('FAIL'\\)\")",
       "Bash(npx tsx:*)",
       "Bash(node -e ':*)",
-      "Bash(npx supabase *)"
+      "Bash(npx supabase *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(npm install *)",
+      "Bash(tasklist)",
+      "Bash(C:\\\\Users\\\\User\\\\Desktop\\\\My projects\\\\Doing\\\\AI web site\\\\pixora\\\\.tools\\\\cloudflared.exe *)",
+      "Bash(netstat -ano)",
+      "Bash(C:\\\\Users\\\\User\\\\Desktop\\\\My projects\\\\Doing\\\\AI web site\\\\pixora\\\\.tools\\\\cloudflared.exe tunnel *)",
+      "Bash(powershell *)",
+      "Bash(awk '{print $NF}')"
     ]
   }
 }

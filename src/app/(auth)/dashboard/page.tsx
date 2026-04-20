@@ -24,7 +24,6 @@ import {
   Download,
   Zap,
   ArrowUpRight,
-  Layers,
   RotateCcw,
   AlertTriangle,
   ArrowRight,
@@ -100,6 +99,20 @@ export default function DashboardPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // ⌘K / Ctrl+K — focus search
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   // Fetch active sites
   const fetchSites = useCallback(async () => {
@@ -255,20 +268,6 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      {/* Search */}
-      <div className="px-3 pt-4 pb-2">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search projects..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-8 pl-9 pr-3 text-xs bg-white/[0.04] border border-white/[0.08] rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/40 focus:bg-white/[0.06] transition-all"
-          />
-        </div>
-      </div>
-
       {/* Navigation */}
       <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto scrollbar-thin">
         {/* New Site — primary CTA, wizard is the only generation flow */}
@@ -314,7 +313,7 @@ export default function DashboardPage() {
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img src={user.imageUrl} alt={user?.fullName || "User"} className="w-9 h-9 rounded-full object-cover shrink-0 border border-white/10" referrerPolicy="no-referrer" />
               ) : (
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-sm font-semibold shrink-0">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white text-sm font-semibold shrink-0">
                   {user?.fullName?.charAt(0)?.toUpperCase() || user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() || "U"}
                 </div>
               )}
@@ -333,7 +332,7 @@ export default function DashboardPage() {
             side="top"
             align="start"
             sideOffset={8}
-            className="w-[calc(260px-1.5rem)] bg-[rgba(20,20,40,0.97)] backdrop-blur-xl border-white/[0.1] rounded-xl p-1"
+            className="w-[calc(260px-1.5rem)] bg-[rgba(22,22,22,0.97)] backdrop-blur-xl border-white/[0.1] rounded-xl p-1"
           >
             {/* Email */}
             <div className="px-3 py-2 text-xs text-muted-foreground truncate">
@@ -351,7 +350,7 @@ export default function DashboardPage() {
 
             {/* Billing */}
             <DropdownMenuItem asChild>
-              <Link href="/billing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-sm">
+              <Link href="/billing/manage" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-sm">
                 <CreditCard className="w-4 h-4" />
                 Billing
               </Link>
@@ -364,25 +363,6 @@ export default function DashboardPage() {
                 Get help
               </Link>
             </DropdownMenuItem>
-
-            <DropdownMenuSeparator className="bg-white/[0.06]" />
-
-            {/* Credits info */}
-            <div className="px-3 py-2">
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-1.5">
-                  <Zap className="w-3 h-3 text-white/70" />
-                  <span className="text-xs text-muted-foreground">Credits</span>
-                </div>
-                <span className="text-xs font-medium">{credits}/{totalCredits}</span>
-              </div>
-              <div className="w-full h-1 bg-white/[0.06] rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-500"
-                  style={{ width: `${creditPercentage}%` }}
-                />
-              </div>
-            </div>
 
             {/* Upgrade plan */}
             {plan === "free" && (
@@ -415,10 +395,10 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-background flex">
+      <div className="h-screen overflow-hidden bg-background flex">
           {/* ===== MOBILE SIDEBAR DRAWER ===== */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" showCloseButton={false} className="w-[280px] p-0 bg-[rgba(10,10,25,0.97)] border-white/[0.06] flex flex-col">
+        <SheetContent side="left" showCloseButton={false} className="w-[280px] p-0 bg-[rgba(12,12,12,0.97)] border-white/[0.06] flex flex-col">
           <SheetTitle className="sr-only">Navigation</SheetTitle>
           {sidebarContent}
         </SheetContent>
@@ -427,7 +407,7 @@ export default function DashboardPage() {
       {/* ===== DESKTOP SIDEBAR ===== */}
       <aside
         className={cn(
-          "hidden md:flex flex-col border-r border-white/[0.06] bg-[rgba(10,10,25,0.5)] shrink-0 h-screen sticky top-0 overflow-hidden transition-[width] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+          "hidden md:flex flex-col border-r border-white/[0.06] bg-[rgba(12,12,12,0.5)] shrink-0 h-screen overflow-hidden transition-[width] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
           sidebarCollapsed ? "w-[52px]" : "w-[260px]"
         )}
       >
@@ -485,7 +465,7 @@ export default function DashboardPage() {
           {/* Bottom avatar */}
           <button
             onClick={() => setSidebarCollapsed(false)}
-            className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-sm font-semibold shrink-0 hover:ring-2 hover:ring-white/20 transition-all"
+            className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white text-sm font-semibold shrink-0 hover:ring-2 hover:ring-white/20 transition-all"
             title={user?.fullName || "Profile"}
           >
             {user?.fullName?.charAt(0)?.toUpperCase() || user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() || "U"}
@@ -506,7 +486,7 @@ export default function DashboardPage() {
       {/* ===== MAIN CONTENT ===== */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header className="h-14 border-b border-white/[0.06] bg-[rgba(10,10,25,0.3)] flex items-center justify-between px-3 md:px-6 shrink-0">
+        <header className="h-14 border-b border-white/[0.06] bg-[rgba(12,12,12,0.3)] flex items-center justify-between px-3 md:px-6 shrink-0">
           {/* Mobile: hamburger + logo */}
           <div className="flex items-center gap-2 md:hidden">
             <button
@@ -520,49 +500,56 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          {/* Desktop: spacer on left */}
-          <div className="hidden md:block" />
-
-          {/* Desktop: Action pills — right side */}
-          <div className="hidden md:flex items-center gap-2">
-            <CreditCounter />
-            <button
-              onClick={() => { setActiveNav("Templates"); setSelectedTemplateId(null); }}
-              className={cn(
-                "flex items-center gap-2 h-9 px-4 rounded-full text-sm transition-all border",
-                activeNav === "Templates"
-                  ? "bg-white/[0.1] text-foreground border-white/[0.12]"
-                  : "bg-white/[0.06] text-muted-foreground hover:text-foreground hover:bg-white/[0.1] border-white/[0.08]"
-              )}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              Templates
-            </button>
-            <Link
-              href="/wizard"
-              className="flex items-center gap-2 h-9 px-4 rounded-full bg-white text-black text-sm font-medium hover:bg-white/90 transition-opacity"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              New Site
-            </Link>
+          {/* Desktop: breadcrumb on left */}
+          <div className="hidden md:flex items-center gap-2 text-sm">
+            <span className="text-muted-foreground">Workspace</span>
+            <ChevronRight className="w-3.5 h-3.5 text-white/30" />
+            <span className="text-foreground font-medium">{activeNav}</span>
+            {activeNav !== "Templates" && (
+              <span className="ml-1 text-[11px] text-muted-foreground bg-white/[0.05] border border-white/[0.06] rounded-full px-2 py-0.5 tabular-nums">
+                {activeNav === "Trash" ? displayTrashed.length : displaySites.length}
+              </span>
+            )}
           </div>
 
-          {/* Mobile: avatar + new site */}
+          {/* Desktop: Action pills — right side */}
+          <div className="hidden md:flex items-center gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search projects..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-56 h-9 pl-9 pr-3 text-xs bg-white/[0.04] border border-white/[0.08] rounded-full text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/40 focus:bg-white/[0.06] transition-all"
+              />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
+                <kbd className="text-[10px] font-medium bg-white/[0.06] border border-white/[0.08] rounded px-1.5 py-0.5 tabular-nums text-muted-foreground/60">
+                  ⌘K
+                </kbd>
+              </div>
+            </div>
+            <Link
+              href="/settings"
+              className="w-9 h-9 rounded-full bg-white/[0.04] border border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-white/[0.08] transition-all flex items-center justify-center shrink-0"
+              title="Help"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </Link>
+            <div className="h-8 w-px bg-white/[0.08] mx-1" />
+            <CreditCounter />
+          </div>
+
+          {/* Mobile: avatar */}
           <div className="flex items-center gap-2 md:hidden">
             <CreditCounter compact />
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xs font-semibold"
+              className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white text-xs font-semibold"
             >
               {user?.fullName?.charAt(0)?.toUpperCase() || "U"}
             </button>
-            <Link
-              href="/wizard"
-              className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-white text-black text-xs font-medium"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              New
-            </Link>
           </div>
         </header>
 
@@ -591,6 +578,7 @@ export default function DashboardPage() {
                   sortMode={sortMode}
                   setSortMode={setSortMode}
                   activeNav={activeNav}
+                  setActiveNav={setActiveNav}
                   searchQuery={searchQuery}
                   onDelete={handleMoveToTrash}
                 />
@@ -674,6 +662,7 @@ function SitesView({
   sortMode,
   setSortMode,
   activeNav,
+  setActiveNav,
   searchQuery,
   onDelete,
 }: {
@@ -684,6 +673,7 @@ function SitesView({
   sortMode: SortMode;
   setSortMode: (s: SortMode) => void;
   activeNav: NavView;
+  setActiveNav: (v: NavView) => void;
   searchQuery: string;
   onDelete: (id: string) => void;
 }) {
@@ -709,19 +699,37 @@ function SitesView({
 
   return (
     <>
-      {/* Recommended templates banner */}
+      {/* Recommended templates */}
       {showRecommended && activeNav === "Recents" && (
-        <div className="mb-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-white/70">
-              Recommended templates
-            </h3>
-            <div className="flex items-center gap-2">
+        <section className="mb-10">
+          <div className="flex items-end justify-between mb-4">
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-2">
+                <span
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ backgroundColor: "#C8E600", boxShadow: "0 0 8px #C8E600" }}
+                />
+                <span className="text-[11px] font-medium tracking-[0.12em] uppercase text-white/50">
+                  Curated for you
+                </span>
+              </div>
+              <h2 className="text-xl font-semibold text-white tracking-tight">
+                Start from a template
+              </h2>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setActiveNav("Templates")}
+                className="text-xs font-medium text-white/60 hover:text-white px-2.5 py-1.5 rounded-md hover:bg-white/[0.05] transition-colors"
+              >
+                View all
+              </button>
               <button
                 onClick={() => setShowRecommended(false)}
-                className="text-white/30 hover:text-white/60 transition-colors p-1"
+                className="text-xs font-medium text-white/30 hover:text-white/60 px-2.5 py-1.5 rounded-md hover:bg-white/[0.05] transition-colors"
+                title="Hide this section"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                Hide
               </button>
             </div>
           </div>
@@ -730,7 +738,7 @@ function SitesView({
               <RecommendedTemplateCard key={t.id} t={t} />
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {/* Header row */}
@@ -750,7 +758,7 @@ function SitesView({
             <DropdownMenuTrigger className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs bg-white/[0.03] border border-white/[0.06] text-muted-foreground hover:text-foreground transition-all">
               {sortMode === "updated" ? "Last edited" : sortMode === "created" ? "Date created" : "Name A-Z"}
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-[rgba(20,20,40,0.95)] backdrop-blur-xl border-white/[0.1]">
+            <DropdownMenuContent align="end" className="bg-[rgba(22,22,22,0.95)] backdrop-blur-xl border-white/[0.1]">
               <DropdownMenuItem onClick={() => setSortMode("updated")} className="text-xs">Last edited</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setSortMode("created")} className="text-xs">Date created</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setSortMode("name")} className="text-xs">Name A-Z</DropdownMenuItem>
@@ -1515,7 +1523,7 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
           <DropdownMenuTrigger className="p-1 rounded-md hover:bg-white/[0.08] transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100 shrink-0 focus:outline-none">
             <MoreVertical className="w-4 h-4 text-muted-foreground" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40 bg-[rgba(20,20,40,0.95)] backdrop-blur-xl border-white/[0.1]">
+          <DropdownMenuContent align="end" className="w-40 bg-[rgba(22,22,22,0.95)] backdrop-blur-xl border-white/[0.1]">
             <DropdownMenuItem asChild>
               <Link href={`/editor/${site.id}`} className="flex items-center gap-2 text-xs">
                 <Edit className="w-3.5 h-3.5" /> Edit
@@ -1595,7 +1603,7 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
         <DropdownMenuTrigger className="p-1 rounded-md hover:bg-white/[0.08] transition-colors md:opacity-0 md:group-hover:opacity-100 data-[state=open]:opacity-100 focus:outline-none">
           <MoreVertical className="w-4 h-4 text-muted-foreground" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40 bg-[rgba(20,20,40,0.95)] backdrop-blur-xl border-white/[0.1]">
+        <DropdownMenuContent align="end" className="w-40 bg-[rgba(22,22,22,0.95)] backdrop-blur-xl border-white/[0.1]">
           <DropdownMenuItem asChild>
             <Link href={`/editor/${site.id}`} className="flex items-center gap-2 text-xs">
               <Edit className="w-3.5 h-3.5" /> Edit

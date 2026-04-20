@@ -72,21 +72,21 @@ export function WizardShell({ children }: WizardShellProps) {
         </>
       ),
       subtitle: "Choose an AI model. Faster costs fewer credits, premium delivers richer designs.",
-      image: "/images/wizard-hero-step4.jpg"
+      image: "/images/wizard-hero-step5.jpg"
     }
   };
 
   const currentContent = leftPanelContent[step as keyof typeof leftPanelContent] || leftPanelContent[1];
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }} 
-      animate={{ opacity: 1 }} 
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
       className="h-screen bg-[#0a0a0a] flex flex-col lg:flex-row overflow-hidden"
     >
       {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-[42%] h-full relative overflow-hidden flex-col shrink-0">
+      <div className="lg:w-[42%] h-full relative overflow-hidden flex-col shrink-0 hidden lg:flex">
         {/* Background Image with Crossfade */}
         <AnimatePresence initial={false}>
           <motion.div
@@ -151,21 +151,21 @@ export function WizardShell({ children }: WizardShellProps) {
 
       {/* Right Panel */}
       <div className="flex-1 flex flex-col relative h-full overflow-y-auto w-full">
-        <div className="max-w-[700px] w-full mx-auto px-6 py-10 md:py-14 flex-1 flex flex-col">
+        <div className="w-full max-w-[700px] mx-auto px-6 py-5 md:py-7 flex-1 flex flex-col">
           
           {/* Step Indicators - Progress Bar Style */}
-          <div className="grid grid-cols-5 gap-2 md:gap-4 mb-16 relative z-10">
-            {steps.map((s, i) => {
+          <div className="grid grid-cols-5 gap-2 md:gap-4 mb-7 relative z-10 w-full max-w-[700px] mx-auto">
+            {steps.map((s) => {
               const isActive = step === s.number;
               const isPast = step > s.number;
               return (
                 <div key={s.number} className="flex flex-col gap-2">
                   <div className="h-1.5 w-full rounded-full bg-white/[0.06] overflow-hidden">
-                    <div 
+                    <div
                       className={cn(
                         "h-full rounded-full transition-all duration-700 ease-in-out",
                         isPast || isActive ? "bg-white w-full" : "w-0"
-                      )} 
+                      )}
                     />
                   </div>
                   <span className={cn(

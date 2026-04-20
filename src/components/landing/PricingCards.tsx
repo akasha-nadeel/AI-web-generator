@@ -45,7 +45,7 @@ const cards: CardData[] = [
     name: "Starter",
     badge: "Early Bird",
     tagline: "For casual builders",
-    price: "$5",
+    price: "$7",
     priceSuffix: "one-time",
     ctaLabel: "Buy Starter",
     popular: false,
@@ -60,9 +60,9 @@ const cards: CardData[] = [
   {
     id: "popular",
     name: "Popular",
-    badge: "Save 20%",
+    badge: "Save 29%",
     tagline: "For creators who build often",
-    price: "$12",
+    price: "$15",
     priceSuffix: "one-time",
     ctaLabel: "Buy Popular",
     popular: true,
@@ -78,9 +78,9 @@ const cards: CardData[] = [
   {
     id: "studio",
     name: "Studio",
-    badge: "Save 37%",
+    badge: "Save 46%",
     tagline: "For heavy builders",
-    price: "$25",
+    price: "$30",
     priceSuffix: "one-time",
     ctaLabel: "Buy Studio",
     popular: false,
@@ -183,15 +183,29 @@ export function PricingCards() {
 
             {/* Features */}
             <ul className="space-y-3 text-[13.5px]">
-              {card.features.map((f) => (
-                <li key={f} className="flex items-start gap-2.5">
-                  <Check
-                    className="w-4 h-4 text-[#C8E600] shrink-0 mt-[2px]"
-                    strokeWidth={3}
-                  />
-                  <span className="text-white/75 leading-snug">{f}</span>
-                </li>
-              ))}
+              {card.features.map((f) => {
+                const numberMatch = f.match(/^(\d+)(.*)/);
+                return (
+                  <li key={f} className="flex items-start gap-2.5">
+                    <Check
+                      className="w-4 h-4 text-[#C8E600] shrink-0 mt-[2px]"
+                      strokeWidth={3}
+                    />
+                    <span className="text-white/70 leading-snug">
+                      {numberMatch ? (
+                        <>
+                          <span className="text-[20px] font-bold text-white mr-1 inline-block align-middle -mt-1">
+                            {numberMatch[1]}
+                          </span>
+                          {numberMatch[2]}
+                        </>
+                      ) : (
+                        f
+                      )}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
           </motion.div>
         ))}

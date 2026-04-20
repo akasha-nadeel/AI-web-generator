@@ -137,6 +137,12 @@
   }
   html {
     @apply font-sans scroll-smooth overflow-x-hidden;
+    scrollbar-gutter: stable;
+  }
+  /* Radix scroll-lock adds right-margin to offset the removed scrollbar.
+     Since scrollbar-gutter reserves that space, we don't need the margin. */
+  html body[data-scroll-locked] {
+    margin-right: 0 !important;
   }
 }
 
