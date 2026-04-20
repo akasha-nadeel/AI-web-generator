@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
   if (user.plan === "free") {
     const { error: planError } = await supabase
       .from("users")
-      .update({ plan: "paid" })
+      .update({ plan: "pro" })
       .eq("id", user.id);
     if (planError) {
       console.error("[paddle webhook] plan upgrade failed", planError);
