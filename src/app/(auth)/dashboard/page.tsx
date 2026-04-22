@@ -45,10 +45,11 @@ import { getTemplatePreview, getPreviewTheme } from "@/lib/templates/preview-dat
 import { assemblePreviewHtml } from "@/lib/assembler/assembler";
 import { TEMPLATE_DESIGN_DNA } from "@/lib/templates/design-dna";
 import { useRouter } from "next/navigation";
-import { Menu, Eye, ChevronRight } from "lucide-react";
+import { Menu, Eye, ChevronRight, Sun, Moon } from "lucide-react";
 import { CreditCounter } from "@/components/ui/CreditCounter";
 import { AnnouncementBanner } from "@/components/shared/AnnouncementBanner";
 import { useCreditsStore } from "@/stores/creditsStore";
+import { useTheme } from "next-themes";
 
 /* ===== TYPES ===== */
 
@@ -248,6 +249,8 @@ export default function DashboardPage() {
     { label: "Trash", icon: Trash2 },
   ];
 
+  const { theme, setTheme } = useTheme();
+
   /* Sidebar content — shared between desktop sidebar and mobile drawer */
   const sidebarContent = (
     <>
@@ -256,8 +259,7 @@ export default function DashboardPage() {
         <Link href="/dashboard" onClick={() => { setActiveNav("Recents"); setMobileMenuOpen(false); }}>
           <span className="flex items-center gap-1 text-xl font-bold text-foreground">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo.png" alt="Weavo Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center dark:invert-0 invert" />
-            Weavo
+            <img src="/images/logo.png" alt="Weavo Logo" className="h-5 w-auto object-contain opacity-95 dark:invert-0 invert" />
           </span>
         </Link>
         <button
@@ -351,9 +353,9 @@ export default function DashboardPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               side="top"
-              align="start"
-              sideOffset={8}
-              className="w-[calc(260px-1.5rem)] bg-popover backdrop-blur-xl border-border rounded-xl p-1"
+              align="center"
+              sideOffset={12}
+              className="w-[calc(260px-1.5rem)] bg-popover backdrop-blur-xl border-border rounded-xl p-1 shadow-2xl z-50"
             >
               {/* Email */}
               <div className="px-3 py-2 text-xs text-muted-foreground truncate">
@@ -383,6 +385,24 @@ export default function DashboardPage() {
                   <HelpCircle className="w-4 h-4" />
                   Get help
                 </Link>
+              </DropdownMenuItem>
+
+              {/* Theme Switcher */}
+              <DropdownMenuItem 
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="flex items-center gap-3 text-sm cursor-pointer"
+              >
+                {theme === "dark" ? (
+                  <>
+                    <Sun className="w-4 h-4" />
+                    Light Mode
+                  </>
+                ) : (
+                  <>
+                    <Moon className="w-4 h-4" />
+                    Dark Mode
+                  </>
+                )}
               </DropdownMenuItem>
 
               {/* Upgrade plan / Buy more credits */}
@@ -426,17 +446,18 @@ export default function DashboardPage() {
       {/* ===== DESKTOP SIDEBAR ===== */}
       <aside
         className={cn(
-          "hidden md:flex flex-col border-r border-border bg-card/50 shrink-0 h-screen overflow-hidden transition-[width] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] relative",
+          "hidden md:flex flex-col border-r border-border bg-card/50 shrink-0 h-screen overflow-hidden transition-[width] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[width] relative",
           sidebarCollapsed ? "w-[52px]" : "w-[260px]"
         )}
       >
         {/* Layer 1: Collapsed Rail */}
         <div
           className={cn(
-            "absolute inset-y-0 left-0 w-[52px] flex flex-col items-center py-3 gap-1 transition-all duration-300 z-20",
+            "absolute inset-y-0 left-0 w-[52px] flex flex-col items-center py-3 gap-1 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform z-20",
             sidebarCollapsed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full pointer-events-none"
           )}
         >
+          {/* ... (rest of collapsed rail) */}
           {/* Expand button */}
           <button
             onClick={() => setSidebarCollapsed(false)}
@@ -531,6 +552,24 @@ export default function DashboardPage() {
                   </Link>
                 </DropdownMenuItem>
 
+                {/* Theme Switcher */}
+                <DropdownMenuItem 
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="flex items-center gap-3 text-sm cursor-pointer"
+                >
+                  {theme === "dark" ? (
+                    <>
+                      <Sun className="w-4 h-4" />
+                      Light Mode
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-4 h-4" />
+                      Dark Mode
+                    </>
+                  )}
+                </DropdownMenuItem>
+
                 <DropdownMenuSeparator className="bg-foreground/[0.06]" />
                 <DropdownMenuItem asChild>
                   <Link href="/billing" className="flex items-center gap-3 text-sm">
@@ -556,8 +595,8 @@ export default function DashboardPage() {
         {/* Layer 2: Expanded Content */}
         <div
           className={cn(
-            "absolute inset-y-0 left-0 w-[260px] flex flex-col h-full transition-all duration-300 z-10",
-            sidebarCollapsed ? "opacity-0 translate-x-[-20px] pointer-events-none" : "opacity-100 translate-x-0"
+            "absolute inset-y-0 left-0 w-[260px] flex flex-col h-full transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform z-10",
+            sidebarCollapsed ? "opacity-0 -translate-x-4 pointer-events-none" : "opacity-100 translate-x-0"
           )}
         >
           {sidebarContent}
@@ -565,9 +604,9 @@ export default function DashboardPage() {
       </aside>
 
       {/* ===== MAIN CONTENT ===== */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 transition-[padding,margin] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[padding,margin]">
         {/* Top bar */}
-        <header className="h-14 border-b border-border bg-background/50 flex items-center justify-between px-3 md:px-6 shrink-0">
+        <header className="h-14 border-b border-border bg-background/50 flex items-center gap-4 px-3 md:px-6 shrink-0 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]">
           {/* Mobile: hamburger + logo */}
           <div className="flex items-center gap-2 md:hidden">
             <button
@@ -581,8 +620,20 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          {/* Desktop: breadcrumb on left */}
-          <div className="hidden md:flex items-center gap-2 text-sm">
+          {/* Desktop: breadcrumb + dynamic logo on left */}
+          <div className="hidden md:flex items-center gap-3 text-sm shrink-0">
+            {/* Logo shown only when sidebar is collapsed */}
+            <div className={cn(
+              "transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden flex items-center",
+              sidebarCollapsed ? "w-32 opacity-100 translate-x-0 mr-1" : "w-0 opacity-0 -translate-x-4 pointer-events-none"
+            )}>
+              <Link href="/dashboard" className="flex items-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/logo.png" alt="Weavo Logo" className="h-7 w-auto object-contain opacity-95 dark:invert-0 invert" />
+              </Link>
+              <div className="h-4 w-px bg-border/60 mx-4 shrink-0" />
+            </div>
+
             <span className="text-muted-foreground">Workspace</span>
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40" />
             <span className="text-foreground font-medium">{activeNav}</span>
@@ -593,8 +644,8 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Desktop: Action pills — right side */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Search bar moved to left (next to breadcrumbs) */}
+          <div className="hidden md:block flex-1 max-w-sm ml-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <input
@@ -603,9 +654,15 @@ export default function DashboardPage() {
                 placeholder="Search projects..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-56 h-9 pl-9 pr-3 text-xs bg-foreground/[0.04] border border-border rounded-full text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/40 focus:bg-foreground/[0.06] transition-all"
+                className="w-full h-9 pl-9 pr-3 text-xs bg-foreground/[0.04] border border-border rounded-full text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/40 focus:bg-foreground/[0.06] transition-all"
               />
             </div>
+          </div>
+
+          <div className="flex-1 md:hidden" />
+
+          {/* Desktop: Action pills — right side */}
+          <div className="hidden md:flex items-center gap-3 ml-auto">
             <CreditCounter />
           </div>
 

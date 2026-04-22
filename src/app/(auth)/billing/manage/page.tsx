@@ -32,14 +32,11 @@ export default function BillingManagePage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col transition-colors duration-300">
-      {/* Top bar */}
+      {/* Top bar — Unified with main app branding */}
       <header className="sticky top-0 z-40 h-14 border-b border-border bg-background/50 backdrop-blur-xl flex items-center justify-between px-4 md:px-6 shrink-0">
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-2 h-9 px-3.5 rounded-full border border-border bg-foreground/[0.04] text-sm text-foreground/80 hover:text-foreground hover:bg-foreground/[0.08] transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="font-medium">Dashboard</span>
+        <Link href="/dashboard" className="flex items-center gap-1 group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/logo.png" alt="Weavo Logo" className="h-5 w-auto object-contain opacity-95 dark:invert-0 invert" />
         </Link>
 
         <div className="flex items-center gap-2">
@@ -48,7 +45,18 @@ export default function BillingManagePage() {
       </header>
 
       {/* Main */}
-      <main className="flex-1 max-w-[1200px] w-full mx-auto px-4 md:px-8 py-10 md:py-14">
+      <main className="flex-1 max-w-[1200px] w-full mx-auto px-4 md:px-8 py-6 md:py-8">
+        {/* Breadcrumb / Back button relocated below nav */}
+        <div className="mb-6">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors group"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+            Back to Workspace
+          </Link>
+        </div>
+
         <div className="mb-8 md:mb-10">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
             Billing

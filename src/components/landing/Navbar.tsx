@@ -43,7 +43,7 @@ export function Navbar() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background transition-colors duration-300">
       <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link 
@@ -59,8 +59,7 @@ export function Navbar() {
           className="flex items-center gap-1 group"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/logo.png" alt="Weavo Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center dark:invert-0 invert" />
-          <span className="text-xl font-bold text-foreground">Weavo</span>
+          <img src="/images/logo.png" alt="Weavo Logo" className="h-5 w-auto object-contain opacity-95 dark:invert-0 invert" />
         </Link>
 
         {/* Desktop Nav */}

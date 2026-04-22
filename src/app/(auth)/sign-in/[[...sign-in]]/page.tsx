@@ -38,8 +38,7 @@ export default function SignInPage() {
         {/* Brand */}
         <div className="absolute top-6 left-8 z-20 flex items-center gap-1">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/logo.png" alt="Weavo Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center" />
-          <span className="text-xl font-bold text-white tracking-tight">Weavo</span>
+          <img src="/images/logo.png" alt="Weavo Logo" className="h-6 w-auto object-contain opacity-95" />
         </div>
 
         {/* Headline */}

@@ -66,9 +66,8 @@ export function AppShell({ children }: AppShellProps) {
             <img
               src="/images/logo.png"
               alt="Weavo Logo"
-              className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center"
+              className="h-6 w-auto object-contain opacity-95 dark:invert-0 invert"
             />
-            Weavo
           </span>
         </Link>
       </div>

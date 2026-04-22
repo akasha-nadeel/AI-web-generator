@@ -59,8 +59,7 @@ export function Footer() {
           <div className="col-span-2">
             <Link href="/" className="flex items-center gap-1 mb-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/logo.png" alt="Weavo Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center dark:invert-0 invert" />
-              <span className="text-xl font-bold text-foreground">Weavo</span>
+              <img src="/images/logo-new.png" alt="Weavo Logo" className="h-7 w-auto object-contain opacity-95 dark:invert-0 invert" />
             </Link>
             <p className="text-sm text-foreground/40 mb-6 max-w-[200px]">
               AI-powered website generation for everyone.
@@ -115,43 +114,36 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Middle Section — Contact + Gallery */}
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-10 pb-16">
-          {/* Contact */}
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-foreground mb-5">
-              CONTACT
-            </h4>
-            <ul className="space-y-3">
-              <li className="text-sm text-foreground/40">support@weavo.com</li>
-              <li className="text-sm text-foreground/40">partnership@weavo.com</li>
-              <li className="text-sm text-foreground/40">enterprise@weavo.com</li>
-            </ul>
-          </div>
-
-          {/* Gallery */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {galleryImages.map((src, i) => (
-              <div
-                key={i}
-                className="rounded-xl overflow-hidden relative h-40 border border-border"
-              >
-                <Image
-                  src={src}
-                  alt=""
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-            ))}
+        {/* Middle Section — Massive New Brand Logo */}
+        <div className="pb-16 md:pb-24 pt-4 border-t border-border/40 overflow-hidden">
+          <div className="flex items-center justify-center select-none pointer-events-none opacity-100">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img 
+              src="/images/logo-new.png" 
+              alt="Weavo Logo" 
+              className="w-full max-w-[90vw] h-auto object-contain dark:invert-0 invert" 
+            />
           </div>
         </div>
 
-        {/* Bottom — Copyright */}
-        <div className="border-t border-border py-6">
-          <p className="text-xs text-foreground/30">
-            &copy; {new Date().getFullYear()} Weavo. All rights reserved.
-          </p>
+        {/* Bottom — Copyright & Contact */}
+        <div className="border-t border-border py-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
+            <p className="text-xs text-foreground/30">
+              &copy; {new Date().getFullYear()} Weavo. All rights reserved.
+            </p>
+            <div className="hidden md:block w-px h-3 bg-border" />
+            <div className="flex gap-4">
+              <Link href="#" className="text-[10px] text-foreground/30 hover:text-foreground transition-colors uppercase tracking-widest font-bold">Privacy</Link>
+              <Link href="#" className="text-[10px] text-foreground/30 hover:text-foreground transition-colors uppercase tracking-widest font-bold">Terms</Link>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-2">
+            <span className="text-[11px] text-foreground/40 font-medium lowercase">support@weavo.com</span>
+            <span className="text-[11px] text-foreground/40 font-medium lowercase">partnership@weavo.com</span>
+            <span className="text-[11px] text-foreground/40 font-medium lowercase">enterprise@weavo.com</span>
+          </div>
         </div>
       </div>
     </footer>
