@@ -81,7 +81,7 @@ export function WizardShell({ children }: WizardShellProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
-      className="h-screen bg-[#0a0a0a] flex flex-col lg:flex-row overflow-hidden"
+      className="h-screen bg-background flex flex-col lg:flex-row overflow-hidden"
     >
       {/* Left Panel */}
       <div className="lg:w-[42%] h-full relative overflow-hidden flex-col shrink-0 hidden lg:flex">
@@ -105,19 +105,17 @@ export function WizardShell({ children }: WizardShellProps) {
           </motion.div>
         </AnimatePresence>
         
-        {/* Overlays */}
-        <div className="absolute inset-0 bg-[#0a0a0a]/10 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/90 via-[#0a0a0a]/20 to-transparent z-10" />
+        {/* Overlays - We keep these somewhat dark to ensure white text remains readable on image */}
+        <div className="absolute inset-0 bg-black/20 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
 
-        {/* Brand & BETA Badge */}
+        {/* Brand */}
         <div className="absolute top-6 left-8 z-20 flex items-center gap-3">
           <Link href="/dashboard" className="flex items-center gap-1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/logo.png" alt="Weavo Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center" />
+            <span className="text-xl font-bold text-white ml-1">Weavo</span>
           </Link>
-          <div className="px-2 py-0.5 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-[10px] font-bold tracking-wider text-white/70">
-            BETA
-          </div>
         </div>
 
         {/* Dynamic Text Content */}
@@ -142,7 +140,7 @@ export function WizardShell({ children }: WizardShellProps) {
       </div>
 
       {/* Right Panel */}
-      <div className="flex-1 flex flex-col relative h-full overflow-y-auto w-full">
+      <div className="flex-1 flex flex-col relative h-full overflow-y-auto w-full bg-background">
         <div className="w-full max-w-[700px] mx-auto px-6 py-5 md:py-7 flex-1 flex flex-col">
           
           {/* Step Indicators - Progress Bar Style */}
@@ -152,17 +150,17 @@ export function WizardShell({ children }: WizardShellProps) {
               const isPast = step > s.number;
               return (
                 <div key={s.number} className="flex flex-col gap-2">
-                  <div className="h-1.5 w-full rounded-full bg-white/[0.06] overflow-hidden">
+                  <div className="h-1.5 w-full rounded-full bg-foreground/[0.06] overflow-hidden">
                     <div
                       className={cn(
                         "h-full rounded-full transition-all duration-700 ease-in-out",
-                        isPast || isActive ? "bg-white w-full" : "w-0"
+                        isPast || isActive ? "bg-primary w-full" : "w-0"
                       )}
                     />
                   </div>
                   <span className={cn(
                     "text-xs md:text-sm font-medium text-center transition-colors duration-500",
-                    isActive || isPast ? "text-white" : "text-white/40"
+                    isActive || isPast ? "text-foreground" : "text-muted-foreground"
                   )}>
                     {s.label}
                   </span>

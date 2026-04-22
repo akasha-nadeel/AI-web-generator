@@ -1,4 +1,5 @@
 import { Navbar } from "@/components/landing/Navbar";
+import { AnnouncementBanner } from "@/components/shared/AnnouncementBanner";
 import { Hero } from "@/components/landing/Hero";
 import { TrustedBy } from "@/components/landing/TrustedBy";
 import { HowItWorks } from "@/components/landing/HowItWorks";
@@ -21,6 +22,7 @@ export default async function LandingPage() {
 
   return (
     <>
+      <AnnouncementBanner />
       <Navbar />
       <main>
         <Hero />

@@ -3,10 +3,21 @@
 import { SignIn } from "@clerk/nextjs";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export default function SignInPage() {
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = theme === "dark";
+
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-black overflow-hidden">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-background text-foreground transition-colors duration-500 overflow-hidden">
       {/* Left Panel - Branding */}
       <motion.div
         initial={{ x: "-100%", opacity: 0 }}
@@ -21,8 +32,8 @@ export default function SignInPage() {
           className="object-cover"
           priority
         />
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+        {/* Overlay — Adjusted for light mode for cleaner branding */}
+        <div className={`absolute inset-0 bg-gradient-to-t ${isDark ? "from-black/60 via-black/20" : "from-black/40 via-transparent"} to-transparent transition-colors duration-500`} />
 
         {/* Brand */}
         <div className="absolute top-6 left-8 z-20 flex items-center gap-1">
@@ -51,56 +62,51 @@ export default function SignInPage() {
         initial={{ x: "100%", opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
-        className="flex-1 flex items-center justify-center bg-black p-6 lg:p-10 min-h-screen lg:min-h-0"
+        className="flex-1 flex items-center justify-center bg-background p-6 lg:p-10 min-h-screen lg:min-h-0 relative transition-colors duration-500"
       >
-        <SignIn
-          forceRedirectUrl="/dashboard"
-          appearance={{
-            variables: {
-              colorBackground: "#000000",
-              colorText: "#ffffff",
-              colorTextSecondary: "rgba(255,255,255,0.5)",
-              colorInputBackground: "rgba(255,255,255,0.05)",
-              colorInputText: "#ffffff",
-              colorPrimary: "#a855f7",
-              colorNeutral: "#ffffff",
-              borderRadius: "0.5rem",
-            },
-            elements: {
-              rootBox: "mx-auto w-full max-w-md",
-              card: "!bg-black shadow-none border-0 p-0 w-full",
-              headerTitle: "!text-white text-2xl font-bold",
-              headerSubtitle: "!text-white/50",
-              socialButtonsBlockButton:
-                "!bg-white/[0.05] !border !border-white/[0.1] !text-white hover:!bg-white/[0.1] transition-colors",
-              socialButtonsBlockButtonText: "!text-white",
-              formFieldLabel: "!text-white font-semibold text-sm",
-              formFieldInput:
-                "!bg-white/[0.05] !border !border-white/[0.1] !text-white !placeholder-white/30 rounded-lg focus:!border-purple-400",
-              footerActionLink: "!text-purple-400 hover:!text-purple-300 font-medium",
-              formButtonPrimary:
-                "!bg-white hover:!bg-white/90 !text-black rounded-lg font-medium transition-colors !shadow-none",
-              dividerLine: "!bg-white/[0.1]",
-              dividerText: "!text-white/30",
-              footer: "!bg-black [&>*]:!bg-black",
-              footerActionText: "!text-white/50",
-              formFieldInputShowPasswordButton: "!text-white/50 hover:!text-white",
-              cardBox: "!bg-black !shadow-none",
-              main: "!bg-black",
-              form: "!bg-black",
-              formField: "!bg-black",
-              internal: "!bg-black",
-              identityPreview: "!bg-white/[0.05] !border-white/[0.1]",
-              identityPreviewText: "!text-white",
-              identityPreviewEditButton: "!text-purple-400",
-              formFieldAction: "!text-purple-400",
-              alertText: "!text-white/70",
-              footerAction: "!bg-black !border-t !border-white/[0.08]",
-              footerPages: "!bg-black",
-              footerPagesLink: "!text-white/50",
-            },
-          }}
-        />
+        {mounted && (
+          <SignIn
+            forceRedirectUrl="/dashboard"
+            appearance={isDark ? {
+              variables: {
+                colorBackground: "#000000",
+                colorText: "#ffffff",
+                colorTextSecondary: "rgba(255,255,255,0.5)",
+                colorInputBackground: "rgba(255,255,255,0.05)",
+                colorInputText: "#ffffff",
+                colorPrimary: "#a855f7",
+                colorNeutral: "#ffffff",
+                borderRadius: "0.5rem",
+              },
+              elements: {
+                rootBox: "mx-auto w-full max-w-md",
+                card: "!bg-transparent shadow-none border-0 p-0 w-full",
+                headerTitle: "text-2xl font-bold",
+                socialButtonsBlockButton: "transition-colors !shadow-none",
+                formButtonPrimary: "!bg-foreground hover:opacity-90 !text-background rounded-lg font-medium transition-colors !shadow-none",
+                dividerLine: "opacity-10",
+                dividerText: "opacity-40",
+                footer: "!bg-transparent",
+                footerAction: "!bg-transparent !border-t !border-foreground/5",
+                cardBox: "!bg-transparent !shadow-none",
+                main: "!bg-transparent",
+                form: "!bg-transparent",
+                formField: "!bg-transparent",
+                internal: "!bg-transparent",
+                identityPreview: "bg-foreground/5 border-foreground/10",
+                footerPages: "!bg-transparent",
+              },
+            } : {
+              // Use default Clerk light theme but make primary button black
+              variables: {
+                colorPrimary: "#000000",
+              },
+              elements: {
+                formButtonPrimary: "bg-black hover:bg-black/90 text-white transition-colors",
+              }
+            }}
+          />
+        )}
       </motion.div>
     </div>
   );

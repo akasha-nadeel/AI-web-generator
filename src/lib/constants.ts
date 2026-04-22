@@ -95,6 +95,16 @@ export const MODEL_COSTS = {
 
 export type ModelKey = keyof typeof MODEL_COSTS;
 
+// Chat-edit costs are intentionally smaller than full generation:
+// a chat edit modifies an existing site rather than building one from
+// scratch. Conversational (CHAT:) replies cost 0 — they're effectively
+// free because they don't change the site and can't be abused to extract
+// value. Only successful HTML updates deduct.
+export const CHAT_EDIT_CREDITS: Record<"haiku" | "sonnet", number> = {
+  haiku: 2,
+  sonnet: 5,
+};
+
 export function canUseModel(plan: string, modelKey: ModelKey): boolean {
   const model = MODEL_COSTS[modelKey];
   if (!model.requiresPayment) return true;

@@ -43,7 +43,7 @@ export function Navbar() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/[0.06]">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
       <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link 
@@ -59,8 +59,8 @@ export function Navbar() {
           className="flex items-center gap-1 group"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/logo.png" alt="Weavo Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center" />
-          <span className="text-xl font-bold text-white">Weavo</span>
+          <img src="/images/logo.png" alt="Weavo Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center dark:invert-0 invert" />
+          <span className="text-xl font-bold text-foreground">Weavo</span>
         </Link>
 
         {/* Desktop Nav */}
@@ -71,7 +71,7 @@ export function Navbar() {
               href={link.href}
               className={cn(
                 "text-sm transition-colors",
-                activeSection === link.href ? "text-white font-medium" : "text-white/50 hover:text-white"
+                activeSection === link.href ? "text-foreground font-medium" : "text-foreground/50 hover:text-foreground"
               )}
             >
               {link.label}
@@ -83,13 +83,13 @@ export function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           <Link
             href="/sign-in"
-            className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2"
+            className="text-sm text-foreground/50 hover:text-foreground transition-colors px-4 py-2"
           >
             Log in
           </Link>
           <Link
             href="/sign-up"
-            className="inline-flex items-center bg-white text-black font-semibold px-5 py-2 rounded-full text-sm hover:bg-white/90 transition-colors"
+            className="inline-flex items-center bg-foreground text-background font-semibold px-5 py-2 rounded-full text-sm hover:bg-foreground/90 transition-colors"
           >
             Get Started Free
           </Link>
@@ -98,7 +98,7 @@ export function Navbar() {
         {/* Mobile Toggle */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden p-2 text-white/60 hover:text-white"
+          className="md:hidden p-2 text-foreground/60 hover:text-foreground"
         >
           {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
@@ -107,8 +107,8 @@ export function Navbar() {
       {/* Mobile Menu */}
       <div
         className={cn(
-          "md:hidden overflow-hidden transition-all duration-300 bg-black/95 backdrop-blur-xl",
-          mobileOpen ? "max-h-96 border-t border-white/[0.06]" : "max-h-0"
+          "md:hidden overflow-hidden transition-all duration-300 bg-background/95 backdrop-blur-xl",
+          mobileOpen ? "max-h-96 border-t border-border" : "max-h-0"
         )}
       >
         <div className="px-4 py-4 flex flex-col gap-3">
@@ -119,22 +119,22 @@ export function Navbar() {
               onClick={() => setMobileOpen(false)}
               className={cn(
                 "text-sm transition-colors py-2",
-                activeSection === link.href ? "text-white font-medium pl-2 border-l-2 border-white" : "text-white/50 hover:text-white"
+                activeSection === link.href ? "text-foreground font-medium pl-2 border-l-2 border-foreground" : "text-foreground/50 hover:text-foreground"
               )}
             >
               {link.label}
             </Link>
           ))}
-          <div className="flex flex-col gap-2 pt-2 border-t border-white/[0.06]">
+          <div className="flex flex-col gap-2 pt-2 border-t border-border">
             <Link
               href="/sign-in"
-              className="text-sm text-white/50 hover:text-white py-2"
+              className="text-sm text-foreground/50 hover:text-foreground py-2"
             >
               Log in
             </Link>
             <Link
               href="/sign-up"
-              className="inline-flex items-center justify-center bg-white text-black font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-white/90 transition-colors"
+              className="inline-flex items-center justify-center bg-foreground text-background font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-foreground/90 transition-colors"
             >
               Get Started Free
             </Link>

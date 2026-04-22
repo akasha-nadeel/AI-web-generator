@@ -230,10 +230,10 @@ export default function BillingPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top bar */}
-      <header className="sticky top-0 z-40 h-14 border-b border-white/[0.06] bg-[rgba(10,10,25,0.6)] backdrop-blur-xl flex items-center justify-between px-4 md:px-6 shrink-0">
+      <header className="sticky top-0 z-40 h-14 border-b border-border bg-background/50 backdrop-blur-xl flex items-center justify-between px-4 md:px-6 shrink-0">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 h-9 px-3.5 rounded-full border border-white/10 bg-white/[0.04] text-sm text-white/80 hover:text-white hover:bg-white/[0.08] transition-colors"
+          className="inline-flex items-center gap-2 h-9 px-3.5 rounded-full border border-border bg-foreground/[0.04] text-sm text-foreground/80 hover:text-foreground hover:bg-foreground/[0.08] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span className="font-medium">Dashboard</span>
@@ -241,13 +241,6 @@ export default function BillingPage() {
 
         <div className="flex items-center gap-2">
           <CreditCounter />
-          <Link
-            href="/wizard"
-            className="hidden sm:flex items-center gap-2 h-9 px-4 rounded-full bg-white text-black text-sm font-medium hover:bg-white/90 transition-opacity"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            New Site
-          </Link>
         </div>
       </header>
 
@@ -255,51 +248,32 @@ export default function BillingPage() {
         {/* Header */}
         <div className="flex items-start justify-between gap-6 mb-8 md:mb-10 flex-wrap">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">Billing</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Billing</h1>
             <p className="text-sm text-muted-foreground mt-1">
               Pay only for credits — no subscriptions, no surprises.
             </p>
-          </div>
-          <div className="inline-flex items-center gap-2.5 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2.5">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center">
-              <Zap className="w-4 h-4 text-amber-300" strokeWidth={2.5} />
-            </div>
-            <div>
-              <div className="text-base font-semibold text-white leading-tight">
-                {balance ?? "…"} credits
-              </div>
-              <div className="text-[11px] text-white/50 capitalize leading-tight">
-                {plan} plan
-              </div>
-            </div>
           </div>
         </div>
 
         {/* Free users: prominent upgrade hero. Pro users: small cost-rationale strip. */}
         {plan === "free" ? (
           <div
-            className="mb-8 rounded-3xl p-7 md:p-9 flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden"
-            style={{
-              background: "linear-gradient(135deg, #181808 0%, #0e0e0e 100%)",
-              borderColor: `${ACCENT}40`,
-              borderWidth: "1px",
-              borderStyle: "solid",
-            }}
+            className="mb-8 rounded-3xl p-7 md:p-9 flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden bg-card border border-border"
           >
             {/* Soft accent glow */}
             <div
-              className="absolute -right-24 -top-24 w-72 h-72 rounded-full opacity-[0.18] blur-3xl pointer-events-none"
+              className="absolute -right-24 -top-24 w-72 h-72 rounded-full opacity-[0.12] blur-3xl pointer-events-none"
               style={{ background: ACCENT }}
             />
 
             <div className="flex-1 relative z-10">
               <div className="flex items-center gap-2 mb-2.5">
                 <Sparkles className="w-5 h-5" style={{ color: ACCENT }} strokeWidth={2.5} />
-                <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+                <h2 className="text-xl md:text-2xl font-bold text-foreground tracking-tight">
                   Unlock all AI models — for life
                 </h2>
               </div>
-              <p className="text-sm md:text-[15px] text-white/65 leading-relaxed max-w-2xl">
+              <p className="text-sm md:text-[15px] text-muted-foreground leading-relaxed max-w-2xl">
                 Buy any pack to upgrade to Pro. Use Sonnet and Opus on every generation, forever — even if your credits run out, your Pro access never does.
               </p>
             </div>
@@ -313,16 +287,16 @@ export default function BillingPage() {
             </a>
           </div>
         ) : (
-          <div className="mb-8 inline-flex items-start gap-2.5 px-4 py-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] max-w-2xl">
+          <div className="mb-8 inline-flex items-start gap-2.5 px-4 py-2.5 rounded-full bg-foreground/[0.03] border border-border max-w-2xl">
             <span
               className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0 mt-[1px]"
               style={{ color: ACCENT }}
             >
               Why credits
             </span>
-            <span className="text-[12.5px] text-white/60 leading-snug text-left">
+            <span className="text-[12.5px] text-muted-foreground leading-snug text-left">
               Each site costs us{" "}
-              <span className="text-white/85 font-semibold">$0.07–$1.05</span> in AI
+              <span className="text-foreground/85 font-semibold">$0.07–$1.05</span> in AI
               compute. Packs cover that plus hosting and payment fees — no hidden
               markup.
             </span>
@@ -338,7 +312,7 @@ export default function BillingPage() {
                 "relative flex flex-col rounded-2xl p-6 md:p-7 backdrop-blur-xl transition-all",
                 card.popular
                   ? "border-2 shadow-lg"
-                  : "border border-white/[0.08] bg-white/[0.03] hover:border-white/[0.16] hover:bg-white/[0.05]"
+                  : "border border-border bg-foreground/[0.03] hover:border-foreground/[0.1] hover:bg-foreground/[0.05]"
               )}
               style={
                 card.popular
@@ -352,7 +326,7 @@ export default function BillingPage() {
             >
               {/* Name + badge */}
               <div className="flex items-center justify-between gap-2 mb-1">
-                <h3 className="text-lg font-bold text-white">{card.name}</h3>
+                <h3 className="text-lg font-bold text-foreground">{card.name}</h3>
                 {card.badge && (
                   <span
                     className="text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap border"
@@ -366,17 +340,17 @@ export default function BillingPage() {
                   </span>
                 )}
               </div>
-              <p className="text-[13px] text-white/55 mb-7 min-h-[20px]">
+              <p className="text-[13px] text-muted-foreground mb-7 min-h-[20px]">
                 {card.tagline}
               </p>
 
               {/* Price */}
               <div className="flex items-baseline gap-1.5 mb-6">
-                <span className="text-4xl md:text-[2.75rem] font-bold leading-none text-white tracking-tight">
+                <span className="text-4xl md:text-[2.75rem] font-bold leading-none text-foreground tracking-tight">
                   {card.price}
                 </span>
                 {card.priceSuffix && (
-                  <span className="text-sm text-white/50 leading-tight">
+                  <span className="text-sm text-muted-foreground leading-tight">
                     /{card.priceSuffix}
                   </span>
                 )}
@@ -384,7 +358,7 @@ export default function BillingPage() {
 
               {/* CTA */}
               {card.id === "free" ? (
-                <div className="flex items-center justify-center w-full py-3 rounded-xl font-semibold text-sm mb-6 bg-white/[0.04] text-white/50 border border-white/[0.08]">
+                <div className="flex items-center justify-center w-full py-3 rounded-xl font-semibold text-sm mb-6 bg-foreground/[0.04] text-muted-foreground border border-border">
                   Current plan
                 </div>
               ) : (
@@ -395,7 +369,7 @@ export default function BillingPage() {
                     "flex items-center justify-center w-full py-3 rounded-xl font-semibold text-sm mb-6 transition-all",
                     card.popular
                       ? "text-black shadow-sm hover:opacity-90"
-                      : "bg-white/[0.08] text-white/90 hover:bg-white/[0.14] border border-white/[0.08]",
+                      : "bg-foreground/[0.08] text-foreground/90 hover:bg-foreground/[0.14] border border-border",
                     loadingId === card.id && "opacity-60 cursor-wait"
                   )}
                   style={card.popular ? { backgroundColor: ACCENT } : undefined}
@@ -415,10 +389,10 @@ export default function BillingPage() {
                         strokeWidth={3}
                         style={{ color: ACCENT }}
                       />
-                      <span className="text-white/70 leading-snug">
+                      <span className="text-muted-foreground leading-snug">
                         {numberMatch ? (
                           <>
-                            <span className="text-[20px] font-bold text-white mr-1 inline-block align-middle -mt-1">
+                            <span className="text-[20px] font-bold text-foreground mr-1 inline-block align-middle -mt-1">
                               {numberMatch[1]}
                             </span>
                             {numberMatch[2]}
@@ -484,17 +458,17 @@ function PurchaseSuccessModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md rounded-3xl border bg-[rgba(15,15,30,0.95)] backdrop-blur-xl p-8 text-center shadow-2xl animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md rounded-3xl border bg-popover backdrop-blur-xl p-8 text-center shadow-2xl animate-in zoom-in-95 duration-200"
         style={{ borderColor: `${ACCENT}40` }}
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+          className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-foreground/10 transition-colors"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
@@ -507,9 +481,9 @@ function PurchaseSuccessModal({
           <Check className="w-8 h-8" strokeWidth={3} style={{ color: ACCENT }} />
         </div>
 
-        <h2 className="text-2xl font-bold text-white mb-2">Payment successful</h2>
-        <p className="text-sm text-white/60 mb-6">
-          Your <span className="text-white font-semibold">{packName}</span> pack is ready to use.
+        <h2 className="text-2xl font-bold text-foreground mb-2">Payment successful</h2>
+        <p className="text-sm text-muted-foreground mb-6">
+          Your <span className="text-foreground font-semibold">{packName}</span> pack is ready to use.
         </p>
 
         <div
@@ -520,17 +494,17 @@ function PurchaseSuccessModal({
             <span className="text-4xl font-bold tracking-tight" style={{ color: ACCENT }}>
               +{credits}
             </span>
-            <span className="text-sm text-white/60 font-medium">credits added</span>
+            <span className="text-sm text-muted-foreground font-medium">credits added</span>
           </div>
-          <div className="text-[12px] text-white/50">
-            New balance: <span className="text-white/80 font-semibold">{newBalance} credits</span>
+          <div className="text-[12px] text-muted-foreground">
+            New balance: <span className="text-foreground/80 font-semibold">{newBalance} credits</span>
           </div>
         </div>
 
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-3 rounded-xl text-sm font-semibold bg-white/[0.06] hover:bg-white/[0.12] text-white/80 transition-colors border border-white/10"
+            className="flex-1 py-3 rounded-xl text-sm font-semibold bg-foreground/[0.06] hover:bg-foreground/[0.12] text-foreground/80 transition-colors border border-border"
           >
             Stay here
           </button>
@@ -573,10 +547,10 @@ function ModelCostBreakdown() {
   return (
     <div className="mt-16 md:mt-20">
       <div className="mb-6 md:mb-8">
-        <h3 className="text-xl md:text-2xl font-bold tracking-tight text-white">
+        <h3 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
           What each model costs
         </h3>
-        <p className="text-sm text-white/55 mt-1.5 max-w-lg">
+        <p className="text-sm text-muted-foreground mt-1.5 max-w-lg">
           All three available to every paid user. Lower credits for fast drafts,
           higher for premium quality.
         </p>
@@ -593,7 +567,7 @@ function ModelCostBreakdown() {
                 "rounded-2xl p-6 md:p-7 backdrop-blur-xl transition-all",
                 isPremium
                   ? "border-2 shadow-lg"
-                  : "border border-white/[0.08] bg-white/[0.03] hover:border-white/[0.16] hover:bg-white/[0.05]"
+                  : "border border-border bg-foreground/[0.03] hover:border-foreground/[0.1] hover:bg-foreground/[0.05]"
               )}
               style={
                 isPremium
@@ -609,7 +583,7 @@ function ModelCostBreakdown() {
                 <div
                   className={cn(
                     "w-9 h-9 rounded-xl flex items-center justify-center",
-                    !isPremium && "bg-white/[0.06] text-white/80"
+                    !isPremium && "bg-foreground/[0.06] text-foreground/80"
                   )}
                   style={
                     isPremium
@@ -619,32 +593,32 @@ function ModelCostBreakdown() {
                 >
                   <Icon className="w-4 h-4" strokeWidth={2.5} />
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">
+                <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
                   {model.label}
                 </span>
               </div>
 
-              <div className="text-lg font-bold text-white leading-tight">
+              <div className="text-lg font-bold text-foreground leading-tight">
                 {model.name}
               </div>
-              <div className="text-[13px] text-white/55 mt-1 leading-relaxed">
+              <div className="text-[13px] text-muted-foreground mt-1 leading-relaxed">
                 {blurb}
               </div>
 
-              <div className="mt-6 pt-5 border-t border-white/[0.08] flex items-baseline gap-1.5">
+              <div className="mt-6 pt-5 border-t border-border flex items-baseline gap-1.5">
                 <span
                   className="text-3xl font-bold leading-none tracking-tight"
-                  style={isPremium ? { color: ACCENT } : { color: "#fff" }}
+                  style={isPremium ? { color: ACCENT } : { color: "currentColor" }}
                 >
                   {model.credits}
                 </span>
-                <span className="text-sm text-white/50">credits / generation</span>
+                <span className="text-sm text-muted-foreground">credits / generation</span>
               </div>
 
               <div
                 className={cn(
                   "mt-3 flex items-center gap-1.5 text-[11px] font-semibold",
-                  model.requiresPayment && "text-white/40"
+                  model.requiresPayment && "text-muted-foreground"
                 )}
                 style={!model.requiresPayment ? { color: ACCENT } : undefined}
               >

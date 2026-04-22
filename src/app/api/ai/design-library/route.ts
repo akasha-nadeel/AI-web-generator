@@ -1,11 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { extractDesignDNA } from "@/lib/ai/prompts/modules/design-extractor";
 import {
   saveDesignPattern,
   listDesignPatterns,
   deleteDesignPattern,
 } from "@/lib/ai/design-library";
+
+// Gate POST/DELETE behind ADMIN_EMAIL. Comma-separated list supported.
+// If unset, admin ops are disabled entirely (safer than permissive default).
+async function isAdmin(clerkId: string | null): Promise<boolean> {
+  if (!clerkId) return false;
+  const allowed = (process.env.ADMIN_EMAIL ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  if (allowed.length === 0) return false;
+  try {
+    const client = await clerkClient();
+    const u = await client.users.getUser(clerkId);
+    const emails = u.emailAddresses.map((e) => e.emailAddress.toLowerCase());
+    return emails.some((e) => allowed.includes(e));
+  } catch {
+    return false;
+  }
+}
 
 /**
  * POST /api/ai/design-library
@@ -18,9 +37,10 @@ export async function POST(req: NextRequest) {
     if (!clerkId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    if (!(await isAdmin(clerkId))) {
+      return NextResponse.json({ error: "Admin only" }, { status: 403 });
+    }
 
-    // Admin check — only Akasha can upload design patterns
-    // In production, check against admin user IDs or roles
     const body = await req.json();
     const { name, industries, moods, images } = body as {
       name: string;
@@ -118,6 +138,9 @@ export async function DELETE(req: NextRequest) {
     const { userId: clerkId } = await auth();
     if (!clerkId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(clerkId))) {
+      return NextResponse.json({ error: "Admin only" }, { status: 403 });
     }
 
     const { id } = await req.json();

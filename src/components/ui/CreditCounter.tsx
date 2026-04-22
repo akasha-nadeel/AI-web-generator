@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Zap } from "lucide-react";
 import { useCreditsStore } from "@/stores/creditsStore";
 import { cn } from "@/lib/utils";
+import { useUser } from "@clerk/nextjs";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface CreditCounterProps {
   /** Show compact `⚡ N` badge vs. full `N credits` text. */
@@ -14,6 +16,7 @@ interface CreditCounterProps {
 
 export function CreditCounter({ compact = false, className }: CreditCounterProps) {
   const { balance, plan, refresh } = useCreditsStore();
+  const { user } = useUser();
 
   useEffect(() => {
     if (balance === null) refresh();
@@ -23,12 +26,16 @@ export function CreditCounter({ compact = false, className }: CreditCounterProps
     return (
       <div
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/40",
+          "flex items-center gap-2.5 rounded-full border border-border bg-foreground/[0.02] pl-1 pr-1 h-9 animate-pulse",
           className
         )}
       >
-        <Zap className="h-3.5 w-3.5" />
-        <span>—</span>
+        <div className="w-8 h-8 rounded-full bg-foreground/[0.04] shrink-0 ml-0.5" />
+        <div className="flex flex-col pr-1 gap-1">
+          <div className="h-3 bg-foreground/[0.06] rounded w-14" />
+          <div className="h-2 bg-foreground/[0.04] rounded w-10" />
+        </div>
+        <div className="h-[28px] w-[28px] rounded-full bg-foreground/[0.06] shrink-0" />
       </div>
     );
   }
@@ -41,17 +48,26 @@ export function CreditCounter({ compact = false, className }: CreditCounterProps
       <Link
         href="/billing"
         className={cn(
-          "group inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-all",
+          "group inline-flex items-center gap-1.5 rounded-full border pl-2 pr-0.5 py-0.5 text-xs font-medium transition-all",
           empty
-            ? "border-red-500/40 bg-red-500/10 text-red-300 hover:bg-red-500/20"
+            ? "border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20"
             : low
-              ? "border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
-              : "border-white/10 bg-white/5 text-white/80 hover:bg-white/10",
+              ? "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-300 hover:bg-amber-500/20"
+              : "border-border bg-foreground/[0.05] text-foreground/80 hover:bg-foreground/[0.1]",
           className
         )}
       >
-        <Zap className={cn("h-3 w-3", !empty && !low && "text-amber-400")} />
-        <span>{balance}</span>
+        <div className="flex items-center gap-1.5">
+          <Zap className={cn("h-3 w-3", !empty && !low && "text-amber-500 dark:text-amber-400")} />
+          <span>{balance}</span>
+        </div>
+        
+        <Avatar size="sm" className="h-[20px] w-[20px] border border-border">
+          <AvatarImage src={user?.imageUrl} alt={user?.fullName || "User"} />
+          <AvatarFallback className="bg-foreground/[0.08] text-[8px] text-foreground font-bold border-none">
+            {user?.fullName?.charAt(0)?.toUpperCase() || "U"}
+          </AvatarFallback>
+        </Avatar>
       </Link>
     );
   }
@@ -60,29 +76,47 @@ export function CreditCounter({ compact = false, className }: CreditCounterProps
     <Link
       href="/billing"
       className={cn(
-        "group flex items-center gap-3 rounded-[20px] border border-white/[0.08] bg-[#0d0d0d] pl-1.5 pr-5 py-1.5 transition-all hover:bg-white/[0.04] hover:border-white/15",
+        "group flex items-center gap-2.5 rounded-full border border-border bg-card pl-1 pr-1 h-9 transition-all hover:bg-foreground/[0.04] hover:border-foreground/20",
         className
       )}
     >
-      {/* Icon Circle */}
-      <div className="w-9 h-9 rounded-full bg-amber-400/10 border border-amber-400/20 flex items-center justify-center shrink-0">
-        <Zap className="h-4.5 w-4.5 text-amber-400" fill="currentColor" />
+      <div className="flex items-center gap-2 pl-0.5">
+        {/* Icon Circle */}
+        <div className="w-8 h-8 flex items-center justify-center shrink-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src="/images/credit-icon.png" 
+            alt="Credits" 
+            className="w-5.5 h-5.5 object-contain" 
+            style={{ 
+              filter: 'invert(69%) sepia(92%) saturate(3267%) hue-rotate(359deg) brightness(101%) contrast(105%)' 
+            }}
+          />
+        </div>
+
+        {/* Text column */}
+        <div className="flex flex-col pr-0.5">
+          <div className="flex items-center gap-1 leading-tight">
+            <span className="text-[15px] font-bold text-foreground tracking-tight">
+              {balance}
+            </span>
+            <span className="text-[12.5px] font-bold text-foreground tracking-tight">
+              credits
+            </span>
+          </div>
+          <div className="text-[10px] font-medium text-blue-600 dark:text-blue-400/80 leading-tight capitalize">
+            {plan} Plan
+          </div>
+        </div>
       </div>
 
-      {/* Text column */}
-      <div className="flex flex-col">
-        <div className="flex items-center gap-1.5 leading-tight">
-          <span className="text-sm font-bold text-white tracking-tight">
-            {balance}
-          </span>
-          <span className="text-sm font-bold text-white tracking-tight">
-            credits
-          </span>
-        </div>
-        <div className="text-[11px] font-medium text-blue-400/80 leading-tight capitalize">
-          {plan} Plan
-        </div>
-      </div>
+      {/* Avatar */}
+      <Avatar size="sm" className="h-[28px] w-[28px] border border-border ring-0 ring-offset-0">
+        <AvatarImage src={user?.imageUrl} alt={user?.fullName || "User"} />
+        <AvatarFallback className="bg-foreground/[0.08] text-[10px] text-foreground font-bold border-none">
+          {user?.fullName?.charAt(0)?.toUpperCase() || "U"}
+        </AvatarFallback>
+      </Avatar>
     </Link>
   );
 }

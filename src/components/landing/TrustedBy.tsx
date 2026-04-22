@@ -89,23 +89,23 @@ export function TrustedBy() {
       className="py-10 md:py-14 px-4 md:px-6"
     >
       <div className="max-w-7xl mx-auto">
-        <p className="text-center text-sm text-white/35 mb-8">
+        <p className="text-center text-sm text-muted-foreground/50 mb-8">
           Built with industry-leading tools
         </p>
 
         {/* Scrolling row with fade edges */}
         <div className="relative overflow-hidden">
-          <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
 
           <div className="flex gap-2 sm:gap-3 animate-scroll-x">
             {[...tools, ...tools].map((tool, i) => (
               <div
                 key={`${tool.name}-${i}`}
-                className="flex-shrink-0 flex items-center gap-2 sm:gap-3 px-5 py-3 sm:px-9 sm:py-4.5 rounded-xl sm:rounded-2xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] transition-colors"
+                className="flex-shrink-0 flex items-center gap-2 sm:px-8 px-5 py-3 sm:py-4.5 rounded-xl sm:rounded-2xl border border-border bg-foreground/[0.03] hover:bg-foreground/[0.06] transition-colors"
               >
-                <span className="text-white/60 [&_svg]:w-4 [&_svg]:h-4 sm:[&_svg]:w-6 sm:[&_svg]:h-6">{tool.svg}</span>
-                <span className="text-xs sm:text-base font-semibold text-white/70 whitespace-nowrap">
+                <span className="text-foreground/60 [&_svg]:w-4 [&_svg]:h-4 sm:[&_svg]:w-6 sm:[&_svg]:h-6">{tool.svg}</span>
+                <span className="text-xs sm:text-base font-semibold text-foreground/70 whitespace-nowrap">
                   {tool.name}
                 </span>
               </div>

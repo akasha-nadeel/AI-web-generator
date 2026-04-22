@@ -28,8 +28,8 @@ export function StepBusinessInfo() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">Let&apos;s get started</h2>
-      <p className="text-white/60 text-base mb-7 leading-relaxed max-w-lg">
+      <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight text-foreground">Let&apos;s get started</h2>
+      <p className="text-muted-foreground text-base mb-7 leading-relaxed max-w-lg">
         We just need a few details. These answers help us generate a starting point that feels right for you.
       </p>
 
@@ -37,34 +37,34 @@ export function StepBusinessInfo() {
         {/* Name + Description — side-by-side on md+ to save vertical space */}
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-semibold mb-2 block text-white/90">What is your website called?</label>
+            <label className="text-sm font-semibold mb-2 block text-foreground/90">What is your website called?</label>
             <input
               type="text"
               value={businessName}
               onChange={(e) => setBusinessInfo(e.target.value, industry, description)}
               placeholder="ie. Acme Studios"
-              className="w-full px-4 py-2.5 rounded-xl bg-transparent border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors"
+              className="w-full px-4 py-2.5 rounded-xl bg-transparent border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="text-sm font-semibold mb-2 block text-white/90">What is your website about?</label>
+            <label className="text-sm font-semibold mb-2 block text-foreground/90">What is your website about?</label>
             <input
               type="text"
               value={description}
               onChange={(e) => setBusinessInfo(businessName, industry, e.target.value)}
               placeholder="Describe it in one sentence"
-              className="w-full px-4 py-2.5 rounded-xl bg-transparent border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors"
+              className="w-full px-4 py-2.5 rounded-xl bg-transparent border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
         </div>
 
         {/* Industry selector */}
         <div>
-          <label className="text-sm font-semibold mb-1 block text-white/90">
+          <label className="text-sm font-semibold mb-1 block text-foreground/90">
             What category does your website fall under?
           </label>
-          <p className="text-xs text-white/50 mb-3">Choose the category that best describes your website.</p>
+          <p className="text-xs text-muted-foreground mb-3">Choose the category that best describes your website.</p>
           <div className="flex flex-wrap gap-2">
             {INDUSTRIES.map((ind) => {
               const Icon = iconMap[ind.icon] || Icons.Globe;
@@ -76,14 +76,14 @@ export function StepBusinessInfo() {
                   className={cn(
                     "inline-flex items-center gap-1.5 pl-3 pr-3.5 py-2 rounded-full border text-[13px] transition-all",
                     isSelected
-                      ? "border-blue-400/70 bg-blue-400/[0.08] text-white shadow-[0_0_0_1px_rgba(96,165,250,0.4)]"
-                      : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/25 hover:text-white/90"
+                      ? "border-primary bg-primary/[0.08] text-primary shadow-[0_0_0_1px_rgba(96,165,250,0.4)]"
+                      : "border-border bg-muted/30 text-muted-foreground hover:border-primary/50 hover:text-foreground"
                   )}
                 >
                   {isSelected ? (
-                    <Icons.Check className="w-3.5 h-3.5 text-blue-400" strokeWidth={3} />
+                    <Icons.Check className="w-3.5 h-3.5 text-primary" strokeWidth={3} />
                   ) : (
-                    <Icon className="w-3.5 h-3.5 text-white/45" />
+                    <Icon className="w-3.5 h-3.5 text-muted-foreground/70" />
                   )}
                   <span className="font-medium">{ind.label}</span>
                 </button>
@@ -94,16 +94,16 @@ export function StepBusinessInfo() {
       </div>
 
       {/* Footer Buttons */}
-      <div className="mt-8 flex justify-between items-center pt-5 border-t border-white/5">
+      <div className="mt-8 flex justify-between items-center pt-5 border-t border-border">
         <div />
         <button
           onClick={() => canProceed && setStep(2)}
           disabled={!canProceed}
           className={cn(
-            "px-6 py-2.5 rounded-lg text-sm font-medium transition-colors",
+            "px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm",
             canProceed
-              ? "bg-white text-black hover:bg-white/90"
-              : "bg-white/10 text-white/30 cursor-not-allowed"
+              ? "bg-primary text-primary-foreground hover:opacity-90"
+              : "bg-muted text-muted-foreground cursor-not-allowed"
           )}
         >
           Next

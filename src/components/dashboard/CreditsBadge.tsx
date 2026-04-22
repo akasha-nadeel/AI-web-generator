@@ -19,7 +19,7 @@ export function CreditsBadge({ remaining, total }: CreditsBadgeProps) {
         <p className="text-sm font-medium">
           {remaining} / {total} credits
         </p>
-        <div className="w-24 h-1.5 bg-white/10 rounded-full mt-1 overflow-hidden">
+        <div className="w-24 h-1.5 bg-foreground/10 rounded-full mt-1 overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all"
             style={{ width: `${percentage}%` }}

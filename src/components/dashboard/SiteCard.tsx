@@ -31,18 +31,18 @@ export function SiteCard({ site, onDelete }: SiteCardProps) {
   });
 
   return (
-    <GlassCard className="group relative">
+    <GlassCard className="group relative transition-colors duration-300">
       {/* Preview area */}
       <Link href={`/editor/${site.id}`} className="block">
-        <div className="aspect-video rounded-lg bg-gradient-to-br from-purple-900/30 via-blue-900/20 to-cyan-900/10 border border-white/5 mb-4 flex items-center justify-center overflow-hidden">
-          <Globe className="w-8 h-8 text-white/20" />
+        <div className="aspect-video rounded-lg bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-cyan-500/5 border border-border mb-4 flex items-center justify-center overflow-hidden">
+          <Globe className="w-8 h-8 text-foreground/20" />
         </div>
       </Link>
 
       {/* Info */}
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="font-semibold text-sm">{site.name}</h3>
+          <h3 className="font-semibold text-sm text-foreground">{site.name}</h3>
           <p className="text-xs text-muted-foreground mt-1">
             {site.industry && <span className="capitalize">{site.industry}</span>}
             {site.industry && " · "}
@@ -53,16 +53,16 @@ export function SiteCard({ site, onDelete }: SiteCardProps) {
         <div className="flex items-center gap-2">
           <Badge
             variant="secondary"
-            className="text-xs capitalize bg-white/5 border-white/10"
+            className="text-xs capitalize bg-foreground/5 border-border"
           >
             {site.status}
           </Badge>
 
           <DropdownMenu>
-            <DropdownMenuTrigger className="p-1 hover:bg-white/10 rounded transition-colors">
+            <DropdownMenuTrigger className="p-1 hover:bg-foreground/10 rounded transition-colors">
               <MoreVertical className="w-4 h-4 text-muted-foreground" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="glass-card border-white/10">
+            <DropdownMenuContent align="end" className="glass-card border-border">
               <DropdownMenuItem asChild>
                 <Link href={`/editor/${site.id}`} className="flex items-center gap-2">
                   <Edit className="w-4 h-4" />
@@ -77,7 +77,7 @@ export function SiteCard({ site, onDelete }: SiteCardProps) {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onDelete(site.id)}
-                className="text-red-400 focus:text-red-400"
+                className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
                 Delete

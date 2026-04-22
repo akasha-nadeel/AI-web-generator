@@ -123,19 +123,19 @@ export function Features() {
           transition={ease.slow}
         >
           <div className="flex items-center gap-2.5 mb-5">
-            <div className="w-1.5 h-1.5 rounded-full bg-white/60" />
-            <span className="text-sm text-white/40">Features</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-foreground/60" />
+            <span className="text-sm text-muted-foreground">Features</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] font-light leading-[1.1] tracking-tight mb-6">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] font-light leading-[1.1] tracking-tight mb-6 text-foreground">
             Everything You Need<br /> to Build Fast
           </h2>
-          <p className="text-sm text-white/35 max-w-md leading-relaxed mb-8">
+          <p className="text-sm text-muted-foreground/70 max-w-md leading-relaxed mb-8">
             Weavo combines AI generation, visual editing, and smart tools to help
             you create professional websites without writing a single line of code.
           </p>
           <a
             href="#contact"
-            className="inline-flex items-center justify-center px-7 py-3.5 bg-white text-black text-sm font-medium rounded-full hover:bg-white/90 transition-colors"
+            className="inline-flex items-center justify-center px-7 py-3.5 bg-foreground text-background text-sm font-medium rounded-full hover:bg-foreground/90 transition-colors"
           >
             Contact Us
           </a>
@@ -153,7 +153,7 @@ export function Features() {
         >
           {/* Cursor-following tooltip */}
           <div
-            className="pointer-events-none absolute z-50 max-w-[220px] px-3.5 py-2.5 rounded-lg bg-white text-black text-xs leading-relaxed font-medium shadow-lg transition-opacity duration-200"
+            className="pointer-events-none absolute z-50 max-w-[220px] px-3.5 py-2.5 rounded-lg glass-card text-foreground text-xs leading-relaxed font-medium shadow-lg transition-opacity duration-200"
             style={{
               left: tooltip.x,
               top: tooltip.y,
@@ -165,7 +165,7 @@ export function Features() {
 
           {rows.map((row, rowIndex) => (
             <div key={rowIndex}>
-              <div className="border-t border-dashed border-white/[0.08]" />
+              <div className="border-t border-dashed border-border" />
 
               <div className="grid grid-cols-3">
                 {row.map((feature, colIndex) => (
@@ -177,22 +177,22 @@ export function Features() {
                     onMouseLeave={handleMouseLeave}
                     className={`group flex flex-col items-center justify-center py-5 md:py-6 px-3 ${
                       colIndex < row.length - 1
-                        ? "border-r border-dashed border-white/[0.08]"
+                        ? "border-r border-dashed border-border"
                         : ""
                     } ${feature.description ? "cursor-pointer" : ""}`}
                   >
                     {feature.isLogo ? (
                       <div className="flex items-center justify-center h-full">
-                        <span className="text-xl md:text-2xl font-bold text-white">
+                        <span className="text-xl md:text-2xl font-bold text-foreground">
                           Weavo
                         </span>
                       </div>
                     ) : (
                       <>
-                        <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center mb-3 group-hover:bg-white/[0.1] group-hover:border-white/[0.15] transition-all duration-300">
-                          <feature.icon className="w-6 h-6 md:w-7 md:h-7 text-white/80 group-hover:text-white transition-colors duration-300" />
+                        <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-muted/30 border border-border flex items-center justify-center mb-3 group-hover:bg-muted/50 group-hover:border-foreground/20 transition-all duration-300">
+                          <feature.icon className="w-6 h-6 md:w-7 md:h-7 text-foreground/70 group-hover:text-foreground transition-colors duration-300" />
                         </div>
-                        <span className="text-xs md:text-sm text-white/50 font-medium text-center group-hover:text-white/80 transition-colors duration-300">
+                        <span className="text-xs md:text-sm text-muted-foreground font-medium text-center group-hover:text-foreground/80 transition-colors duration-300">
                           {feature.title}
                         </span>
                       </>
@@ -202,7 +202,7 @@ export function Features() {
               </div>
             </div>
           ))}
-          <div className="border-t border-dashed border-white/[0.08]" />
+          <div className="border-t border-dashed border-border" />
         </motion.div>
       </div>
     </SectionWrapper>

@@ -2,35 +2,36 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Sparkles,
     ArrowLeft,
     ArrowUp,
     Zap,
-    Code2,
     AlertTriangle,
     Copy,
     ThumbsUp,
     ThumbsDown,
     RefreshCw,
-    Share2,
-    GitFork,
     Globe,
-    History,
-    Settings,
     Maximize2,
-    ExternalLink,
+    Monitor,
+    Tablet,
+    Smartphone,
+    LayoutDashboard,
     Flag,
     Eye,
     RotateCcw,
     X,
     ChevronRight,
     ImageIcon,
+    History,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCreditsStore } from "@/stores/creditsStore";
 import { CreditCounter } from "@/components/ui/CreditCounter";
+import { PublishDialog } from "@/components/editor/PublishDialog";
 
 /* ===== TYPES ===== */
 
@@ -251,8 +252,15 @@ function GeneratePageContent() {
     const [errorMsg, setErrorMsg] = useState("");
     const [siteId, setSiteId] = useState<string | null>(null);
     const [siteHtml, setSiteHtml] = useState<string>("");
+    const [subdomain, setSubdomain] = useState<string | null>(null);
+    const [publishOpen, setPublishOpen] = useState(false);
+    const [historyOpen, setHistoryOpen] = useState(false);
+    const [versions, setVersions] = useState<Array<{ id: string; source: string; summary: string | null; created_at: string }>>([]);
+    const [versionsLoading, setVersionsLoading] = useState(false);
+    const [restoringId, setRestoringId] = useState<string | null>(null);
     const [chatInput, setChatInput] = useState("");
     const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
+    const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isChatLoading, setIsChatLoading] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(true);
@@ -390,8 +398,12 @@ function GeneratePageContent() {
             ]);
 
             setStatus("preparing");
-            window.history.replaceState(null, "", `/generate/${data.siteId}`);
-            setTimeout(() => setStatus("done"), 1500);
+            // After a fresh generation, jump straight to the editor where the
+            // user can preview/export/publish. The AI-chat refine loop is
+            // reachable from the editor's Edit button.
+            setTimeout(() => {
+                router.replace(`/editor/${data.siteId}`);
+            }, 1200);
         } catch (err) {
             const errMessage = err instanceof Error ? err.message : "Something went wrong";
             setErrorMsg(errMessage);
@@ -414,6 +426,7 @@ function GeneratePageContent() {
                 // Support both new format (html in site_json) and raw site_json
                 const html = data.site.site_json?.html || "";
                 setSiteHtml(html);
+                setSubdomain(data.site.subdomain ?? null);
                 setMessages([
                     { role: "ai", content: "Welcome back! Your website is ready. Use the chat to make changes.", status: "done", elapsed: 0 },
                 ]);
@@ -455,10 +468,6 @@ function GeneratePageContent() {
         }
     }, [routeSiteId, prompt, router, startGeneration, loadExistingSite]);
 
-    const handleOpenEditor = () => {
-        if (siteId) router.push(`/editor/${siteId}`);
-    };
-
     const handleRetry = () => {
         hasStarted.current = false;
         setErrorMsg("");
@@ -475,6 +484,13 @@ function GeneratePageContent() {
         setAttachedImages([]);
         setIsChatLoading(true);
 
+        // Capture prior turns BEFORE we append the new ones so the history
+        // we send reflects only completed conversation (no empty loading bubble).
+        const priorTurns = messages
+            .filter((m) => m.status !== "error" && m.status !== "loading" && m.content.trim())
+            .slice(-10) // keep the last ~5 exchanges; each exchange is user+ai
+            .map((m) => ({ role: m.role === "ai" ? "assistant" : "user", content: m.content }));
+
         setMessages((prev) => [...prev, { role: "user", content: userMsg, images: imagesToSend.length > 0 ? imagesToSend : undefined }]);
         setMessages((prev) => [...prev, { role: "ai", content: "", status: "loading" }]);
 
@@ -487,6 +503,8 @@ function GeneratePageContent() {
                 body: JSON.stringify({
                     message: userMsg,
                     html: siteHtml,
+                    siteId,
+                    history: priorTurns,
                     images: imagesToSend.map((img) => ({
                         data: img.data,
                         type: img.type,
@@ -494,16 +512,111 @@ function GeneratePageContent() {
                 }),
             });
 
-            const data = await res.json();
-            const chatElapsed = Math.round((Date.now() - start) / 1000);
-
+            // Error responses still come back as JSON (e.g. 401, 402, 429).
+            const contentType = res.headers.get("content-type") || "";
             if (!res.ok) {
-                throw new Error(data.error || "Chat failed");
+                const errData = contentType.includes("json")
+                    ? await res.json().catch(() => ({}))
+                    : { error: await res.text().catch(() => "Chat failed") };
+                if (res.status === 402 && errData.code === "INSUFFICIENT_CREDITS") {
+                    useCreditsStore.getState().openOutOfCredits({
+                        required: errData.required ?? 0,
+                        balance: errData.balance ?? 0,
+                        model: errData.model,
+                    });
+                    useCreditsStore.getState().refresh();
+                }
+                throw new Error(errData.error || "Chat failed");
             }
 
-            if (data.html) {
+            // Success → NDJSON stream. Walk it line by line.
+            if (!res.body) throw new Error("Empty stream");
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+
+            // Mode starts unknown. Once we get mode=chat, tokens stream live
+            // into the last AI message. Once we get mode=html, we keep the
+            // placeholder and swap in the final HTML on `done`.
+            let mode: "chat" | "html" | null = null;
+            let liveText = "";
+
+            // Helper: update the last AI message by patching its content.
+            const patchLast = (updater: (prev: string) => string, status: "loading" | "done" | "error" = "loading") => {
+                setMessages((prev) => {
+                    const updated = [...prev];
+                    const last = updated[updated.length - 1];
+                    if (!last || last.role !== "ai") return prev;
+                    updated[updated.length - 1] = {
+                        ...last,
+                        content: updater(last.content),
+                        status,
+                        elapsed: Math.round((Date.now() - start) / 1000),
+                    };
+                    return updated;
+                });
+            };
+
+            let finalHtml: string | null = null;
+            let finalReply: string | null = null;
+            let streamError: string | null = null;
+
+            outer: while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split("\n");
+                buffer = lines.pop() ?? "";
+                for (const line of lines) {
+                    if (!line.trim()) continue;
+                    let evt: { type: string; [k: string]: unknown };
+                    try {
+                        evt = JSON.parse(line);
+                    } catch {
+                        continue;
+                    }
+                    if (evt.type === "mode") {
+                        mode = evt.mode as "chat" | "html";
+                        if (mode === "html") {
+                            patchLast(() => "Applying your change…", "loading");
+                        } else {
+                            patchLast(() => "", "loading");
+                        }
+                    } else if (evt.type === "token" && typeof evt.text === "string") {
+                        if (mode === "chat") {
+                            liveText += evt.text;
+                            const snapshot = liveText;
+                            patchLast(() => snapshot, "loading");
+                        }
+                    } else if (evt.type === "progress" && typeof evt.chars === "number") {
+                        // HTML mode heartbeat — show live char count so user sees the stream is alive.
+                        if (mode === "html") {
+                            const chars = evt.chars as number;
+                            patchLast(() => `Applying your change… ${chars.toLocaleString()} chars`, "loading");
+                        }
+                    } else if (evt.type === "scope" && Array.isArray(evt.targets)) {
+                        // Server picked specific sections — tell the user we're doing a targeted edit.
+                        const n = evt.targets.length;
+                        patchLast(() => `Editing ${n === 1 ? "1 section" : `${n} sections`}…`, "loading");
+                    } else if (evt.type === "done") {
+                        if (typeof evt.creditsRemaining === "number") {
+                            useCreditsStore.getState().setBalance(evt.creditsRemaining);
+                        }
+                        if (typeof evt.html === "string") finalHtml = evt.html;
+                        if (typeof evt.reply === "string") finalReply = evt.reply;
+                        break outer;
+                    } else if (evt.type === "error" && typeof evt.message === "string") {
+                        streamError = evt.message;
+                        break outer;
+                    }
+                }
+            }
+
+            if (streamError) throw new Error(streamError);
+
+            if (finalHtml) {
                 setPrevHtml(siteHtml);
-                setSiteHtml(data.html);
+                setSiteHtml(finalHtml);
                 setShowChanges(false);
 
                 // Auto-save to database
@@ -511,23 +624,27 @@ function GeneratePageContent() {
                     fetch("/api/sites", {
                         method: "PATCH",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ id: siteId, site_json: { html: data.html } }),
+                        body: JSON.stringify({
+                            id: siteId,
+                            site_json: { html: finalHtml },
+                            source: "chat",
+                            summary: userMsg.slice(0, 140),
+                        }),
                     }).catch(() => {});
                 }
-            }
 
-            setMessages((prev) => {
-                const updated = [...prev];
-                updated[updated.length - 1] = {
-                    role: "ai",
-                    content: data.html
-                        ? `Done! I've applied your changes: **"${userMsg.slice(0, 80)}${userMsg.length > 80 ? "..." : ""}"**. Check the preview to see the update.`
-                        : "I processed your request but couldn't generate updated HTML. Please try rephrasing.",
-                    status: "done",
-                    elapsed: chatElapsed,
-                };
-                return updated;
-            });
+                patchLast(
+                    () => `Done! I've applied your changes: **"${userMsg.slice(0, 80)}${userMsg.length > 80 ? "..." : ""}"**. Check the preview to see the update.`,
+                    "done"
+                );
+            } else if (finalReply) {
+                patchLast(() => finalReply!, "done");
+            } else if (liveText) {
+                // Stream ended but no explicit done payload — use what we streamed.
+                patchLast(() => liveText, "done");
+            } else {
+                patchLast(() => "I didn't catch that. Could you rephrase as a specific change?", "done");
+            }
         } catch (err) {
             const chatElapsed = Math.round((Date.now() - start) / 1000);
             setMessages((prev) => {
@@ -685,44 +802,54 @@ function GeneratePageContent() {
     }
 
     return (
-        <div className="min-h-screen bg-background flex flex-col">
+        <div className="h-screen bg-background flex flex-col overflow-hidden">
             {/* ===== TOP HEADER BAR ===== */}
             <div className="h-12 border-b border-white/[0.06] bg-[rgba(10,10,25,0.6)] flex items-center justify-between px-3 md:px-5 shrink-0 z-20">
-                <button
-                    onClick={() => router.push("/dashboard")}
-                    className="flex items-center gap-2 h-8 px-3 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all"
-                >
-                    <ArrowLeft className="w-4 h-4" />
-                    <span className="hidden sm:inline">Back to start</span>
-                </button>
+                <div className="flex items-center gap-2">
+                    <Link
+                        href={`/editor/${siteId}`}
+                        className="flex items-center gap-2 h-8 px-4 rounded-full bg-white/[0.06] border border-white/[0.08] text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.12] transition-all"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        <span className="hidden sm:inline">Back</span>
+                    </Link>
+                </div>
 
-                <span className="text-sm font-medium text-foreground truncate max-w-[200px] md:max-w-xs">
-                    {siteName}
-                </span>
-
-                <div className="flex items-center gap-1">
-                    <CreditCounter compact className="mr-1" />
-                    <button className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all">
-                        <GitFork className="w-3.5 h-3.5" />
-                        Remix
-                    </button>
-                    <button className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs text-foreground bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.1] transition-all font-medium">
-                        <Share2 className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">Share</span>
+                <div className="flex items-center gap-1.5">
+                    <button
+                        onClick={async () => {
+                            setHistoryOpen(true);
+                            if (!siteId) return;
+                            setVersionsLoading(true);
+                            try {
+                                const r = await fetch(`/api/sites/${siteId}/versions`);
+                                const d = await r.json();
+                                setVersions(d.versions || []);
+                            } finally {
+                                setVersionsLoading(false);
+                            }
+                        }}
+                        disabled={!siteId}
+                        className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium bg-white/[0.06] text-muted-foreground hover:text-foreground hover:bg-white/[0.1] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                        title="Version history"
+                    >
+                        <History className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">History</span>
                     </button>
                     <button
-                        onClick={handleOpenEditor}
-                        disabled={status !== "done"}
-                        className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs bg-white text-black font-medium hover:bg-white/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                        onClick={() => setPublishOpen(true)}
+                        disabled={status !== "done" || !siteId}
+                        className={cn(
+                            "flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed",
+                            subdomain
+                                ? "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30"
+                                : "bg-white text-black hover:bg-white/90"
+                        )}
+                        title={subdomain ? `Live at ${subdomain}` : "Publish site"}
                     >
-                        <span className="hidden sm:inline">Publish</span>
-                        <span className="sm:hidden">Go</span>
-                    </button>
-                    <button className="hidden md:flex p-2 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.06] transition-all" title="History">
-                        <History className="w-4 h-4" />
-                    </button>
-                    <button className="hidden md:flex p-2 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.06] transition-all" title="Settings">
-                        <Settings className="w-4 h-4" />
+                        <Globe className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">{subdomain ? "Live" : "Publish"}</span>
+                        <span className="sm:hidden">{subdomain ? "Live" : "Go"}</span>
                     </button>
                 </div>
             </div>
@@ -734,7 +861,7 @@ function GeneratePageContent() {
                 {/* ===== LEFT SIDEBAR — Chat ===== */}
                 <div
                     ref={sidebarRef}
-                    className="w-full lg:w-[360px] lg:h-[calc(100vh-3rem)] lg:sticky lg:top-12 border-b lg:border-b-0 bg-[rgba(10,10,25,0.5)] flex flex-col shrink-0"
+                    className="relative w-full lg:w-[360px] lg:h-full border-b lg:border-b-0 bg-[rgba(10,10,25,0.5)] flex flex-col shrink-0"
                 >
                     {/* Drag handle */}
                     <div
@@ -744,18 +871,15 @@ function GeneratePageContent() {
                     >
                         <div
                             className={cn(
-                                "w-[3px] h-full transition-colors duration-100",
-                                isDragging ? "bg-purple-500" : "bg-transparent group-hover:bg-purple-500/50"
+                                "w-[2px] h-full transition-colors duration-100",
+                                isDragging ? "bg-white/80" : "bg-transparent group-hover:bg-white/40"
                             )}
                         />
                     </div>
 
                     {/* AI model header */}
-                    <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center gap-2">
+                    <div className="px-4 py-3 border-b border-white/[0.06] flex items-center gap-2 h-14 shrink-0">
                     <span className="text-sm font-medium text-foreground">Weavo AI</span>
-                    <button className="p-1 rounded-md text-muted-foreground/50 hover:text-foreground hover:bg-white/[0.06] transition-all" title="Settings">
-                        <Settings className="w-3.5 h-3.5" />
-                    </button>
                     <div className="ml-auto flex items-center gap-1.5">
                         {status === "generating" && (
                             <span className="text-[11px] text-amber-400 font-medium">Generating...</span>
@@ -764,7 +888,7 @@ function GeneratePageContent() {
                             <span className="text-[11px] text-blue-400 font-medium">Preparing...</span>
                         )}
                         {status === "done" && !isChatLoading && (
-                            <span className="text-[11px] text-emerald-400">Ready</span>
+                            <CreditCounter className="scale-[0.9] origin-right" />
                         )}
                         {isChatLoading && (
                             <span className="text-[11px] text-amber-400 font-medium">Updating...</span>
@@ -823,12 +947,21 @@ function GeneratePageContent() {
                                         )}
                                     </div>
 
-                                    {msg.status === "loading" && (
+                                    {msg.status === "loading" && !msg.content && (
                                         <div className="flex items-center gap-2">
                                             <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }}>
                                                 <Sparkles className="w-3.5 h-3.5 text-purple-400" />
                                             </motion.div>
                                             <span className="text-xs text-purple-400 font-medium">Processing your request...</span>
+                                        </div>
+                                    )}
+
+                                    {msg.status === "loading" && msg.content && (
+                                        // Streaming — show content as it builds, with a subtle
+                                        // cursor so the user knows it's still going.
+                                        <div className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                                            {msg.content}
+                                            <span className="inline-block w-[2px] h-[1em] align-text-bottom bg-purple-400 ml-0.5 animate-pulse" />
                                         </div>
                                     )}
 
@@ -1088,7 +1221,8 @@ function GeneratePageContent() {
             {/* ===== MAIN CONTENT — Preview / Code ===== */}
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Sub-bar */}
-                <div className="h-11 border-b border-white/[0.06] flex items-center gap-3 px-3 md:px-4 shrink-0">
+                <div className="h-11 border-b border-white/[0.06] flex items-center justify-between px-3 md:px-4 shrink-0 relative">
+                    {/* Left group — Preview/Code toggle */}
                     <div className="flex items-center gap-1 shrink-0">
                         <button
                             onClick={() => setActiveTab("preview")}
@@ -1114,38 +1248,34 @@ function GeneratePageContent() {
                         </button>
                     </div>
 
-                    <div className="hidden md:flex flex-1 items-center justify-end gap-2">
+                    {/* Middle group — Device toggle, absolutely centered */}
+                    <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center">
+                        {(["desktop", "tablet", "mobile"] as const).map((device) => {
+                            const Icon = { desktop: Monitor, tablet: Tablet, mobile: Smartphone }[device];
+                            return (
+                                <button
+                                    key={device}
+                                    onClick={() => setPreviewDevice(device)}
+                                    className={cn(
+                                        "p-2 rounded-lg transition-colors",
+                                        previewDevice === device
+                                            ? "bg-white/10 text-foreground"
+                                            : "text-muted-foreground hover:text-foreground"
+                                    )}
+                                >
+                                    <Icon className="w-4 h-4" />
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Right group */}
+                    <div className="hidden md:flex items-center gap-2 ml-auto">
                         <a
                             href={siteId ? `/preview/${siteId}` : "#"}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 h-7 px-3 rounded-lg bg-white/[0.04] border border-white/[0.06] max-w-xs hover:bg-white/[0.08] transition-colors"
-                            title="Open preview in new tab"
-                        >
-                            <ExternalLink className="w-3 h-3 text-muted-foreground/50 shrink-0" />
-                            <span className="text-xs text-muted-foreground/60 truncate">
-                                {siteId ? `/${siteId.slice(0, 8)}...` : "/preview"}
-                            </span>
-                        </a>
-
-                        <button
-                            onClick={() => setActiveTab(activeTab === "code" ? "preview" : "code")}
-                            className={cn(
-                                "p-1.5 rounded-lg transition-all",
-                                activeTab === "code" 
-                                    ? "bg-white/[0.1] text-foreground" 
-                                    : "text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.06]"
-                            )}
-                            title="Toggle code view"
-                        >
-                            <Code2 className="w-4 h-4" />
-                        </button>
-
-                        <a
-                            href={siteId ? `/preview/${siteId}` : "#"}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-1.5 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.06] transition-all inline-flex items-center justify-center"
+                            className="p-1.5 rounded-lg text-foreground/80 hover:text-foreground hover:bg-white/[0.08] transition-all inline-flex items-center justify-center"
                             title="Open fullscreen"
                         >
                             <Maximize2 className="w-4 h-4" />
@@ -1158,7 +1288,13 @@ function GeneratePageContent() {
                     <div className="flex-1 flex flex-col overflow-hidden">
                         {/* PREVIEW TAB */}
                         {activeTab === "preview" && (
-                            <div className="flex-1 flex flex-col overflow-hidden">
+                            <div className={cn(
+                                "flex-1 flex justify-center items-start min-h-0",
+                                // Desktop: no padding, iframe fills; tablet/mobile: pad so the
+                                // device frame doesn't touch the edges, and let the container
+                                // scroll if the frame is taller than the viewport.
+                                previewDevice === "desktop" ? "p-0" : "p-2 md:p-4 overflow-auto"
+                            )}>
                                 {status === "generating" ? (
                                     <div className="flex-1 flex items-center justify-center">
                                         <Spinner size={44} />
@@ -1192,12 +1328,82 @@ function GeneratePageContent() {
                                         </div>
                                     </div>
                                 ) : siteHtml ? (
-                                    <iframe
-                                        srcDoc={siteHtml}
-                                        title="Website Preview"
-                                        className={cn("flex-1 w-full border-0 bg-white", isDragging && "pointer-events-none")}
-                                        sandbox="allow-same-origin allow-scripts"
-                                    />
+                                    previewDevice === "desktop" ? (
+                                        <iframe
+                                            srcDoc={siteHtml}
+                                            title="Website Preview"
+                                            className={cn("flex-1 w-full h-full border-0 bg-white", isDragging && "pointer-events-none")}
+                                            sandbox="allow-same-origin allow-scripts"
+                                        />
+                                    ) : previewDevice === "tablet" ? (
+                                        /* ===== TABLET — CSS iPad Pro frame ===== */
+                                        <div className="flex-1 flex justify-center items-center">
+                                            <div
+                                                className="relative bg-[#1d1d1f] shadow-2xl shadow-black/60"
+                                                style={{ borderRadius: 24, padding: "18px 18px" }}
+                                            >
+                                                {/* Camera dot */}
+                                                <div className="absolute top-[7px] left-1/2 -translate-x-1/2 w-[5px] h-[5px] rounded-full bg-[#333] ring-1 ring-[#444]" />
+                                                {/* Power button */}
+                                                <div className="absolute top-[80px] -right-[2px] w-[2px] h-[30px] bg-[#333] rounded-r-sm" />
+                                                {/* Screen */}
+                                                <div
+                                                    className="overflow-hidden bg-black"
+                                                    style={{ borderRadius: 8, width: 560, height: "calc(100vh - 180px)", maxHeight: 740 }}
+                                                >
+                                                    <iframe
+                                                        srcDoc={siteHtml}
+                                                        className={cn("border-0 bg-white", isDragging && "pointer-events-none")}
+                                                        sandbox="allow-scripts allow-same-origin"
+                                                        style={{ width: "768px", height: "137.2%", transform: "scale(0.729)", transformOrigin: "top left" }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        /* ===== MOBILE — CSS iPhone 12 Pro frame ===== */
+                                        <div className="flex-1 flex justify-center items-center">
+                                            <div
+                                                className="relative shadow-2xl shadow-black/60"
+                                                style={{ borderRadius: 32, padding: "10px 10px", background: "linear-gradient(145deg, #2c3e4a 0%, #1a2c35 50%, #1d2d36 100%)" }}
+                                            >
+                                                {/* Notch — classic iPhone 12 style */}
+                                                <div
+                                                    className="absolute top-0 left-1/2 -translate-x-1/2 z-20 flex items-center justify-center gap-[6px]"
+                                                    style={{ width: 100, height: 22, background: "linear-gradient(180deg, #1a2c35 0%, #1d2d36 100%)", borderBottomLeftRadius: 14, borderBottomRightRadius: 14 }}
+                                                >
+                                                    {/* Speaker grille */}
+                                                    <div className="w-[28px] h-[2.5px] rounded-full bg-[#0a0f12]" style={{ boxShadow: "inset 0 0.5px 1px rgba(0,0,0,0.5)" }} />
+                                                    {/* Camera lens */}
+                                                    <div className="w-[6px] h-[6px] rounded-full bg-[#0e1519] ring-1 ring-[#253540]" />
+                                                </div>
+                                                {/* Frame highlight edge */}
+                                                <div className="absolute inset-0 rounded-[32px] border border-white/[0.08] pointer-events-none" />
+                                                {/* Power button */}
+                                                <div className="absolute top-[100px] -right-[2.5px] w-[2.5px] h-[28px] rounded-r-sm" style={{ background: "linear-gradient(90deg, #2c3e4a, #3a5060)" }} />
+                                                {/* Silent switch */}
+                                                <div className="absolute top-[70px] -left-[2.5px] w-[2.5px] h-[12px] rounded-l-sm" style={{ background: "linear-gradient(270deg, #2c3e4a, #3a5060)" }} />
+                                                {/* Volume up */}
+                                                <div className="absolute top-[92px] -left-[2.5px] w-[2.5px] h-[24px] rounded-l-sm" style={{ background: "linear-gradient(270deg, #2c3e4a, #3a5060)" }} />
+                                                {/* Volume down */}
+                                                <div className="absolute top-[122px] -left-[2.5px] w-[2.5px] h-[24px] rounded-l-sm" style={{ background: "linear-gradient(270deg, #2c3e4a, #3a5060)" }} />
+                                                {/* Screen */}
+                                                <div
+                                                    className="overflow-hidden bg-black relative"
+                                                    style={{ borderRadius: 22, width: 230, height: "calc(100vh - 160px)", maxHeight: 500 }}
+                                                >
+                                                    <iframe
+                                                        srcDoc={siteHtml}
+                                                        className={cn("border-0 bg-white", isDragging && "pointer-events-none")}
+                                                        sandbox="allow-scripts allow-same-origin"
+                                                        style={{ width: "375px", height: "163.1%", transform: "scale(0.6133)", transformOrigin: "top left" }}
+                                                    />
+                                                </div>
+                                                {/* Home indicator */}
+                                                <div className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-[70px] h-[3px] rounded-full bg-white/15" />
+                                            </div>
+                                        </div>
+                                    )
                                 ) : (
                                     <div className="flex-1 flex items-center justify-center">
                                         <Spinner size={36} />
@@ -1237,6 +1443,114 @@ function GeneratePageContent() {
                 </div>
             </div>
             </div>
+
+            {siteId && (
+                <PublishDialog
+                    siteId={siteId}
+                    currentSubdomain={subdomain}
+                    open={publishOpen}
+                    onClose={() => setPublishOpen(false)}
+                    onPublished={(sub) => setSubdomain(sub)}
+                    onUnpublished={() => setSubdomain(null)}
+                />
+            )}
+
+            {/* ===== HISTORY DRAWER ===== */}
+            <AnimatePresence>
+                {historyOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setHistoryOpen(false)}
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90]"
+                        />
+                        <motion.div
+                            initial={{ x: "100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "100%" }}
+                            transition={{ type: "spring", damping: 30, stiffness: 280 }}
+                            className="fixed top-0 right-0 h-full w-full sm:w-[380px] bg-[rgba(12,12,28,0.98)] border-l border-white/10 z-[100] flex flex-col"
+                        >
+                            <div className="h-12 px-4 border-b border-white/10 flex items-center justify-between shrink-0">
+                                <div className="flex items-center gap-2">
+                                    <History className="w-4 h-4 text-muted-foreground" />
+                                    <span className="text-sm font-medium">Version history</span>
+                                </div>
+                                <button
+                                    onClick={() => setHistoryOpen(false)}
+                                    className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/[0.06]"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <div className="flex-1 overflow-y-auto p-3">
+                                {versionsLoading ? (
+                                    <div className="flex items-center justify-center h-32 text-xs text-muted-foreground">Loading…</div>
+                                ) : versions.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-32 text-xs text-muted-foreground text-center px-6">
+                                        No previous versions yet. Every edit from now on will be saved here so you can roll back.
+                                    </div>
+                                ) : (
+                                    <ul className="flex flex-col gap-2">
+                                        {versions.map((v) => (
+                                            <li
+                                                key={v.id}
+                                                className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-3 hover:border-white/[0.15] transition-all"
+                                            >
+                                                <div className="flex items-start justify-between gap-2 mb-2">
+                                                    <div className="min-w-0">
+                                                        <div className="text-xs font-medium text-foreground capitalize">
+                                                            {v.source} edit
+                                                        </div>
+                                                        <div className="text-[11px] text-muted-foreground mt-0.5">
+                                                            {new Date(v.created_at).toLocaleString()}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {v.summary && (
+                                                    <div className="text-[11px] text-muted-foreground truncate mb-2">{v.summary}</div>
+                                                )}
+                                                <button
+                                                    disabled={restoringId === v.id}
+                                                    onClick={async () => {
+                                                        if (!siteId) return;
+                                                        setRestoringId(v.id);
+                                                        try {
+                                                            const r = await fetch(`/api/sites/${siteId}/restore`, {
+                                                                method: "POST",
+                                                                headers: { "Content-Type": "application/json" },
+                                                                body: JSON.stringify({ versionId: v.id }),
+                                                            });
+                                                            const d = await r.json();
+                                                            if (r.ok && d.site_json?.html) {
+                                                                setPrevHtml(siteHtml);
+                                                                setSiteHtml(d.site_json.html);
+                                                                setHistoryOpen(false);
+                                                                // Refresh list so the "before restore" snapshot appears
+                                                                const lr = await fetch(`/api/sites/${siteId}/versions`);
+                                                                const ld = await lr.json();
+                                                                setVersions(ld.versions || []);
+                                                            }
+                                                        } finally {
+                                                            setRestoringId(null);
+                                                        }
+                                                    }}
+                                                    className="w-full flex items-center justify-center gap-1.5 h-7 rounded-md text-[11px] font-medium bg-white/[0.06] hover:bg-white/[0.12] text-foreground disabled:opacity-50 transition-all"
+                                                >
+                                                    <RotateCcw className="w-3 h-3" />
+                                                    {restoringId === v.id ? "Restoring…" : "Restore this version"}
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

@@ -17,6 +17,7 @@ import { extractDesignDNA, formatDesignBriefForPrompt, type DesignBrief } from "
 import { findBestPattern } from "@/lib/ai/design-library";
 import { MODEL_COSTS, canUseModel, type ModelKey } from "@/lib/constants";
 import { validateAndFixImages } from "@/lib/ai/image-validator";
+import { enhanceGeneratedHtml } from "@/lib/ai/runtime/post-process";
 
 export const maxDuration = 120; // Allow up to 120s for AI generation (32k token responses need more time)
 
@@ -442,6 +443,14 @@ ${userPrompt}`;
       console.log(`[Generate] Image validation — checked ${validation.checked}, all OK`);
     }
     generatedHtml = validation.html;
+
+    // Inject scroll animations + smooth scroll + mobile-nav runtime,
+    // and repair nav anchors. Idempotent — safe to re-run on chat edits.
+    const enhanced = enhanceGeneratedHtml(generatedHtml);
+    generatedHtml = enhanced.html;
+    console.log(
+      `[Generate] Runtime enhance — ids:+${enhanced.addedIds}, nav fixed:${enhanced.fixedNavLinks}, reveals:+${enhanced.addedReveals}, runtime injected:${enhanced.injectedRuntime}`
+    );
 
     // Store the generated HTML in site_json as { html: "..." }
     const siteData = { html: generatedHtml };

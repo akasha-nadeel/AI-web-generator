@@ -47,6 +47,7 @@ import { TEMPLATE_DESIGN_DNA } from "@/lib/templates/design-dna";
 import { useRouter } from "next/navigation";
 import { Menu, Eye, ChevronRight } from "lucide-react";
 import { CreditCounter } from "@/components/ui/CreditCounter";
+import { AnnouncementBanner } from "@/components/shared/AnnouncementBanner";
 import { useCreditsStore } from "@/stores/creditsStore";
 
 /* ===== TYPES ===== */
@@ -85,7 +86,7 @@ const INDUSTRY_DESCRIPTIONS: Record<string, string> = {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, isLoaded: userLoaded } = useUser();
   const { signOut } = useClerk();
   const [sites, setSites] = useState<Site[]>([]);
   const [trashedSites, setTrashedSites] = useState<Site[]>([]);
@@ -253,15 +254,15 @@ export default function DashboardPage() {
       {/* Brand header */}
       <div className="p-4 flex items-center justify-between">
         <Link href="/dashboard" onClick={() => { setActiveNav("Recents"); setMobileMenuOpen(false); }}>
-          <span className="flex items-center gap-1 text-xl font-bold text-white">
+          <span className="flex items-center gap-1 text-xl font-bold text-foreground">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo.png" alt="Weavo Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center" />
+            <img src="/images/logo.png" alt="Weavo Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center dark:invert-0 invert" />
             Weavo
           </span>
         </Link>
         <button
           onClick={() => { setSidebarCollapsed(true); setMobileMenuOpen(false); }}
-          className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all"
+          className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-foreground/[0.06] transition-all"
           title="Hide sidebar"
         >
           <PanelLeft className="w-4 h-4" />
@@ -270,7 +271,7 @@ export default function DashboardPage() {
 
       {/* Navigation */}
       <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto scrollbar-thin">
-        {/* New Site — primary CTA, wizard is the only generation flow */}
+        {/* New Site — primary CTA */}
         <Link
           href="/wizard"
           onClick={() => setMobileMenuOpen(false)}
@@ -279,122 +280,144 @@ export default function DashboardPage() {
           <Plus className="w-4 h-4 text-purple-400" />
           New Site
         </Link>
-        <div className="my-1.5 mx-3 border-t border-white/[0.06]" />
+        <div className="my-1.5 mx-3 border-t border-border" />
 
-        {sidebarNavItems.map((item) => (
-          <button
-            key={item.label}
-            onClick={() => { setActiveNav(item.label); setSearchQuery(""); setMobileMenuOpen(false); if (item.label === "Templates") setSelectedTemplateId(null); }}
-            className={cn(
-              "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
-              activeNav === item.label
-                ? "bg-white/[0.08] text-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
-            )}
-          >
-            <item.icon className="w-4 h-4" />
-            {item.label}
-            {item.label === "Trash" && trashedSites.length > 0 && (
-              <span className="ml-auto text-[10px] bg-white/[0.08] px-1.5 py-0.5 rounded-full">
-                {trashedSites.length}
-              </span>
-            )}
-          </button>
-        ))}
+        {loading ? (
+          <div className="space-y-0.5 animate-pulse">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg">
+                <div className="w-4 h-4 rounded bg-foreground/[0.06]" />
+                <div className="h-3.5 bg-foreground/[0.04] rounded w-24" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          sidebarNavItems.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => { setActiveNav(item.label); setSearchQuery(""); setMobileMenuOpen(false); if (item.label === "Templates") setSelectedTemplateId(null); }}
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
+                activeNav === item.label
+                  ? "bg-foreground/[0.08] text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-foreground/[0.04]"
+              )}
+            >
+              <item.icon className="w-4 h-4" />
+              {item.label}
+              {item.label === "Trash" && trashedSites.length > 0 && (
+                <span className="ml-auto text-[10px] bg-foreground/[0.08] px-1.5 py-0.5 rounded-full">
+                  {trashedSites.length}
+                </span>
+              )}
+            </button>
+          ))
+        )}
       </nav>
 
       {/* Bottom profile section */}
-      <div className="mt-auto border-t border-white/[0.06]">
-        <DropdownMenu>
-          <DropdownMenuTrigger className="w-full focus:outline-none">
-            <div className="flex items-center gap-3 p-3 hover:bg-white/[0.04] transition-colors cursor-pointer">
-              {/* Avatar */}
-              {user?.imageUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={user.imageUrl} alt={user?.fullName || "User"} className="w-9 h-9 rounded-full object-cover shrink-0 border border-white/10" referrerPolicy="no-referrer" />
-              ) : (
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white text-sm font-semibold shrink-0">
-                  {user?.fullName?.charAt(0)?.toUpperCase() || user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() || "U"}
+      <div className="mt-auto border-t border-border">
+        {!userLoaded ? (
+          <div className="flex items-center gap-3 p-3 animate-pulse">
+            <div className="w-9 h-9 rounded-full bg-foreground/[0.06] shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="h-3 bg-foreground/[0.06] rounded w-20 mb-2" />
+              <div className="h-2 bg-foreground/[0.04] rounded w-12" />
+            </div>
+          </div>
+        ) : (
+          <DropdownMenu>
+            <DropdownMenuTrigger className="w-full focus:outline-none">
+              <div className="flex items-center gap-3 p-3 hover:bg-foreground/[0.04] transition-colors cursor-pointer">
+                {/* Avatar */}
+                {user?.imageUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={user.imageUrl} alt={user?.fullName || "User"} className="w-9 h-9 rounded-full object-cover shrink-0 border border-border" referrerPolicy="no-referrer" />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-foreground/[0.08] flex items-center justify-center text-foreground text-sm font-semibold shrink-0">
+                    {user?.fullName?.charAt(0)?.toUpperCase() || user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium truncate">
+                    {user?.fullName || "User"}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground truncate capitalize">
+                    {planConfig.name} plan
+                  </p>
                 </div>
-              )}
-              <div className="flex-1 min-w-0 text-left">
-                <p className="text-sm font-medium truncate">
-                  {user?.fullName || "User"}
-                </p>
-                <p className="text-[11px] text-muted-foreground truncate capitalize">
-                  {planConfig.name} plan
-                </p>
+                <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
               </div>
-              <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            side="top"
-            align="start"
-            sideOffset={8}
-            className="w-[calc(260px-1.5rem)] bg-[rgba(22,22,22,0.97)] backdrop-blur-xl border-white/[0.1] rounded-xl p-1"
-          >
-            {/* Email */}
-            <div className="px-3 py-2 text-xs text-muted-foreground truncate">
-              {user?.primaryEmailAddress?.emailAddress}
-            </div>
-            <DropdownMenuSeparator className="bg-white/[0.06]" />
-
-            {/* Settings */}
-            <DropdownMenuItem asChild>
-              <Link href="/settings" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-sm">
-                <Settings className="w-4 h-4" />
-                Settings
-              </Link>
-            </DropdownMenuItem>
-
-            {/* Billing */}
-            <DropdownMenuItem asChild>
-              <Link href="/billing/manage" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-sm">
-                <CreditCard className="w-4 h-4" />
-                Billing
-              </Link>
-            </DropdownMenuItem>
-
-            {/* Help */}
-            <DropdownMenuItem asChild>
-              <Link href="/settings" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-sm">
-                <HelpCircle className="w-4 h-4" />
-                Get help
-              </Link>
-            </DropdownMenuItem>
-
-            {/* Upgrade plan / Buy more credits */}
-            <DropdownMenuSeparator className="bg-white/[0.06]" />
-            <DropdownMenuItem asChild>
-              <Link href="/billing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-sm">
-                <ArrowUpRight className="w-4 h-4" />
-                {plan === "free" ? "Upgrade plan" : "Buy credits"}
-              </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator className="bg-white/[0.06]" />
-
-            {/* Log out */}
-            <DropdownMenuItem
-              onClick={() => signOut({ redirectUrl: "/" })}
-              className="flex items-center gap-3 text-sm text-red-400 focus:text-red-400"
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              side="top"
+              align="start"
+              sideOffset={8}
+              className="w-[calc(260px-1.5rem)] bg-popover backdrop-blur-xl border-border rounded-xl p-1"
             >
-              <LogOut className="w-4 h-4" />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              {/* Email */}
+              <div className="px-3 py-2 text-xs text-muted-foreground truncate">
+                {user?.primaryEmailAddress?.emailAddress}
+              </div>
+              <DropdownMenuSeparator className="bg-border" />
+
+              {/* Settings */}
+              <DropdownMenuItem asChild>
+                <Link href="/settings" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-sm">
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+
+              {/* Billing */}
+              <DropdownMenuItem asChild>
+                <Link href="/billing/manage" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-sm">
+                  <CreditCard className="w-4 h-4" />
+                  Billing
+                </Link>
+              </DropdownMenuItem>
+
+              {/* Help */}
+              <DropdownMenuItem asChild>
+                <Link href="/settings" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-sm">
+                  <HelpCircle className="w-4 h-4" />
+                  Get help
+                </Link>
+              </DropdownMenuItem>
+
+              {/* Upgrade plan / Buy more credits */}
+              <DropdownMenuSeparator className="bg-border" />
+              <DropdownMenuItem asChild>
+                <Link href="/billing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-sm">
+                  <ArrowUpRight className="w-4 h-4" />
+                  {plan === "free" ? "Upgrade plan" : "Buy credits"}
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="bg-border" />
+
+              {/* Log out */}
+              <DropdownMenuItem
+                onClick={() => signOut({ redirectUrl: "/" })}
+                className="flex items-center gap-3 text-sm text-destructive focus:text-destructive"
+              >
+                <LogOut className="w-4 h-4" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </>
   );
 
   return (
-    <>
-      <div className="h-screen overflow-hidden bg-background flex">
+    <div className="flex flex-col h-screen overflow-hidden transition-colors duration-300">
+      <AnnouncementBanner />
+      <div className="flex-1 flex overflow-hidden bg-background">
           {/* ===== MOBILE SIDEBAR DRAWER ===== */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" showCloseButton={false} className="w-[280px] p-0 bg-[rgba(12,12,12,0.97)] border-white/[0.06] flex flex-col">
+        <SheetContent side="left" showCloseButton={false} className="w-[280px] p-0 bg-card/95 border-border flex flex-col">
           <SheetTitle className="sr-only">Navigation</SheetTitle>
           {sidebarContent}
         </SheetContent>
@@ -403,27 +426,27 @@ export default function DashboardPage() {
       {/* ===== DESKTOP SIDEBAR ===== */}
       <aside
         className={cn(
-          "hidden md:flex flex-col border-r border-white/[0.06] bg-[rgba(12,12,12,0.5)] shrink-0 h-screen overflow-hidden transition-[width] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+          "hidden md:flex flex-col border-r border-border bg-card/50 shrink-0 h-screen overflow-hidden transition-[width] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] relative",
           sidebarCollapsed ? "w-[52px]" : "w-[260px]"
         )}
       >
-        {/* Collapsed icon rail */}
+        {/* Layer 1: Collapsed Rail */}
         <div
           className={cn(
-            "absolute inset-0 flex flex-col items-center py-3 gap-1 transition-opacity duration-200",
-            sidebarCollapsed ? "opacity-100 delay-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+            "absolute inset-y-0 left-0 w-[52px] flex flex-col items-center py-3 gap-1 transition-all duration-300 z-20",
+            sidebarCollapsed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full pointer-events-none"
           )}
         >
           {/* Expand button */}
           <button
             onClick={() => setSidebarCollapsed(false)}
-            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all mb-2"
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-foreground/[0.06] transition-all mb-2"
             title="Show sidebar"
           >
             <PanelLeft className="w-5 h-5" />
           </button>
 
-          {/* New Site icon — primary CTA */}
+          {/* New Site icon */}
           <Link
             href="/wizard"
             title="New Site"
@@ -431,7 +454,7 @@ export default function DashboardPage() {
           >
             <Plus className="w-5 h-5 text-purple-400" />
           </Link>
-          <div className="my-1 w-5 border-t border-white/[0.06]" />
+          <div className="my-1 w-5 border-t border-border" />
 
           {/* Nav icons */}
           {sidebarNavItems.map((item) => (
@@ -442,37 +465,99 @@ export default function DashboardPage() {
               className={cn(
                 "p-2 rounded-lg transition-all relative",
                 activeNav === item.label
-                  ? "bg-white/[0.08] text-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
+                  ? "bg-foreground/[0.08] text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-foreground/[0.04]"
               )}
             >
               <item.icon className="w-5 h-5" />
               {item.label === "Trash" && trashedSites.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-white/[0.15] text-[8px] flex items-center justify-center">
+                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-foreground/[0.15] text-[8px] flex items-center justify-center">
                   {trashedSites.length}
                 </span>
               )}
             </button>
           ))}
 
-          {/* Spacer */}
           <div className="flex-1" />
 
-          {/* Bottom avatar */}
-          <button
-            onClick={() => setSidebarCollapsed(false)}
-            className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white text-sm font-semibold shrink-0 hover:ring-2 hover:ring-white/20 transition-all"
-            title={user?.fullName || "Profile"}
-          >
-            {user?.fullName?.charAt(0)?.toUpperCase() || user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() || "U"}
-          </button>
+          {/* Bottom avatar rail */}
+          {!userLoaded ? (
+            <div className="w-9 h-9 rounded-full bg-foreground/[0.06] animate-pulse shrink-0" />
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="focus:outline-none">
+                <div
+                  className="w-9 h-9 rounded-full bg-foreground/[0.08] flex items-center justify-center text-foreground text-sm font-semibold shrink-0 hover:bg-foreground/[0.12] transition-all cursor-pointer overflow-hidden border border-border"
+                  title={user?.fullName || "Profile"}
+                >
+                  {user?.imageUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={user.imageUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  ) : (
+                    user?.fullName?.charAt(0)?.toUpperCase() || user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() || "U"
+                  )}
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="right"
+                align="end"
+                sideOffset={12}
+                className="w-56 bg-popover backdrop-blur-xl border-border rounded-xl p-1 z-[100]"
+              >
+                {/* Email */}
+                <div className="px-3 py-2 text-xs text-muted-foreground truncate">
+                  {user?.primaryEmailAddress?.emailAddress}
+                </div>
+                <DropdownMenuSeparator className="bg-foreground/[0.06]" />
+
+                <DropdownMenuItem asChild>
+                  <Link href="/settings" className="flex items-center gap-3 text-sm">
+                    <Settings className="w-4 h-4" />
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                  <Link href="/billing/manage" className="flex items-center gap-3 text-sm">
+                    <CreditCard className="w-4 h-4" />
+                    Billing
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                  <Link href="/settings" className="flex items-center gap-3 text-sm">
+                    <HelpCircle className="w-4 h-4" />
+                    Get help
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator className="bg-foreground/[0.06]" />
+                <DropdownMenuItem asChild>
+                  <Link href="/billing" className="flex items-center gap-3 text-sm">
+                    <ArrowUpRight className="w-4 h-4" />
+                    {plan === "free" ? "Upgrade plan" : "Buy credits"}
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator className="bg-foreground/[0.06]" />
+
+                <DropdownMenuItem
+                  onClick={() => signOut({ redirectUrl: "/" })}
+                  className="flex items-center gap-3 text-sm text-destructive focus:text-destructive"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
-        {/* Expanded full sidebar */}
+        {/* Layer 2: Expanded Content */}
         <div
           className={cn(
-            "flex flex-col h-full min-w-[260px] transition-opacity duration-200",
-            sidebarCollapsed ? "opacity-0 pointer-events-none" : "opacity-100 delay-100 pointer-events-auto"
+            "absolute inset-y-0 left-0 w-[260px] flex flex-col h-full transition-all duration-300 z-10",
+            sidebarCollapsed ? "opacity-0 translate-x-[-20px] pointer-events-none" : "opacity-100 translate-x-0"
           )}
         >
           {sidebarContent}
@@ -482,27 +567,27 @@ export default function DashboardPage() {
       {/* ===== MAIN CONTENT ===== */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header className="h-14 border-b border-white/[0.06] bg-[rgba(12,12,12,0.3)] flex items-center justify-between px-3 md:px-6 shrink-0">
+        <header className="h-14 border-b border-border bg-background/50 flex items-center justify-between px-3 md:px-6 shrink-0">
           {/* Mobile: hamburger + logo */}
           <div className="flex items-center gap-2 md:hidden">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="p-2 -ml-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all"
+              className="p-2 -ml-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-foreground/[0.06] transition-all"
             >
               <Menu className="w-5 h-5" />
             </button>
             <Link href="/dashboard" className="flex items-center gap-1.5">
-              <span className="text-base font-bold text-white">Weavo</span>
+              <span className="text-base font-bold text-foreground">Weavo</span>
             </Link>
           </div>
 
           {/* Desktop: breadcrumb on left */}
           <div className="hidden md:flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">Workspace</span>
-            <ChevronRight className="w-3.5 h-3.5 text-white/30" />
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40" />
             <span className="text-foreground font-medium">{activeNav}</span>
             {activeNav !== "Templates" && (
-              <span className="ml-1 text-[11px] text-muted-foreground bg-white/[0.05] border border-white/[0.06] rounded-full px-2 py-0.5 tabular-nums">
+              <span className="ml-1 text-[11px] text-muted-foreground bg-foreground/[0.05] border border-border rounded-full px-2 py-0.5 tabular-nums">
                 {activeNav === "Trash" ? displayTrashed.length : displaySites.length}
               </span>
             )}
@@ -518,34 +603,15 @@ export default function DashboardPage() {
                 placeholder="Search projects..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-56 h-9 pl-9 pr-3 text-xs bg-white/[0.04] border border-white/[0.08] rounded-full text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/40 focus:bg-white/[0.06] transition-all"
+                className="w-56 h-9 pl-9 pr-3 text-xs bg-foreground/[0.04] border border-border rounded-full text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/40 focus:bg-foreground/[0.06] transition-all"
               />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
-                <kbd className="text-[10px] font-medium bg-white/[0.06] border border-white/[0.08] rounded px-1.5 py-0.5 tabular-nums text-muted-foreground/60">
-                  ⌘K
-                </kbd>
-              </div>
             </div>
-            <Link
-              href="/settings"
-              className="w-9 h-9 rounded-full bg-white/[0.04] border border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-white/[0.08] transition-all flex items-center justify-center shrink-0"
-              title="Help"
-            >
-              <HelpCircle className="w-4 h-4" />
-            </Link>
-            <div className="h-8 w-px bg-white/[0.08] mx-1" />
             <CreditCounter />
           </div>
 
           {/* Mobile: avatar */}
           <div className="flex items-center gap-2 md:hidden">
             <CreditCounter compact />
-            <button
-              onClick={() => setMobileMenuOpen(true)}
-              className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white text-xs font-semibold"
-            >
-              {user?.fullName?.charAt(0)?.toUpperCase() || "U"}
-            </button>
           </div>
         </header>
 
@@ -583,7 +649,7 @@ export default function DashboardPage() {
         </main>
       </div>
     </div>
-    </>
+    </div>
   );
 }
 
@@ -598,7 +664,7 @@ export default function DashboardPage() {
 function buildHeroSrcDoc(html: string): string {
   if (!html) return "";
   const injection = `<style id="__pixora_thumb_style__">
-    html, body { margin: 0 !important; padding: 0 !important; overflow: hidden !important; }
+    html, body { margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: transparent !important; }
     /* Kill entrance animations so the hero is visible the instant it mounts */
     .animate, .animate-fade, .animate-scale { opacity: 1 !important; animation: none !important; transform: none !important; }
   </style>
@@ -705,24 +771,24 @@ function SitesView({
                   className="w-1.5 h-1.5 rounded-full"
                   style={{ backgroundColor: "#C8E600", boxShadow: "0 0 8px #C8E600" }}
                 />
-                <span className="text-[11px] font-medium tracking-[0.12em] uppercase text-white/50">
+                <span className="text-[11px] font-medium tracking-[0.12em] uppercase text-muted-foreground">
                   Curated for you
                 </span>
               </div>
-              <h2 className="text-xl font-semibold text-white tracking-tight">
+              <h2 className="text-xl font-semibold text-foreground tracking-tight">
                 Start from a template
               </h2>
             </div>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setActiveNav("Templates")}
-                className="text-xs font-medium text-white/60 hover:text-white px-2.5 py-1.5 rounded-md hover:bg-white/[0.05] transition-colors"
+                className="text-xs font-medium text-muted-foreground hover:text-foreground px-2.5 py-1.5 rounded-md hover:bg-foreground/[0.05] transition-colors"
               >
                 View all
               </button>
               <button
                 onClick={() => setShowRecommended(false)}
-                className="text-xs font-medium text-white/30 hover:text-white/60 px-2.5 py-1.5 rounded-md hover:bg-white/[0.05] transition-colors"
+                className="text-xs font-medium text-muted-foreground/40 hover:text-foreground px-2.5 py-1.5 rounded-md hover:bg-foreground/[0.05] transition-colors"
                 title="Hide this section"
               >
                 Hide
@@ -740,7 +806,7 @@ function SitesView({
       {/* Header row */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-lg font-semibold text-foreground">
             {activeNav === "Recents" ? "Recently Edited" : "All Projects"}
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -751,10 +817,10 @@ function SitesView({
         <div className="flex items-center gap-2">
           {/* Sort */}
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs bg-white/[0.03] border border-white/[0.06] text-muted-foreground hover:text-foreground transition-all">
+            <DropdownMenuTrigger className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs bg-foreground/[0.03] border border-border text-muted-foreground hover:text-foreground transition-all focus:outline-none">
               {sortMode === "updated" ? "Last edited" : sortMode === "created" ? "Date created" : "Name A-Z"}
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-[rgba(22,22,22,0.95)] backdrop-blur-xl border-white/[0.1]">
+            <DropdownMenuContent align="end" className="bg-popover backdrop-blur-xl border-border">
               <DropdownMenuItem onClick={() => setSortMode("updated")} className="text-xs">Last edited</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setSortMode("created")} className="text-xs">Date created</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setSortMode("name")} className="text-xs">Name A-Z</DropdownMenuItem>
@@ -762,16 +828,16 @@ function SitesView({
           </DropdownMenu>
 
           {/* View toggle */}
-          <div className="flex items-center bg-white/[0.03] rounded-lg p-0.5 border border-white/[0.06]">
+          <div className="flex items-center bg-foreground/[0.03] rounded-lg p-0.5 border border-border">
             <button
               onClick={() => setViewMode("grid")}
-              className={cn("p-1.5 rounded-md transition-all", viewMode === "grid" ? "bg-white/[0.1] text-foreground" : "text-muted-foreground hover:text-foreground")}
+              className={cn("p-1.5 rounded-md transition-all", viewMode === "grid" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={cn("p-1.5 rounded-md transition-all", viewMode === "list" ? "bg-white/[0.1] text-foreground" : "text-muted-foreground hover:text-foreground")}
+              className={cn("p-1.5 rounded-md transition-all", viewMode === "list" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}
             >
               <List className="w-3.5 h-3.5" />
             </button>
@@ -825,7 +891,7 @@ function TemplatesGallery({ selectedIndustry, onSelectIndustry }: { selectedIndu
         <>
           <div className="flex items-start sm:items-center justify-between gap-4 mb-6 flex-col sm:flex-row">
             <div>
-              <h2 className="text-lg font-semibold">Templates</h2>
+              <h2 className="text-lg font-semibold text-foreground">Templates</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Pick a design you love — we&apos;ll generate a unique site inspired by its style
               </p>
@@ -837,7 +903,7 @@ function TemplatesGallery({ selectedIndustry, onSelectIndustry }: { selectedIndu
                 placeholder="Search templates..."
                 value={templateSearch}
                 onChange={(e) => setTemplateSearch(e.target.value)}
-                className="w-full h-9 pl-9 pr-3 rounded-lg bg-white/[0.06] border border-white/[0.08] text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/25 transition-colors"
+                className="w-full h-9 pl-9 pr-3 rounded-lg bg-foreground/[0.03] border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/25 transition-colors"
               />
             </div>
           </div>
@@ -958,7 +1024,7 @@ function TemplateDetailView({
           {/* Meta pills */}
           <div className="flex items-center gap-2 mt-3 flex-wrap">
             {palette && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-foreground/[0.04] border border-border">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: palette.colors.primary }} />
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: palette.colors.secondary }} />
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: palette.colors.accent }} />
@@ -966,11 +1032,11 @@ function TemplateDetailView({
               </div>
             )}
             {font && (
-              <span className="text-[11px] text-muted-foreground px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
+              <span className="text-[11px] text-muted-foreground px-2.5 py-1 rounded-full bg-foreground/[0.04] border border-border">
                 {font.fonts.heading} / {font.fonts.body}
               </span>
             )}
-            <span className="text-[11px] text-muted-foreground px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
+            <span className="text-[11px] text-muted-foreground px-2.5 py-1 rounded-full bg-foreground/[0.04] border border-border">
               {preview.sections.length} sections
             </span>
           </div>
@@ -981,14 +1047,14 @@ function TemplateDetailView({
             href={`/preview/${industryId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 h-10 px-5 rounded-full bg-white/[0.08] text-foreground text-sm font-medium hover:bg-white/[0.12] transition-colors border border-white/[0.08]"
+            className="flex items-center gap-2 h-10 px-5 rounded-full bg-foreground/[0.08] text-foreground text-sm font-medium hover:bg-foreground/[0.12] transition-colors border border-border"
           >
             <Eye className="w-4 h-4" />
             Preview
           </a>
           <button
             onClick={handleUseTemplate}
-            className="flex items-center gap-2 h-10 px-5 rounded-full bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors"
+            className="flex items-center gap-2 h-10 px-5 rounded-full bg-foreground text-background text-sm font-medium hover:bg-foreground/90 transition-colors"
           >
             <Sparkles className="w-4 h-4" />
             Generate Like This
@@ -1054,7 +1120,7 @@ function SectionScreenshot({ html, cardIndex }: { html: string; cardIndex: numbe
   const cappedH = scaledH > 0 ? Math.max(120, scaledH) : undefined;
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-white/[0.06] bg-[#111118] hover:border-white/[0.12] transition-colors">
+    <div className="rounded-2xl overflow-hidden border border-border bg-card hover:border-border transition-colors">
       <div
         ref={containerRef}
         className="overflow-hidden relative"
@@ -1118,10 +1184,10 @@ function RecommendedTemplateCard({ t }: { t: { id: string; title: string; desc: 
 
   return (
     <Link href={`/wizard?template=${t.id}`} className="block group cursor-pointer">
-      <div className="rounded-lg overflow-hidden border border-white/[0.06] bg-[#1e1e22] hover:border-white/[0.12] transition-colors duration-200">
+      <div className="rounded-lg overflow-hidden border border-border bg-card hover:border-border transition-colors duration-200">
         <div
           ref={containerRef}
-          className="relative overflow-hidden bg-[#2a2a2e]"
+          className="relative overflow-hidden bg-muted/30"
           style={{ height: thumbHeight }}
         >
           {previewHtml && scale > 0 ? (
@@ -1142,9 +1208,9 @@ function RecommendedTemplateCard({ t }: { t: { id: string; title: string; desc: 
               sandbox="allow-same-origin"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#2a2a2e] to-[#1e1e22]" />
+            <div className="w-full h-full bg-gradient-to-br from-muted/30 to-card" />
           )}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
+          <div className="absolute inset-0 bg-background/0 group-hover:bg-foreground/5 transition-colors duration-200" />
         </div>
 
         <div className="px-3 py-2.5 flex flex-col justify-end">
@@ -1195,10 +1261,10 @@ function TemplateCard({
 
   return (
     <div className="group cursor-pointer" onClick={onPreview}>
-      <div className="rounded-lg overflow-hidden border border-white/[0.06] bg-[#1e1e22] hover:border-white/[0.12] transition-colors duration-200">
+      <div className="rounded-lg overflow-hidden border border-border bg-card hover:border-border transition-colors duration-200">
         <div
           ref={containerRef}
-          className="relative overflow-hidden bg-[#2a2a2e]"
+          className="relative overflow-hidden bg-muted/30"
           style={{ height: thumbHeight }}
         >
           {previewHtml && scale > 0 ? (
@@ -1219,10 +1285,10 @@ function TemplateCard({
               sandbox="allow-same-origin"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#2a2a2e] to-[#1e1e22]" />
+            <div className="w-full h-full bg-gradient-to-br from-muted/30 to-card" />
           )}
           {/* Hover overlay */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
+          <div className="absolute inset-0 bg-background/0 group-hover:bg-foreground/5 transition-colors duration-200" />
         </div>
 
         {/* Info row — matching SiteGridCard */}
@@ -1274,23 +1340,23 @@ function TrashView({
           {sites.length > 0 && (
             <button
               onClick={onEmptyTrash}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs text-red-400 hover:text-red-300 bg-red-500/[0.08] hover:bg-red-500/[0.12] border border-red-500/[0.15] transition-all"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs text-destructive hover:text-red-300 bg-red-500/[0.08] hover:bg-red-500/[0.12] border border-red-500/[0.15] transition-all"
             >
               <AlertTriangle className="w-3 h-3" />
               Empty Trash
             </button>
           )}
 
-          <div className="flex items-center bg-white/[0.03] rounded-lg p-0.5 border border-white/[0.06]">
+          <div className="flex items-center bg-foreground/[0.03] rounded-lg p-0.5 border border-border">
             <button
               onClick={() => setViewMode("grid")}
-              className={cn("p-1.5 rounded-md transition-all", viewMode === "grid" ? "bg-white/[0.1] text-foreground" : "text-muted-foreground hover:text-foreground")}
+              className={cn("p-1.5 rounded-md transition-all", viewMode === "grid" ? "bg-foreground/[0.1] text-foreground" : "text-muted-foreground hover:text-foreground")}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={cn("p-1.5 rounded-md transition-all", viewMode === "list" ? "bg-white/[0.1] text-foreground" : "text-muted-foreground hover:text-foreground")}
+              className={cn("p-1.5 rounded-md transition-all", viewMode === "list" ? "bg-foreground/[0.1] text-foreground" : "text-muted-foreground hover:text-foreground")}
             >
               <List className="w-3.5 h-3.5" />
             </button>
@@ -1303,7 +1369,7 @@ function TrashView({
         <SkeletonGrid viewMode={viewMode} />
       ) : sites.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-5">
+          <div className="w-16 h-16 rounded-2xl bg-foreground/[0.04] border border-border flex items-center justify-center mb-5">
             <Trash2 className="w-7 h-7 text-muted-foreground/40" />
           </div>
           <h3 className="text-base font-medium mb-1">Trash is empty</h3>
@@ -1312,7 +1378,7 @@ function TrashView({
           </p>
         </div>
       ) : viewMode === "grid" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {sites.map((site) => (
             <TrashedGridCard
               key={site.id}
@@ -1349,39 +1415,82 @@ function TrashedGridCard({
   onRestore: (id: string) => void;
   onPermanentDelete: (id: string) => void;
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  const siteHtml = site.site_json?.html || "";
+  const heroSrcDoc = useMemo(() => buildHeroSrcDoc(siteHtml), [siteHtml]);
+
   const formattedDate = new Date(site.updated_at).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
   });
 
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setContainerWidth(entry.contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const iframeRenderWidth = 1440;
+  const scale = containerWidth > 0 ? containerWidth / iframeRenderWidth : 0;
+  const thumbHeight = 180;
+  const iframeHeight = scale > 0 ? Math.ceil(thumbHeight / scale) : 900;
+
   return (
-    <div className="group rounded-xl border border-white/[0.06] bg-white/[0.02] opacity-70 hover:opacity-100 transition-all duration-200">
-      <div className="p-3 pb-0">
-        <div className="aspect-[4/3] rounded-lg bg-gradient-to-br from-red-900/10 via-gray-900/10 to-gray-900/5 border border-white/[0.04] flex items-center justify-center relative">
-          <Globe className="w-8 h-8 text-white/10" />
-        </div>
+    <div className="group rounded-lg overflow-hidden border border-border bg-card hover:border-border transition-colors duration-200">
+      <div
+        ref={containerRef}
+        className="relative overflow-hidden bg-muted/30"
+        style={{ height: thumbHeight }}
+      >
+        {heroSrcDoc && scale > 0 ? (
+          <iframe
+            srcDoc={heroSrcDoc}
+            title={site.name}
+            className="border-0 pointer-events-none select-none block grayscale opacity-60 group-hover:opacity-80 transition-opacity"
+            scrolling="no"
+            style={{
+              width: `${iframeRenderWidth}px`,
+              height: `${iframeHeight}px`,
+              transform: `scale(${scale})`,
+              transformOrigin: "top left",
+              overflow: "hidden",
+            }}
+            tabIndex={-1}
+            loading="lazy"
+            sandbox="allow-scripts"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-muted/30 to-card flex items-center justify-center">
+            <Globe className="w-8 h-8 text-foreground/10" />
+          </div>
+        )}
       </div>
 
-      <div className="p-3 pt-2.5">
-        <h3 className="text-sm font-medium truncate line-through decoration-white/20">{site.name}</h3>
-        <p className="text-xs text-muted-foreground mt-0.5">Deleted {formattedDate}</p>
-
-        <div className="flex items-center gap-2 mt-3">
-          <button
-            onClick={() => onRestore(site.id)}
-            className="flex items-center gap-1.5 h-7 px-2.5 rounded-md text-xs text-foreground bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] transition-all"
-          >
-            <RotateCcw className="w-3 h-3" />
-            Restore
-          </button>
-          <button
-            onClick={() => onPermanentDelete(site.id)}
-            className="flex items-center gap-1.5 h-7 px-2.5 rounded-md text-xs text-red-400 hover:text-red-300 bg-red-500/[0.06] hover:bg-red-500/[0.1] transition-all"
-          >
-            <Trash2 className="w-3 h-3" />
-            Delete
-          </button>
+      <div className="px-3 py-2.5 flex items-center justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-[13px] font-medium truncate text-foreground/90">{site.name}</h3>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Deleted {formattedDate}</p>
         </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger className="p-1 rounded-md hover:bg-foreground/[0.08] transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100 shrink-0 focus:outline-none">
+            <MoreVertical className="w-4 h-4 text-muted-foreground" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-44 bg-popover backdrop-blur-xl border-border">
+            <DropdownMenuItem onClick={() => onRestore(site.id)} className="flex items-center gap-2 text-xs">
+              <RotateCcw className="w-3.5 h-3.5" /> Restore
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onPermanentDelete(site.id)} className="text-destructive focus:text-destructive text-xs">
+              <Trash2 className="w-3.5 h-3.5 mr-2" /> Delete Permanently
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
@@ -1405,13 +1514,13 @@ function TrashedListRow({
   });
 
   return (
-    <div className="group flex items-center gap-4 px-3 py-2.5 rounded-lg hover:bg-white/[0.03] transition-colors opacity-70 hover:opacity-100">
-      <div className="w-14 h-10 rounded-md bg-gradient-to-br from-red-900/15 via-gray-900/10 to-gray-900/5 border border-white/[0.06] flex items-center justify-center shrink-0">
-        <Globe className="w-4 h-4 text-white/15" />
+    <div className="group flex items-center gap-4 px-3 py-2.5 rounded-lg hover:bg-foreground/[0.03] transition-colors opacity-70 hover:opacity-100">
+      <div className="w-14 h-10 rounded-md bg-gradient-to-br from-red-900/15 via-gray-900/10 to-gray-900/5 border border-border flex items-center justify-center shrink-0">
+        <Globe className="w-4 h-4 text-foreground/15" />
       </div>
 
       <div className="flex-1 min-w-0">
-        <h3 className="text-sm font-medium truncate line-through decoration-white/20">{site.name}</h3>
+        <h3 className="text-sm font-medium truncate line-through decoration-foreground/20">{site.name}</h3>
       </div>
 
       <span className="text-xs text-muted-foreground">{formattedDate}</span>
@@ -1419,14 +1528,14 @@ function TrashedListRow({
       <div className="flex items-center gap-1.5 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
         <button
           onClick={() => onRestore(site.id)}
-          className="flex items-center gap-1 h-7 px-2 rounded-md text-xs text-foreground bg-white/[0.06] hover:bg-white/[0.1] transition-all"
+          className="flex items-center gap-1 h-7 px-2 rounded-md text-xs text-foreground bg-foreground/[0.06] hover:bg-foreground/[0.1] transition-all"
         >
           <RotateCcw className="w-3 h-3" />
           Restore
         </button>
         <button
           onClick={() => onPermanentDelete(site.id)}
-          className="flex items-center gap-1 h-7 px-2 rounded-md text-xs text-red-400 bg-red-500/[0.06] hover:bg-red-500/[0.1] transition-all"
+          className="flex items-center gap-1 h-7 px-2 rounded-md text-xs text-destructive bg-red-500/[0.06] hover:bg-red-500/[0.1] transition-all"
         >
           <Trash2 className="w-3 h-3" />
         </button>
@@ -1469,12 +1578,12 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
   const iframeHeight = scale > 0 ? Math.ceil(thumbHeight / scale) : 900;
 
   return (
-    <div className="group rounded-lg overflow-hidden border border-white/[0.06] bg-[#1e1e22] hover:border-white/[0.12] transition-colors duration-200">
+    <div className="group rounded-lg overflow-hidden border border-border bg-card hover:border-border transition-colors duration-200">
       {/* Thumbnail */}
       <Link href={`/editor/${site.id}`} className="block">
         <div
           ref={containerRef}
-          className="relative overflow-hidden bg-[#2a2a2e]"
+          className="relative overflow-hidden bg-muted/30"
           style={{ height: thumbHeight }}
         >
           {heroSrcDoc && scale > 0 ? (
@@ -1495,12 +1604,12 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
               sandbox="allow-scripts"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#2a2a2e] to-[#1e1e22] flex items-center justify-center">
-              <Globe className="w-8 h-8 text-white/10" />
+            <div className="w-full h-full bg-gradient-to-br from-muted/30 to-card flex items-center justify-center">
+              <Globe className="w-8 h-8 text-foreground/10" />
             </div>
           )}
           {/* Hover overlay */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
+          <div className="absolute inset-0 bg-background/0 group-hover:bg-foreground/5 transition-colors duration-200" />
         </div>
       </Link>
 
@@ -1516,10 +1625,10 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
         </Link>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="p-1 rounded-md hover:bg-white/[0.08] transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100 shrink-0 focus:outline-none">
+          <DropdownMenuTrigger className="p-1 rounded-md hover:bg-foreground/[0.08] transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100 shrink-0 focus:outline-none">
             <MoreVertical className="w-4 h-4 text-muted-foreground" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40 bg-[rgba(22,22,22,0.95)] backdrop-blur-xl border-white/[0.1]">
+          <DropdownMenuContent align="end" className="w-40 bg-popover backdrop-blur-xl border-border">
             <DropdownMenuItem asChild>
               <Link href={`/editor/${site.id}`} className="flex items-center gap-2 text-xs">
                 <Edit className="w-3.5 h-3.5" /> Edit
@@ -1530,7 +1639,7 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
                 <Download className="w-3.5 h-3.5" /> Export
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDelete(site.id)} className="text-red-400 focus:text-red-400 text-xs">
+            <DropdownMenuItem onClick={() => onDelete(site.id)} className="text-destructive focus:text-destructive text-xs">
               <Trash2 className="w-3.5 h-3.5 mr-2" /> Move to Trash
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -1552,10 +1661,10 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
   });
 
   return (
-    <div className="group flex items-center gap-4 px-3 py-2.5 rounded-lg hover:bg-white/[0.03] transition-colors">
+    <div className="group flex items-center gap-4 px-3 py-2.5 rounded-lg hover:bg-foreground/[0.03] transition-colors">
       <Link
         href={`/editor/${site.id}`}
-        className="w-16 h-11 rounded-md border border-white/[0.06] overflow-hidden shrink-0 relative"
+        className="w-16 h-11 rounded-md border border-border overflow-hidden shrink-0 relative"
       >
         {heroSrcDoc ? (
           <iframe
@@ -1576,7 +1685,7 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-purple-900/25 via-blue-900/15 to-cyan-900/10 flex items-center justify-center">
-            <Globe className="w-4 h-4 text-white/15" />
+            <Globe className="w-4 h-4 text-foreground/15" />
           </div>
         )}
       </Link>
@@ -1589,17 +1698,17 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
         {site.industry || "\u2014"}
       </span>
 
-      <Badge variant="secondary" className="hidden sm:flex text-[10px] capitalize bg-white/[0.04] border-white/[0.08] h-5">
+      <Badge variant="secondary" className="hidden sm:flex text-[10px] capitalize bg-foreground/[0.04] border-border h-5">
         {site.status}
       </Badge>
 
       <span className="text-xs text-muted-foreground w-24 text-right">{formattedDate}</span>
 
       <DropdownMenu>
-        <DropdownMenuTrigger className="p-1 rounded-md hover:bg-white/[0.08] transition-colors md:opacity-0 md:group-hover:opacity-100 data-[state=open]:opacity-100 focus:outline-none">
+        <DropdownMenuTrigger className="p-1 rounded-md hover:bg-foreground/[0.08] transition-colors md:opacity-0 md:group-hover:opacity-100 data-[state=open]:opacity-100 focus:outline-none">
           <MoreVertical className="w-4 h-4 text-muted-foreground" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40 bg-[rgba(22,22,22,0.95)] backdrop-blur-xl border-white/[0.1]">
+        <DropdownMenuContent align="end" className="w-40 bg-popover backdrop-blur-xl border-border">
           <DropdownMenuItem asChild>
             <Link href={`/editor/${site.id}`} className="flex items-center gap-2 text-xs">
               <Edit className="w-3.5 h-3.5" /> Edit
@@ -1610,7 +1719,7 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
               <Download className="w-3.5 h-3.5" /> Export
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onDelete(site.id)} className="text-red-400 focus:text-red-400 text-xs">
+          <DropdownMenuItem onClick={() => onDelete(site.id)} className="text-destructive focus:text-destructive text-xs">
             <Trash2 className="w-3.5 h-3.5 mr-2" /> Move to Trash
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -1624,8 +1733,8 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="w-20 h-20 rounded-2xl bg-white/[0.06] border border-white/[0.1] flex items-center justify-center mb-6">
-        <Sparkles className="w-9 h-9 text-white/50" />
+      <div className="w-20 h-20 rounded-2xl bg-foreground/[0.06] border border-border flex items-center justify-center mb-6">
+        <Sparkles className="w-9 h-9 text-muted-foreground/60" />
       </div>
       <h2 className="text-xl font-semibold mb-2">No websites yet</h2>
       <p className="text-muted-foreground text-sm mb-8 max-w-sm">
@@ -1633,7 +1742,7 @@ function EmptyState() {
       </p>
       <Link
         href="/wizard"
-        className="flex items-center gap-2 h-10 px-6 rounded-xl bg-transparent text-white text-sm font-medium border-2 border-white/40 hover:border-white/60 hover:bg-white/[0.06] transition-colors"
+        className="flex items-center gap-2 h-10 px-6 rounded-xl bg-transparent text-foreground text-sm font-medium border-2 border-foreground/40 hover:border-foreground/60 hover:bg-foreground/[0.06] transition-colors"
       >
         <Sparkles className="w-4 h-4" />
         Create Your First Website
@@ -1657,23 +1766,51 @@ function SkeletonGrid({ viewMode }: { viewMode: ViewMode }) {
   return (
     <div className={cn(
       viewMode === "grid"
-        ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
-        : "flex flex-col gap-2"
+        ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        : "flex flex-col gap-1.5"
     )}>
       {[1, 2, 3, 4, 5, 6].map((i) =>
         viewMode === "grid" ? (
-          <div key={i} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 animate-pulse">
-            <div className="aspect-[4/3] rounded-lg bg-white/[0.04] mb-3" />
-            <div className="h-3.5 bg-white/[0.04] rounded w-3/4 mb-2" />
-            <div className="h-3 bg-white/[0.04] rounded w-1/2" />
+          <div key={i} className="rounded-lg overflow-hidden border border-border bg-card animate-pulse">
+            {/* Thumbnail area */}
+            <div className="bg-muted/30" style={{ height: 180 }} />
+            
+            {/* Info row */}
+            <div className="px-3 py-2.5 flex items-center justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="h-4 bg-foreground/[0.04] rounded w-3/4 mb-2" />
+                <div className="h-3 bg-foreground/[0.04] rounded w-1/2" />
+              </div>
+              <div className="w-6 h-6 rounded bg-foreground/[0.04] shrink-0" />
+            </div>
           </div>
         ) : (
-          <div key={i} className="flex items-center gap-4 p-3 rounded-xl border border-white/[0.06] bg-white/[0.02] animate-pulse">
-            <div className="w-16 h-12 rounded-lg bg-white/[0.04] shrink-0" />
-            <div className="flex-1">
-              <div className="h-3.5 bg-white/[0.04] rounded w-1/3 mb-2" />
-              <div className="h-3 bg-white/[0.04] rounded w-1/4" />
+          <div key={i} className="flex items-center gap-4 px-3 py-2.5 rounded-lg border border-transparent bg-foreground/[0.01] animate-pulse">
+            {/* Thumbnail */}
+            <div className="w-16 h-11 rounded-md border border-border bg-foreground/[0.04] shrink-0" />
+            
+            {/* Name */}
+            <div className="flex-1 min-w-0">
+              <div className="h-4 bg-foreground/[0.04] rounded w-1/4" />
             </div>
+
+            {/* Industry */}
+            <div className="hidden sm:block w-28 shrink-0">
+              <div className="h-3 bg-foreground/[0.04] rounded w-3/4" />
+            </div>
+
+            {/* Status */}
+            <div className="hidden sm:flex w-12 shrink-0">
+              <div className="h-5 bg-foreground/[0.04] rounded-full w-full" />
+            </div>
+
+            {/* Date */}
+            <div className="w-24 shrink-0 flex justify-end">
+              <div className="h-3 bg-foreground/[0.04] rounded w-20" />
+            </div>
+
+            {/* Action */}
+            <div className="w-6 h-6 rounded bg-foreground/[0.04] shrink-0" />
           </div>
         )
       )}

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/shared/ThemeProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -52,10 +53,17 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider appearance={{ baseTheme: dark }}>
-      <html lang="en" className={`${inter.variable} dark h-full antialiased`}>
-        <body className="min-h-full flex flex-col bg-background text-foreground">
-          {children}
-          <Toaster position="bottom-right" />
+      <html lang="en" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
+        <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-300">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Toaster position="bottom-right" />
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

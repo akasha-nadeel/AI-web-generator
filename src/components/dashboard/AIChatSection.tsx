@@ -258,12 +258,10 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
       >
         {/* Hero heading — Google AI Studio style */}
         <div className="relative z-10 text-center mb-8">
-          <h1 className="text-3xl md:text-4xl lg:text-[2.6rem] font-normal tracking-tight leading-tight flex items-center justify-center gap-1"
-            style={{ color: '#c4c7c5' }}
-          >
+          <h1 className="text-3xl md:text-4xl lg:text-[2.6rem] font-normal tracking-tight leading-tight flex items-center justify-center gap-1 text-foreground/70">
             <span>Build your ideas with Weavo</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo.png" alt="Weavo Logo" className="w-16 h-16 md:w-20 md:h-20 object-contain opacity-70" />
+            <img src="/images/logo.png" alt="Weavo Logo" className="w-16 h-16 md:w-20 md:h-20 object-contain opacity-70 dark:invert-0 invert" />
           </h1>
         </div>
 
@@ -280,7 +278,7 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
             <div
               className={cn(
                 "relative z-10 rounded-[16px] overflow-hidden transition-all duration-300",
-                isFocused ? "bg-[#1c1a24]" : "bg-[#18161f]"
+                isFocused ? "bg-card/95" : "bg-card/80"
               )}
             >
 
@@ -304,10 +302,7 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
               onBlur={() => setIsFocused(false)}
               placeholder={attachedImages.length > 0 ? "Describe what you want based on the image..." : "Describe an app and let Weavo do the rest"}
               rows={2}
-              className="w-full bg-transparent text-[15px] md:text-base resize-none focus:outline-none px-5 pt-5 pb-3 min-h-[88px] max-h-[200px] scrollbar-thin"
-              style={{
-                color: '#e3e3e3',
-              }}
+              className="w-full bg-transparent text-[15px] md:text-base resize-none focus:outline-none px-5 pt-5 pb-3 min-h-[88px] max-h-[200px] scrollbar-thin text-foreground"
               onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
               onDrop={(e) => {
                 e.preventDefault();
@@ -333,7 +328,7 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
-                        className="relative group flex items-center gap-2.5 rounded-xl bg-white/[0.06] border border-white/[0.08] pr-3 overflow-hidden"
+                        className="relative group flex items-center gap-2.5 rounded-xl bg-foreground/[0.06] border border-border pr-3 overflow-hidden"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
@@ -342,14 +337,14 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
                           className="w-[52px] h-[52px] object-cover"
                         />
                         <div className="py-1.5 min-w-0">
-                          <p className="text-[11px] text-white/70 truncate max-w-[120px]">{img.name}</p>
-                          <p className="text-[10px] text-white/30 uppercase">{img.type.split("/")[1]}</p>
+                          <p className="text-[11px] text-foreground/70 truncate max-w-[120px]">{img.name}</p>
+                          <p className="text-[10px] text-foreground/30 uppercase">{img.type.split("/")[1]}</p>
                         </div>
                         <button
                           onClick={() => removeAttachedImage(idx)}
-                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-background/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                         >
-                          <X className="w-3 h-3 text-white" />
+                          <X className="w-3 h-3 text-foreground" />
                         </button>
                       </motion.div>
                     ))}
@@ -368,7 +363,7 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
                     "flex items-center justify-center w-8 h-8 rounded-lg border transition-all",
                     attachedImages.length > 0
                       ? "border-blue-400/30 bg-blue-400/10 text-blue-400"
-                      : "border-white/[0.08] bg-white/[0.06] text-muted-foreground hover:text-foreground hover:bg-white/[0.1]"
+                      : "border-border bg-foreground/[0.06] text-muted-foreground hover:text-foreground hover:bg-foreground/[0.1]"
                   )}
                   title="Upload reference image"
                 >
@@ -377,7 +372,7 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
 
                 {/* Industry dropdown */}
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs bg-white/[0.06] border border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-white/[0.1] transition-all">
+                  <DropdownMenuTrigger className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs bg-foreground/[0.06] border border-border text-muted-foreground hover:text-foreground hover:bg-foreground/[0.1] transition-all focus:outline-none">
                     <Sparkles className="w-3 h-3" />
                     <span className="hidden sm:inline max-w-[100px] truncate">
                       {selectedIndustry === "auto" ? "Auto-detect" : INDUSTRIES.find(i => i.id === selectedIndustry)?.label || "Auto-detect"}
@@ -386,11 +381,11 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="start"
-                    className="w-52 bg-[rgba(20,20,40,0.95)] backdrop-blur-xl border-white/[0.1] max-h-64 overflow-y-auto"
+                    className="w-52 bg-popover backdrop-blur-xl border-border max-h-64 overflow-y-auto"
                   >
                     <DropdownMenuItem
                       onClick={() => setSelectedIndustry("auto")}
-                      className={cn("text-xs", selectedIndustry === "auto" && "bg-white/[0.08]")}
+                      className={cn("text-xs", selectedIndustry === "auto" && "bg-foreground/[0.08]")}
                     >
                       <Wand2 className="w-3.5 h-3.5 mr-2" />
                       Auto-detect
@@ -399,7 +394,7 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
                       <DropdownMenuItem
                         key={ind.id}
                         onClick={() => setSelectedIndustry(ind.id)}
-                        className={cn("text-xs", selectedIndustry === ind.id && "bg-white/[0.08]")}
+                        className={cn("text-xs", selectedIndustry === ind.id && "bg-foreground/[0.08]")}
                       >
                         {ind.label}
                       </DropdownMenuItem>
@@ -409,19 +404,19 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
 
                 {/* Mood dropdown */}
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs bg-white/[0.06] border border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-white/[0.1] transition-all">
+                  <DropdownMenuTrigger className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs bg-foreground/[0.06] border border-border text-muted-foreground hover:text-foreground hover:bg-foreground/[0.1] transition-all focus:outline-none">
                     <span className="capitalize">{selectedMood}</span>
                     <ChevronDown className="w-3 h-3 opacity-50" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="start"
-                    className="bg-[rgba(20,20,40,0.95)] backdrop-blur-xl border-white/[0.1]"
+                    className="bg-popover backdrop-blur-xl border-border"
                   >
                     {MOODS.map((mood) => (
                       <DropdownMenuItem
                         key={mood.id}
                         onClick={() => setSelectedMood(mood.id)}
-                        className={cn("text-xs", selectedMood === mood.id && "bg-white/[0.08]")}
+                        className={cn("text-xs", selectedMood === mood.id && "bg-foreground/[0.08]")}
                       >
                         {mood.label}
                       </DropdownMenuItem>
@@ -447,12 +442,12 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
                   </motion.button>
                 )}
 
-                {/* I'm feeling lucky button — white pill like Google */}
+                {/* I'm feeling lucky button — pill style */}
                 <button
                   onClick={handleFeelingLucky}
-                  className="flex items-center gap-2 h-9 px-4 rounded-full text-sm font-medium transition-all hover:bg-white/[0.12] active:scale-[0.98] bg-white/[0.07] border border-white/[0.1] text-white/80"
+                  className="flex items-center gap-2 h-9 px-4 rounded-full text-sm font-medium transition-all bg-foreground/[0.07] border border-border text-foreground/80 hover:bg-foreground/[0.12] active:scale-[0.98]"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                  <Sparkles className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
                   <span className="whitespace-nowrap">I&apos;m feeling lucky</span>
                 </button>
               </div>
@@ -465,7 +460,7 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
             <motion.p
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-xs text-red-400 mt-2 text-center"
+              className="text-xs text-destructive mt-2 text-center"
             >
               {error}
             </motion.p>
@@ -492,7 +487,7 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
                       }
                     }, 0);
                   }}
-                  className="flex items-center gap-2 shrink-0 h-9 px-4 rounded-full text-sm font-medium bg-white/[0.05] border border-white/[0.08] text-white/70 hover:bg-white/[0.1] hover:border-white/[0.15] hover:text-white/90 transition-all active:scale-[0.97]"
+                  className="flex items-center gap-2 shrink-0 h-9 px-4 rounded-full text-sm font-medium bg-foreground/[0.05] border border-border text-foreground/70 hover:bg-foreground/[0.1] hover:border-foreground/20 hover:text-foreground transition-all active:scale-[0.97]"
                 >
                   <chip.icon className={cn("w-3.5 h-3.5", chip.color)} />
                   <span className="whitespace-nowrap">{chip.label}</span>
@@ -505,9 +500,9 @@ export function AIChatSection({ credits, plan }: AIChatSectionProps) {
                 const el = document.getElementById('suggestion-chips-scroll');
                 if (el) el.scrollBy({ left: 200, behavior: 'smooth' });
               }}
-              className="absolute right-0 top-0 h-9 w-10 flex items-center justify-center bg-gradient-to-l from-[#0e0c15] via-[#0e0c15]/90 to-transparent opacity-0 group-hover/chips:opacity-100 transition-opacity"
+              className="absolute right-0 top-0 h-9 w-10 flex items-center justify-center bg-gradient-to-l from-background via-background/90 to-transparent opacity-0 group-hover/chips:opacity-100 transition-opacity"
             >
-              <ChevronRight className="w-4 h-4 text-white/50" />
+              <ChevronRight className="w-4 h-4 text-foreground/50" />
             </button>
           </div>
         </div>

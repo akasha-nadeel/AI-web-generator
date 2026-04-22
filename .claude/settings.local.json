@@ -51,7 +51,9 @@
       "Bash(netstat -ano)",
       "Bash(C:\\\\Users\\\\User\\\\Desktop\\\\My projects\\\\Doing\\\\AI web site\\\\pixora\\\\.tools\\\\cloudflared.exe tunnel *)",
       "Bash(powershell *)",
-      "Bash(awk '{print $NF}')"
+      "Bash(awk '{print $NF}')",
+      "WebFetch(domain:ai.google.dev)",
+      "Bash(node scripts/upload-wavevibes-pattern.mjs)"
     ]
   }
 }

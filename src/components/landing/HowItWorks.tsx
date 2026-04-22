@@ -51,13 +51,13 @@ export function HowItWorks() {
           transition={ease.smooth}
         >
           <div className="flex items-center gap-2.5 mb-5">
-            <div className="w-1.5 h-1.5 rounded-full bg-white/60" />
-            <span className="text-sm text-white/40">How we work</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-foreground/60" />
+            <span className="text-sm text-muted-foreground">How we work</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] font-light leading-[1.1] tracking-tight mb-4 italic">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] font-light leading-[1.1] tracking-tight mb-4 italic text-foreground">
             Three Steps to Your<br /> Dream Website
           </h2>
-          <p className="text-sm text-white/35 max-w-md leading-relaxed">
+          <p className="text-sm text-muted-foreground/70 max-w-md leading-relaxed">
             No coding, no design skills needed. Just describe what you want and
             let AI handle the rest.
           </p>
@@ -84,10 +84,10 @@ export function HowItWorks() {
                   flex: isActive ? 2.5 : 1,
                   transition: "flex 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
                 }}
-                className={`relative rounded-[20px] overflow-hidden cursor-pointer ${
+                className={`relative rounded-[20px] overflow-hidden cursor-pointer transition-colors ${
                   isActive
-                    ? "bg-white/[0.07]"
-                    : "bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.05]"
+                    ? "bg-muted/30"
+                    : "bg-muted/10 border border-border hover:bg-muted/20"
                 }`}
               >
                 {/* Full background image for cards that have bgImage */}
@@ -97,19 +97,21 @@ export function HowItWorks() {
                       src={step.bgImage}
                       alt=""
                       fill
-                      className="object-cover"
+                      className="object-cover opacity-[0.15] dark:opacity-60 grayscale dark:grayscale-0 hover:grayscale-0 transition-all duration-700"
                     />
+                    {/* Gradient overlay — Dark mode only for focus, hidden in light mode for cleanliness */}
+                    <div className="hidden dark:block absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-80" />
                   </>
                 )}
 
                 <div className="relative z-10 h-full flex flex-col p-7">
                   {/* Label */}
-                  <span className={`text-[11px] font-medium tracking-wide uppercase mb-3 ${i === 0 ? "text-white" : "text-white"}`}>
+                  <span className={`text-[11px] font-medium tracking-wide uppercase mb-3 text-foreground`}>
                     {step.label}
                   </span>
 
                   {/* Title */}
-                  <h3 className={`text-lg lg:text-xl font-semibold leading-snug max-w-[220px] ${i === 0 ? "text-white" : "text-white"}`}>
+                  <h3 className={`text-lg lg:text-xl font-semibold leading-snug max-w-[220px] text-foreground`}>
                     {step.title}
                   </h3>
 
@@ -138,7 +140,7 @@ export function HowItWorks() {
 
                   {/* Subtitle — revealed on hover */}
                   <p
-                    className={`absolute bottom-16 right-7 left-7 text-[13px] leading-relaxed text-right max-w-[220px] ml-auto transition-all duration-500 ease-in-out ${i === 0 ? "text-white/50" : i === 2 ? "text-white/50" : "text-white/40"}`}
+                    className={`absolute bottom-16 right-7 left-7 text-[13px] leading-relaxed text-right max-w-[220px] ml-auto transition-all duration-500 ease-in-out text-muted-foreground`}
                     style={{
                       opacity: isActive ? 1 : 0,
                       transform: isActive ? "translateY(0)" : "translateY(10px)",
@@ -148,7 +150,7 @@ export function HowItWorks() {
                   </p>
 
                   {/* Step number */}
-                  <span className="absolute bottom-5 right-7 text-8xl font-bold text-white/[0.04] leading-none select-none pointer-events-none">
+                  <span className="absolute bottom-5 right-7 text-8xl font-bold text-foreground/[0.04] leading-none select-none pointer-events-none">
                     {step.number}
                   </span>
                 </div>
@@ -162,12 +164,12 @@ export function HowItWorks() {
           {steps.map((step, i) => (
             <div
               key={i}
-              className="relative rounded-[20px] overflow-hidden bg-white/[0.05] border border-white/[0.08] p-6"
+              className="relative rounded-[20px] overflow-hidden bg-muted/20 border border-border p-6"
             >
-              <span className={`text-[11px] font-medium tracking-wide uppercase mb-2 block ${i === 0 ? "text-white" : "text-white"}`}>
+              <span className={`text-[11px] font-medium tracking-wide uppercase mb-2 block text-foreground`}>
                 {step.label}
               </span>
-              <h3 className={`text-lg font-semibold leading-snug mb-4 ${i === 0 ? "text-white" : "text-white"}`}>
+              <h3 className={`text-lg font-semibold leading-snug mb-4 text-foreground`}>
                 {step.title}
               </h3>
               {step.image && (
@@ -180,7 +182,7 @@ export function HowItWorks() {
                   />
                 </div>
               )}
-              <span className="absolute bottom-4 right-6 text-7xl font-bold text-white/[0.04] leading-none select-none pointer-events-none">
+              <span className="absolute bottom-4 right-6 text-7xl font-bold text-foreground/[0.04] leading-none select-none pointer-events-none">
                 {step.number}
               </span>
             </div>

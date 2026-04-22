@@ -59,38 +59,45 @@
   --weavo-cyan: #06b6d4;
   --weavo-pink: #ec4899;
 
-  /* Dark theme as default */
-  --background: oklch(0.1 0.02 280);
-  --foreground: oklch(0.95 0 0);
-  --card: oklch(0.15 0.015 280);
-  --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.15 0.015 280);
-  --popover-foreground: oklch(0.95 0 0);
+  /* Light theme as default */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.15 0.02 280);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.02 280);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.02 280);
   --primary: oklch(0.55 0.25 290);
   --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.2 0.02 280);
-  --secondary-foreground: oklch(0.9 0 0);
-  --muted: oklch(0.2 0.015 280);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.25 0.03 280);
-  --accent-foreground: oklch(0.95 0 0);
+  --secondary: oklch(0.95 0.02 280);
+  --secondary-foreground: oklch(0.15 0.02 280);
+  --muted: oklch(0.95 0.01 280);
+  --muted-foreground: oklch(0.45 0.02 280);
+  --accent: oklch(0.92 0.02 280);
+  --accent-foreground: oklch(0.15 0.02 280);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 12%);
+  --border: oklch(0.9 0.02 280);
+  --input: oklch(0.9 0.02 280);
   --ring: oklch(0.55 0.25 290);
+  --radius: 0.75rem;
+
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.05);
+  --glass-card-bg: rgba(255, 255, 255, 0.8);
+  --glass-card-border: rgba(0, 0, 0, 0.08);
+
   --chart-1: oklch(0.55 0.25 290);
   --chart-2: oklch(0.6 0.2 230);
   --chart-3: oklch(0.65 0.2 195);
   --chart-4: oklch(0.7 0.2 330);
   --chart-5: oklch(0.75 0.15 60);
-  --radius: 0.75rem;
-  --sidebar: oklch(0.12 0.02 280);
-  --sidebar-foreground: oklch(0.95 0 0);
+
+  --sidebar: oklch(0.98 0.01 280);
+  --sidebar-foreground: oklch(0.15 0.02 280);
   --sidebar-primary: oklch(0.55 0.25 290);
   --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.2 0.02 280);
-  --sidebar-accent-foreground: oklch(0.95 0 0);
-  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-accent: oklch(0.95 0.02 280);
+  --sidebar-accent-foreground: oklch(0.15 0.02 280);
+  --sidebar-border: oklch(0.9 0.02 280);
   --sidebar-ring: oklch(0.55 0.25 290);
 }
 
@@ -113,11 +120,18 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.55 0.25 290);
+
+  --glass-bg: rgba(0, 0, 0, 0.3);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-card-bg: rgba(255, 255, 255, 0.06);
+  --glass-card-border: rgba(255, 255, 255, 0.1);
+
   --chart-1: oklch(0.55 0.25 290);
   --chart-2: oklch(0.6 0.2 230);
   --chart-3: oklch(0.65 0.2 195);
   --chart-4: oklch(0.7 0.2 330);
   --chart-5: oklch(0.75 0.15 60);
+
   --sidebar: oklch(0.12 0.02 280);
   --sidebar-foreground: oklch(0.95 0 0);
   --sidebar-primary: oklch(0.55 0.25 290);
@@ -133,7 +147,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
   }
   html {
     @apply font-sans scroll-smooth overflow-x-hidden;
@@ -152,40 +166,40 @@
 
 @layer utilities {
   .glass {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--glass-bg);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border);
   }
 
   .glass-card {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--glass-card-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-card-border);
     border-radius: 1rem;
   }
 
   .glass-panel {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--glass-card-bg);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-card-border);
     border-radius: 1.5rem;
   }
 
   .glass-nav {
-    background: rgba(10, 10, 30, 0.6);
+    background: var(--glass-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid var(--glass-border);
   }
 
   .glass-input {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--glass-card-bg);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-card-border);
   }
 
   .gradient-text {

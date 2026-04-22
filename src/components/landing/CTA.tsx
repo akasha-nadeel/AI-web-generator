@@ -36,13 +36,13 @@ export function CTA() {
         <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 max-w-3xl leading-tight">
           Ready to Build Your Website?
         </h2>
-        <p className="text-white/60 max-w-xl mx-auto mb-8 text-base md:text-lg">
+        <p className="text-white/70 max-w-xl mx-auto mb-8 text-base md:text-lg">
           Join thousands of creators who trust Weavo to build their online
           presence. Start free — no credit card required.
         </p>
         <Link
           href={ctaHref}
-          className="inline-flex items-center gap-2 bg-white text-black font-semibold px-8 py-4 rounded-full hover:bg-white/90 transition-colors text-sm"
+          className="inline-flex items-center gap-2 bg-foreground text-background font-semibold px-8 py-4 rounded-full hover:bg-foreground/90 transition-colors text-sm"
         >
           {isSignedIn ? "Go to Dashboard" : "Get Started Free"}
           <ArrowRight className="w-4 h-4" />

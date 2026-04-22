@@ -225,26 +225,26 @@ export function PricingPopup({
   return (
     <>
       <div
-        className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black/75 backdrop-blur-md animate-in fade-in duration-200 px-4 py-10"
+        className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-background/80 backdrop-blur-md animate-in fade-in duration-200 px-4 py-10"
         onClick={onClose}
       >
         <div
-          className="relative w-full max-w-[1280px] rounded-3xl border border-white/10 bg-[#0a0a0a] p-6 md:p-10 shadow-2xl animate-in zoom-in-95 duration-200"
+          className="relative w-full max-w-[1280px] rounded-3xl border border-border bg-popover p-6 md:p-10 shadow-2xl animate-in zoom-in-95 duration-200"
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={onClose}
-            className="absolute top-5 right-5 w-9 h-9 rounded-full border border-white/15 bg-white/[0.06] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.14] transition-colors z-10"
+            className="absolute top-5 right-5 w-9 h-9 rounded-full border border-border bg-foreground/[0.06] flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-foreground/[0.14] transition-colors z-10"
             aria-label="Close"
           >
             <X className="w-4 h-4" strokeWidth={2.5} />
           </button>
 
           <div className="mb-7 max-w-2xl">
-            <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight mb-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight mb-2">
               {title}
             </h2>
-            <p className="text-sm md:text-base text-white/60 leading-relaxed">
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
               {subtitle}
             </p>
           </div>
@@ -257,7 +257,7 @@ export function PricingPopup({
                   "relative flex flex-col rounded-2xl p-5 md:p-6 transition-all",
                   card.popular
                     ? "border-2 shadow-lg"
-                    : "border border-white/[0.08] bg-white/[0.03] hover:border-white/[0.16] hover:bg-white/[0.05]"
+                    : "border border-border bg-foreground/[0.03] hover:border-foreground/[0.1] hover:bg-foreground/[0.05]"
                 )}
                 style={
                   card.popular
@@ -270,7 +270,7 @@ export function PricingPopup({
                 }
               >
                 <div className="flex items-center justify-between gap-2 mb-1">
-                  <h3 className="text-lg font-bold text-white">{card.name}</h3>
+                  <h3 className="text-lg font-bold text-foreground">{card.name}</h3>
                   {card.badge && (
                     <span
                       className="text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap border"
@@ -284,19 +284,19 @@ export function PricingPopup({
                     </span>
                   )}
                 </div>
-                <p className="text-[13px] text-white/55 mb-5 min-h-[20px]">{card.tagline}</p>
+                <p className="text-[13px] text-muted-foreground mb-5 min-h-[20px]">{card.tagline}</p>
 
                 <div className="flex items-baseline gap-1.5 mb-5">
-                  <span className="text-3xl md:text-[2.25rem] font-bold leading-none text-white tracking-tight">
+                  <span className="text-3xl md:text-[2.25rem] font-bold leading-none text-foreground tracking-tight">
                     {card.price}
                   </span>
                   {card.priceSuffix && (
-                    <span className="text-sm text-white/50 leading-tight">/{card.priceSuffix}</span>
+                    <span className="text-sm text-muted-foreground leading-tight">/{card.priceSuffix}</span>
                   )}
                 </div>
 
                 {card.id === "free" ? (
-                  <div className="flex items-center justify-center w-full py-2.5 rounded-xl font-semibold text-sm mb-5 bg-white/[0.04] text-white/50 border border-white/[0.08]">
+                  <div className="flex items-center justify-center w-full py-2.5 rounded-xl font-semibold text-sm mb-5 bg-foreground/[0.04] text-muted-foreground border border-border">
                     Current plan
                   </div>
                 ) : (
@@ -307,7 +307,7 @@ export function PricingPopup({
                       "flex items-center justify-center w-full py-2.5 rounded-xl font-semibold text-sm mb-5 transition-all",
                       card.popular
                         ? "text-black shadow-sm hover:opacity-90"
-                        : "bg-white/[0.08] text-white/90 hover:bg-white/[0.14] border border-white/[0.08]",
+                        : "bg-foreground/[0.08] text-foreground/90 hover:bg-foreground/[0.14] border border-border",
                       loadingId === card.id && "opacity-60 cursor-wait"
                     )}
                     style={card.popular ? { backgroundColor: ACCENT } : undefined}
@@ -326,10 +326,10 @@ export function PricingPopup({
                           strokeWidth={3}
                           style={{ color: ACCENT }}
                         />
-                        <span className="text-white/70 leading-snug">
+                        <span className="text-muted-foreground leading-snug">
                           {numberMatch ? (
                             <>
-                              <span className="text-[20px] font-bold text-white mr-1 inline-block align-middle -mt-1">
+                              <span className="text-[20px] font-bold text-foreground mr-1 inline-block align-middle -mt-1">
                                 {numberMatch[1]}
                               </span>
                               {numberMatch[2]}

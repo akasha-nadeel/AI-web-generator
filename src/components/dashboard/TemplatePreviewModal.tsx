@@ -78,28 +78,28 @@ export function TemplatePreviewModal({ open, onOpenChange, industryId }: Templat
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="sm:max-w-[95vw] w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col bg-[rgba(10,10,25,0.98)] border-white/[0.08]"
+        className="sm:max-w-[95vw] w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col bg-popover backdrop-blur-xl border-border"
       >
         <DialogTitle className="sr-only">{industry.label} Template Preview</DialogTitle>
 
         {/* Top bar */}
-        <div className="flex items-center justify-between px-3 md:px-5 h-14 border-b border-white/[0.06] shrink-0">
+        <div className="flex items-center justify-between px-3 md:px-5 h-14 border-b border-border shrink-0">
           {/* Left: Back + info */}
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => onOpenChange(false)}
-              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all shrink-0"
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-foreground/[0.06] transition-all shrink-0"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
             <div className="min-w-0">
-              <h3 className="text-sm font-semibold truncate">{preview.siteName}</h3>
+              <h3 className="text-sm font-semibold truncate text-foreground">{preview.siteName}</h3>
               <p className="text-[11px] text-muted-foreground truncate hidden sm:block">{industry.label}</p>
             </div>
 
             {/* Palette badge */}
             {palette && (
-              <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
+              <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-foreground/[0.04] border border-border">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: palette.colors.primary }} />
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: palette.colors.secondary }} />
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: palette.colors.accent }} />
@@ -109,14 +109,14 @@ export function TemplatePreviewModal({ open, onOpenChange, industryId }: Templat
 
             {/* Font badge */}
             {font && (
-              <span className="hidden lg:inline text-[10px] text-muted-foreground px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.08]">
+              <span className="hidden lg:inline text-[10px] text-muted-foreground px-2 py-0.5 rounded-full bg-foreground/[0.04] border border-border">
                 {font.label}
               </span>
             )}
           </div>
 
           {/* Center: Device toggle */}
-          <div className="hidden sm:flex items-center gap-0.5 bg-white/[0.04] rounded-lg p-0.5 border border-white/[0.06]">
+          <div className="hidden sm:flex items-center gap-0.5 bg-foreground/[0.04] rounded-lg p-0.5 border border-border">
             {(["desktop", "tablet", "mobile"] as const).map((d) => {
               const Icon = { desktop: Monitor, tablet: Tablet, mobile: Smartphone }[d];
               return (
@@ -126,7 +126,7 @@ export function TemplatePreviewModal({ open, onOpenChange, industryId }: Templat
                   className={cn(
                     "p-1.5 rounded-md transition-all",
                     device === d
-                      ? "bg-white/[0.1] text-foreground"
+                      ? "bg-background text-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
@@ -147,7 +147,7 @@ export function TemplatePreviewModal({ open, onOpenChange, industryId }: Templat
             </button>
             <button
               onClick={() => onOpenChange(false)}
-              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all hidden sm:flex"
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-foreground/[0.06] transition-all hidden sm:flex"
             >
               <X className="w-4 h-4" />
             </button>
@@ -155,7 +155,7 @@ export function TemplatePreviewModal({ open, onOpenChange, industryId }: Templat
         </div>
 
         {/* Preview iframe */}
-        <div className="flex-1 bg-neutral-950 overflow-auto flex justify-center p-2 md:p-4">
+        <div className="flex-1 bg-muted/10 overflow-auto flex justify-center p-2 md:p-4">
           <div
             style={{ width: deviceWidths[device] }}
             className={cn(
@@ -165,7 +165,7 @@ export function TemplatePreviewModal({ open, onOpenChange, industryId }: Templat
           >
             <iframe
               srcDoc={previewHtml}
-              className="w-full h-full rounded-lg border border-white/[0.05]"
+              className="w-full h-full rounded-lg border border-border shadow-2xl"
               sandbox="allow-same-origin"
               title={`${industry.label} template preview`}
             />

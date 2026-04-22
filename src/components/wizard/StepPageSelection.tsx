@@ -23,7 +23,7 @@ export function StepPageSelection() {
       const defaults = INDUSTRY_DEFAULT_PAGES[industry] || ["Home", "About", "Contact"];
       setSelectedPages(defaults);
     }
-  }, [industry]);
+  }, [industry, selectedPages.length, setSelectedPages]);
 
   const allPages = [
     "Home",
@@ -54,8 +54,8 @@ export function StepPageSelection() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">Choose your pages</h2>
-      <p className="text-white/60 text-base mb-7 leading-relaxed max-w-lg">
+      <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight text-foreground">Choose your pages</h2>
+      <p className="text-muted-foreground text-base mb-7 leading-relaxed max-w-lg">
         Select the pages you need. We&apos;ve pre-selected recommended pages for
         your industry.
       </p>
@@ -72,11 +72,11 @@ export function StepPageSelection() {
                 className={cn(
                   "inline-flex items-center gap-1.5 pl-3 pr-3.5 py-2 rounded-full border text-[13px] font-medium transition-all cursor-pointer",
                   isSelected
-                    ? "border-blue-400/70 bg-blue-400/[0.08] text-white shadow-[0_0_0_1px_rgba(96,165,250,0.4)]"
-                    : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/25 hover:text-white/90"
+                    ? "border-primary bg-primary/[0.08] text-primary shadow-[0_0_0_1px_rgba(96,165,250,0.4)]"
+                    : "border-border bg-muted/30 text-muted-foreground hover:border-primary/50 hover:text-foreground"
                 )}
               >
-                {isSelected && <Check className="w-3.5 h-3.5 text-blue-400" strokeWidth={3} />}
+                {isSelected && <Check className="w-3.5 h-3.5 text-primary" strokeWidth={3} />}
                 {page}
               </button>
             );
@@ -91,33 +91,33 @@ export function StepPageSelection() {
             onChange={(e) => setCustomPage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAddCustom()}
             placeholder="Add custom page..."
-            className="flex-1 px-4 py-2.5 rounded-xl bg-transparent border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl bg-transparent border border-border text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           />
           <button
             onClick={handleAddCustom}
-            className="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors shrink-0"
+            className="w-10 h-10 rounded-xl border border-border flex items-center justify-center hover:bg-muted transition-colors shrink-0"
           >
-            <Plus className="w-4 h-4 text-white/60" />
+            <Plus className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
 
-        <p className="text-xs text-white/50">
+        <p className="text-xs text-muted-foreground">
           {selectedPages.length} page{selectedPages.length !== 1 ? "s" : ""}{" "}
           selected
         </p>
       </div>
 
       {/* Footer Buttons */}
-      <div className="mt-8 flex justify-between items-center pt-5 border-t border-white/5 shrink-0">
+      <div className="mt-8 flex justify-between items-center pt-5 border-t border-border shrink-0">
         <button
           onClick={() => setStep(3)}
-          className="px-6 py-2.5 rounded-lg text-sm font-medium transition-colors border border-white/10 bg-transparent text-white hover:bg-white/5"
+          className="px-6 py-2.5 rounded-lg text-sm font-medium transition-colors border border-border bg-transparent text-foreground hover:bg-muted"
         >
           Back
         </button>
         <button
           onClick={handleNext}
-          className="px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 bg-white text-black hover:bg-white/90"
+          className="px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm flex items-center gap-2 bg-primary text-primary-foreground hover:opacity-90"
         >
           Next
           <ArrowRight className="w-4 h-4" />

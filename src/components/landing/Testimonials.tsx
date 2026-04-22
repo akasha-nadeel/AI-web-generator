@@ -70,7 +70,7 @@ export function Testimonials() {
   return (
     <section
       id="testimonials"
-      className="py-12 md:py-16 lg:py-20 px-4 md:px-6 bg-[#0a0a0a]"
+      className="py-12 md:py-16 lg:py-20 px-4 md:px-6 transition-colors duration-300"
     >
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
@@ -85,7 +85,7 @@ export function Testimonials() {
           >
             {/* Description */}
             <div className="mb-12">
-              <p className="text-sm md:text-base text-white/50 leading-relaxed max-w-sm">
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-sm">
                 At Weavo, we offer more than just website building; we provide an
                 unparalleled AI-powered experience tailored to meet your needs and
                 exceed your expectations.
@@ -94,14 +94,14 @@ export function Testimonials() {
               {/* Team avatars */}
               <div className="flex items-center gap-4 mt-8">
                 <div className="flex -space-x-3">
-                  <Image src="/images/people/person-1.jpg" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
-                  <Image src="/images/people/person-2.jpg" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
-                  <Image src="/images/people/person-3.jpg" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
-                  <Image src="/images/people/person-4.jpg" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] object-cover object-top" />
+                  <Image src="/images/people/person-1.jpg" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-background object-cover object-top" />
+                  <Image src="/images/people/person-2.jpg" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-background object-cover object-top" />
+                  <Image src="/images/people/person-3.jpg" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-background object-cover object-top" />
+                  <Image src="/images/people/person-4.jpg" alt="" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-background object-cover object-top" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white/80">Meet Our</p>
-                  <p className="text-sm font-medium text-white/80">Happy Customers</p>
+                  <p className="text-sm font-medium text-foreground/80">Meet Our</p>
+                  <p className="text-sm font-medium text-foreground/80">Happy Customers</p>
                 </div>
               </div>
             </div>
@@ -110,14 +110,14 @@ export function Testimonials() {
             <div className="space-y-0">
               {stats.map((s, i) => (
                 <div key={s.target}>
-                  {i > 0 && <div className="h-px bg-white/[0.08]" />}
+                  {i > 0 && <div className="h-px bg-border" />}
                   <div className="flex items-center gap-6 py-5">
-                    <p className="text-4xl sm:text-5xl md:text-7xl font-light text-white min-w-[100px] sm:min-w-[120px] md:min-w-[150px] tracking-tight">
+                    <p className="text-4xl sm:text-5xl md:text-7xl font-light text-foreground min-w-[100px] sm:min-w-[120px] md:min-w-[150px] tracking-tight">
                       <CountUp target={s.target} suffix={s.suffix} />
                     </p>
                     <div>
-                      <p className="text-sm md:text-base font-normal text-white/60">{s.label}</p>
-                      <p className="text-sm md:text-base font-normal text-white/60">{s.desc}</p>
+                      <p className="text-sm md:text-base font-normal text-muted-foreground">{s.label}</p>
+                      <p className="text-sm md:text-base font-normal text-muted-foreground">{s.desc}</p>
                     </div>
                   </div>
                 </div>
@@ -145,16 +145,16 @@ export function Testimonials() {
 
               {/* Contact Us Now — floating top right */}
               <div className="absolute top-3 right-3 sm:top-5 sm:right-5">
-                <div className="flex items-center gap-2 bg-white rounded-full px-3 py-2 sm:px-5 sm:py-2.5 shadow-lg">
-                  <Phone className="w-4 h-4 text-[#0a0a0a]" />
-                  <span className="text-sm font-semibold text-[#0a0a0a]">Contact Us Now</span>
+                <div className="flex items-center gap-2 bg-foreground rounded-full px-3 py-2 sm:px-5 sm:py-2.5 shadow-lg">
+                  <Phone className="w-4 h-4 text-background" />
+                  <span className="text-sm font-semibold text-background">Contact Us Now</span>
                 </div>
               </div>
 
               {/* Help icon — floating bottom right */}
               <div className="absolute bottom-28 right-5">
-                <div className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
-                  <HelpCircle className="w-5 h-5 text-[#0a0a0a]/60" />
+                <div className="w-10 h-10 rounded-full bg-foreground/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                  <HelpCircle className="w-5 h-5 text-background/60" />
                 </div>
               </div>
 
@@ -165,13 +165,13 @@ export function Testimonials() {
                   <p className="text-white font-semibold text-base sm:text-lg italic">Building Your Dreams</p>
 
                   {/* Consultation card */}
-                  <div className="bg-white rounded-xl px-4 py-3 flex items-center gap-3 shadow-xl">
+                  <div className="glass-card px-4 py-3 flex items-center gap-3 shadow-xl border-white/20">
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center shrink-0">
                       <span className="text-white text-xs font-bold">P</span>
                     </div>
                     <div>
-                      <p className="text-[10px] text-[#0a0a0a]/50">Special Offer</p>
-                      <p className="text-xs font-semibold text-[#0a0a0a] leading-tight">Get Started Free<br />With Weavo AI</p>
+                      <p className="text-[10px] text-foreground/50">Special Offer</p>
+                      <p className="text-xs font-semibold text-foreground leading-tight">Get Started Free<br />With Weavo AI</p>
                     </div>
                   </div>
                 </div>
@@ -183,3 +183,4 @@ export function Testimonials() {
     </section>
   );
 }
+

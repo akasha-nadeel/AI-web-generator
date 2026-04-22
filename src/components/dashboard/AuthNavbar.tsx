@@ -16,14 +16,13 @@ export function AuthNavbar() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 glass-nav">
+    <header className="sticky top-0 z-50 glass-nav transition-colors duration-300">
       <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-xl font-bold gradient-text">Weavo</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo-infinity.png" alt="Logo" className="w-8 h-8 object-contain opacity-90 scale-[1.7] origin-center mr-2 dark:invert-0 invert" />
+            <span className="text-xl font-bold text-foreground">Weavo</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
@@ -34,8 +33,8 @@ export function AuthNavbar() {
                 className={cn(
                   "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors",
                   pathname === item.href
-                    ? "bg-white/10 text-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                    ? "bg-foreground/10 text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
                 )}
               >
                 <item.icon className="w-4 h-4" />
@@ -45,13 +44,15 @@ export function AuthNavbar() {
           </div>
         </div>
 
-        <UserButton
-          appearance={{
-            elements: {
-              avatarBox: "w-8 h-8",
-            },
-          }}
-        />
+        <div className="flex items-center gap-3">
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: "w-8 h-8",
+              },
+            }}
+          />
+        </div>
       </nav>
     </header>
   );

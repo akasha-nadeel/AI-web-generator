@@ -36,6 +36,18 @@ export interface Database {
           reason?: string;
         };
       };
+      increment_site_bandwidth: {
+        Args: {
+          p_site_id: string;
+          p_bytes: number;
+        };
+        Returns: {
+          success: boolean;
+          used_bytes?: number;
+          reset_at?: string;
+          reason?: string;
+        };
+      };
     };
     Tables: {
       users: {
@@ -110,6 +122,10 @@ export interface Database {
           theme_json: Record<string, unknown>;
           site_json: Record<string, unknown> | null;
           status: "draft" | "published" | "archived";
+          subdomain: string | null;
+          published_at: string | null;
+          bandwidth_used_bytes: number;
+          bandwidth_reset_at: string;
           created_at: string;
           updated_at: string;
         };
@@ -121,6 +137,10 @@ export interface Database {
           theme_json?: Record<string, unknown>;
           site_json?: Record<string, unknown> | null;
           status?: "draft" | "published" | "archived";
+          subdomain?: string | null;
+          published_at?: string | null;
+          bandwidth_used_bytes?: number;
+          bandwidth_reset_at?: string;
           created_at?: string;
           updated_at?: string;
         };
@@ -132,6 +152,10 @@ export interface Database {
           theme_json?: Record<string, unknown>;
           site_json?: Record<string, unknown> | null;
           status?: "draft" | "published" | "archived";
+          subdomain?: string | null;
+          published_at?: string | null;
+          bandwidth_used_bytes?: number;
+          bandwidth_reset_at?: string;
           created_at?: string;
           updated_at?: string;
         };
@@ -196,6 +220,36 @@ export interface Database {
           result_json?: Record<string, unknown> | null;
           model?: string | null;
           cost_cents?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      site_versions: {
+        Row: {
+          id: string;
+          site_id: string;
+          user_id: string;
+          site_json: Record<string, unknown>;
+          source: string;
+          summary: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          site_id: string;
+          user_id: string;
+          site_json: Record<string, unknown>;
+          source?: string;
+          summary?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          site_id?: string;
+          user_id?: string;
+          site_json?: Record<string, unknown>;
+          source?: string;
+          summary?: string | null;
           created_at?: string;
         };
         Relationships: [];

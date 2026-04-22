@@ -5,13 +5,14 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Play, Sparkles, Send, Users, Box, Wallet, Settings, MapPin } from "lucide-react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 /* Dot line — vertical line of evenly spaced dots */
 function DotLine({ className }: { className?: string }) {
   return (
     <div className={`flex flex-col items-center gap-[10px] h-full ${className ?? ""}`}>
       {Array.from({ length: 80 }).map((_, i) => (
-        <div key={i} className="w-[4px] h-[4px] rounded-full bg-white/[0.15] shrink-0" />
+        <div key={i} className="w-[4px] h-[4px] rounded-full bg-foreground/[0.15] shrink-0" />
       ))}
     </div>
   );
@@ -164,7 +165,12 @@ export function Hero() {
   }, []);
 
   return (
-    <section id="hero" className="relative min-h-screen bg-[#0a0a0a] overflow-hidden pt-16">
+    <section id="hero" className="relative min-h-screen bg-background text-foreground transition-colors duration-500 overflow-hidden pt-16">
+      {/* Theme Toggle — Positioned below Navbar (which is 64px/h-16) */}
+      <div className="absolute top-20 right-4 md:right-8 z-30">
+        <ThemeToggle />
+      </div>
+
       {/* Subtle background — desktop */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(120,119,198,0.04),transparent_50%)]" />
 
@@ -204,7 +210,7 @@ export function Hero() {
             className="relative z-10 lg:pr-8"
           >
             {/* Heading */}
-            <h1 className="text-[clamp(48px,6.5vw,88px)] font-medium leading-[1.05] tracking-tight text-[#f5f0e8] mb-6">
+            <h1 className="text-[clamp(48px,6.5vw,88px)] font-medium leading-[1.05] tracking-tight text-foreground mb-6">
               AI Websites
               <br />
               Built for Rapid
@@ -213,10 +219,10 @@ export function Hero() {
             </h1>
 
             {/* Decorative arrow */}
-            <Image src="/images/hero-arrow.png" alt="" width={80} height={80} className="hidden lg:block absolute right-0 top-[55%] invert opacity-80 -rotate-[30deg]" />
+            <Image src="/images/hero-arrow.png" alt="" width={80} height={80} className="hidden lg:block absolute right-0 top-[55%] dark:invert opacity-100 -rotate-[30deg]" />
 
             {/* Description */}
-            <p className="text-base lg:text-lg text-[#f5f0e8]/50 max-w-md mb-10 leading-relaxed">
+            <p className="text-base lg:text-lg text-foreground/70 max-w-md mb-10 leading-relaxed">
               Describe your business, pick your style, and let AI generate a professional website in seconds.
             </p>
 
@@ -224,21 +230,21 @@ export function Hero() {
             <div className="flex flex-wrap items-center gap-4 sm:gap-6">
               <Link
                 href="/sign-up"
-                className="inline-flex items-center gap-2 bg-[#f5f0e8] text-[#0a0a0a] font-semibold px-8 py-4 rounded-full hover:bg-white transition-colors text-sm"
+                className="inline-flex items-center gap-2 bg-foreground text-background font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity text-sm"
               >
                 Get Started Free
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="#how-it-works"
-                className="inline-flex items-center gap-3 text-[#f5f0e8]/50 hover:text-[#f5f0e8]/80 transition-colors group"
+                className="inline-flex items-center gap-3 text-foreground hover:opacity-80 transition-opacity group"
               >
-                <div className="w-11 h-11 rounded-full border border-[#f5f0e8]/20 flex items-center justify-center group-hover:border-[#f5f0e8]/40 transition-colors">
+                <div className="w-11 h-11 rounded-full border border-foreground/30 flex items-center justify-center group-hover:border-foreground/50 transition-colors">
                   <Play className="w-4 h-4 fill-current ml-0.5" />
                 </div>
                 <div>
                   <span className="text-xs font-bold uppercase tracking-widest block">Watch Demo</span>
-                  <span className="text-[11px] text-[#f5f0e8]/30">2 min</span>
+                  <span className="text-[11px] text-foreground/60">2 min</span>
                 </div>
               </Link>
             </div>
@@ -281,9 +287,9 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Top & bottom gradient masks for smooth fade */}
-      <div className="absolute top-16 left-0 right-0 h-24 bg-gradient-to-b from-[#0a0a0a] to-transparent z-20 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#0a0a0a] to-transparent z-20 pointer-events-none" />
+      {/* Top & bottom gradient masks — Dark mode only for smooth fade */}
+      <div className="hidden dark:block absolute top-16 left-0 right-0 h-24 bg-gradient-to-b from-background to-transparent z-20 pointer-events-none" />
+      <div className="hidden dark:block absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent z-20 pointer-events-none" />
     </section>
   );
 }

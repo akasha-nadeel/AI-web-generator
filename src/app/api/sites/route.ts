@@ -64,13 +64,13 @@ export async function PATCH(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const body = await req.json();
-    const { id, site_json, siteJson, action } = body;
+    const { id, site_json, siteJson, action, source, summary } = body;
     if (!id) return NextResponse.json({ error: "Missing site ID" }, { status: 400 });
 
-    // Verify ownership
+    // Verify ownership + fetch current site_json for snapshotting
     const { data: site } = await supabase
       .from("sites")
-      .select("user_id")
+      .select("user_id, site_json")
       .eq("id", id)
       .single();
 
@@ -101,6 +101,19 @@ export async function PATCH(req: NextRequest) {
     if (!jsonData) {
       return NextResponse.json({ error: "Missing site data" }, { status: 400 });
     }
+
+    // Snapshot the PREVIOUS state before overwriting so the user can roll back.
+    // Skip if there is no prior site_json (brand-new site) — nothing to restore to.
+    if (site.site_json) {
+      await supabase.from("site_versions").insert({
+        site_id: id,
+        user_id: user.id,
+        site_json: site.site_json,
+        source: source ?? "chat",
+        summary: summary ?? null,
+      });
+    }
+
     await supabase
       .from("sites")
       .update({ site_json: jsonData, updated_at: new Date().toISOString() })

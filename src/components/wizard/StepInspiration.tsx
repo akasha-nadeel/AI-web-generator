@@ -29,8 +29,8 @@ export function StepInspiration() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">Add inspiration <span className="text-white/40 font-normal">(optional)</span></h2>
-      <p className="text-white/60 text-base mb-7 leading-relaxed max-w-lg">
+      <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight text-foreground">Add inspiration <span className="text-muted-foreground/40 font-normal">(optional)</span></h2>
+      <p className="text-muted-foreground text-base mb-7 leading-relaxed max-w-lg">
         Upload screenshots of websites you like, your logo, or product photos.
         Our AI will match the style.
       </p>
@@ -39,13 +39,13 @@ export function StepInspiration() {
         {/* Upload area */}
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="border border-dashed border-white/20 rounded-2xl p-10 text-center cursor-pointer hover:border-blue-400/[0.8] hover:bg-white/[0.02] transition-colors"
+          className="border border-dashed border-border rounded-2xl p-10 text-center cursor-pointer hover:border-primary hover:bg-muted/30 transition-all"
         >
-          <Upload className="w-8 h-8 text-white/40 mx-auto mb-4" />
-          <p className="text-base text-white/80 mb-2 font-medium">
+          <Upload className="w-8 h-8 text-muted-foreground/40 mx-auto mb-4" />
+          <p className="text-base text-foreground/80 mb-2 font-medium">
             Click to upload or drag and drop
           </p>
-          <p className="text-sm text-white/40">
+          <p className="text-sm text-muted-foreground/60">
             PNG, JPG, WEBP up to 5MB each
           </p>
           <input
@@ -62,7 +62,7 @@ export function StepInspiration() {
         {inspirationImages.length > 0 && (
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
             {inspirationImages.map((img, i) => (
-              <div key={i} className="relative group rounded-xl overflow-hidden aspect-square border border-white/10">
+              <div key={i} className="relative group rounded-xl overflow-hidden aspect-square border border-border">
                 <img
                   src={img}
                   alt={`Inspiration ${i + 1}`}
@@ -81,16 +81,16 @@ export function StepInspiration() {
       </div>
 
       {/* Footer Buttons */}
-      <div className="mt-8 flex justify-between items-center pt-5 border-t border-white/5">
+      <div className="mt-8 flex justify-between items-center pt-5 border-t border-border">
         <button
           onClick={() => setStep(1)}
-          className="px-6 py-2.5 rounded-lg text-sm font-medium transition-colors border border-white/10 bg-transparent text-white hover:bg-white/5"
+          className="px-6 py-2.5 rounded-lg text-sm font-medium transition-colors border border-border bg-transparent text-foreground hover:bg-muted"
         >
           Back
         </button>
         <button
           onClick={() => setStep(3)}
-          className="px-6 py-2.5 rounded-lg text-sm font-medium transition-colors bg-white text-black hover:bg-white/90"
+          className="px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm bg-primary text-primary-foreground hover:opacity-90"
         >
           {inspirationImages.length > 0 ? "Next" : "Skip"}
         </button>
