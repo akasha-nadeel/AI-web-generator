@@ -259,56 +259,40 @@ export function PricingPopup({
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
             {cards.map((card) => (
               <div
                 key={card.id}
                 className={cn(
-                  "relative flex flex-col rounded-2xl p-5 md:p-6 transition-all border",
-                  card.popular
-                    ? "border-2 shadow-lg"
-                    : "border-border bg-foreground/[0.03] hover:border-foreground/[0.1] hover:bg-foreground/[0.05]"
+                  "relative flex flex-col rounded-[2rem] p-6 md:p-7 transition-all border-0 overflow-hidden",
+                  "text-white shadow-xl hover:shadow-2xl duration-300"
                 )}
-                style={
-                  card.popular
-                    ? {
-                        borderColor: card.color,
-                        backgroundColor: `${card.color}0A`,
-                        boxShadow: `0 10px 30px -10px ${card.color}26`,
-                      }
-                    : {
-                        borderColor: card.id === "free" ? "transparent" : undefined
-                      }
-                }
+                style={{ 
+                  backgroundColor: card.color,
+                  boxShadow: `0 20px 40px -15px ${card.color}66`
+                }}
               >
                 <div className="flex items-center justify-between gap-2 mb-1">
-                  <h3 className="text-lg font-bold text-foreground">{card.name}</h3>
+                  <h3 className="text-xl font-bold">{card.name}</h3>
                   {card.badge && (
-                    <span
-                      className="text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap border"
-                      style={{
-                        color: card.color,
-                        borderColor: `${card.color}4D`,
-                        backgroundColor: `${card.color}1A`,
-                      }}
-                    >
+                    <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-white/20 text-white backdrop-blur-sm">
                       {card.badge}
                     </span>
                   )}
                 </div>
-                <p className="text-[13px] text-muted-foreground mb-5 min-h-[20px]">{card.tagline}</p>
+                <p className="text-[13px] text-white/70 mb-6 min-h-[20px]">{card.tagline}</p>
 
-                <div className="flex items-baseline gap-1.5 mb-5">
-                  <span className="text-3xl md:text-[2.25rem] font-bold leading-none text-foreground tracking-tight">
+                <div className="flex items-baseline gap-1.5 mb-7">
+                  <span className="text-4xl md:text-[2.75rem] font-black leading-none tracking-tighter">
                     {card.price}
                   </span>
                   {card.priceSuffix && (
-                    <span className="text-sm text-muted-foreground leading-tight">/{card.priceSuffix}</span>
+                    <span className="text-sm text-white/60 font-medium tracking-tight">/{card.priceSuffix}</span>
                   )}
                 </div>
 
                 {card.id === "free" ? (
-                  <div className="flex items-center justify-center w-full py-2.5 rounded-xl font-semibold text-sm mb-5 bg-foreground/[0.04] text-muted-foreground border border-border">
+                  <div className="flex items-center justify-center w-full py-3.5 rounded-2xl font-bold text-sm mb-7 bg-white/20 text-white border border-white/20 backdrop-blur-sm">
                     Current plan
                   </div>
                 ) : (
@@ -316,29 +300,27 @@ export function PricingPopup({
                     onClick={() => handleBuy(card.id)}
                     disabled={loadingId === card.id}
                     className={cn(
-                      "flex items-center justify-center w-full py-2.5 rounded-xl font-semibold text-sm mb-5 transition-all text-white shadow-sm hover:opacity-90",
+                      "flex items-center justify-center w-full py-3.5 rounded-2xl bg-white font-bold text-sm mb-7 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg",
                       loadingId === card.id && "opacity-60 cursor-wait"
                     )}
-                    style={{ backgroundColor: card.color }}
+                    style={{ color: card.color }}
                   >
                     {loadingId === card.id ? "Loading…" : card.ctaLabel}
                   </button>
                 )}
 
-                <ul className="space-y-2.5 text-[13px]">
+                <ul className="space-y-3.5 text-[13.5px]">
                   {card.features.map((f) => {
                     const numberMatch = f.match(/^(\d+)(.*)/);
                     return (
-                      <li key={f} className="flex items-start gap-2.5">
-                        <Check
-                          className="w-4 h-4 shrink-0 mt-[2px]"
-                          strokeWidth={3}
-                          style={{ color: card.color }}
-                        />
-                        <span className="text-muted-foreground leading-snug">
+                      <li key={f} className="flex items-start gap-3">
+                        <div className="mt-1 w-4 h-4 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                          <Check className="w-2.5 h-2.5 text-white" strokeWidth={4} />
+                        </div>
+                        <span className="text-white/80 leading-snug font-medium">
                           {numberMatch ? (
                             <>
-                              <span className="text-[20px] font-bold text-foreground mr-1 inline-block align-middle -mt-1">
+                              <span className="text-[20px] font-black text-white mr-1 inline-block align-middle -mt-1 tracking-tighter">
                                 {numberMatch[1]}
                               </span>
                               {numberMatch[2]}
