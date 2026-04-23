@@ -114,7 +114,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
         <div className="flex items-center gap-2 md:gap-4 min-w-0">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 h-9 px-4 rounded-full bg-white/[0.06] border border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-white/[0.12] transition-all shrink-0"
+            className="flex items-center gap-2 h-9 px-4 rounded-full bg-foreground/[0.06] border border-foreground/[0.08] text-muted-foreground hover:text-foreground hover:bg-foreground/[0.12] transition-all shrink-0"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm font-medium">Dashboard</span>
@@ -130,7 +130,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
               className={cn(
                 "px-2 py-1 rounded-lg text-xs transition-colors",
                 activeTab === "preview"
-                  ? "bg-white/10 text-foreground"
+                  ? "bg-foreground/10 text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -141,7 +141,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
               className={cn(
                 "px-2 py-1 rounded-lg text-xs transition-colors",
                 activeTab === "code"
-                  ? "bg-white/10 text-foreground"
+                  ? "bg-foreground/10 text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -160,7 +160,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
                   className={cn(
                     "p-2 rounded-lg transition-colors",
                     previewDevice === device
-                      ? "bg-white/10 text-foreground"
+                      ? "bg-foreground/10 text-foreground"
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
@@ -175,7 +175,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
           {/* Edit with AI chat — flips to the /generate page */}
           <Link
             href={`/generate/${siteId}`}
-            className="flex items-center gap-1.5 h-8 px-2 md:px-3 rounded-lg bg-lime-400/10 hover:bg-lime-400/20 text-lime-300 hover:text-lime-200 text-xs font-medium transition-colors"
+            className="flex items-center gap-1.5 h-8 px-2 md:px-3 rounded-lg bg-lime-400/10 hover:bg-lime-400/20 text-lime-600 dark:text-lime-300 hover:text-lime-700 dark:hover:text-lime-200 text-xs font-medium transition-colors"
             title="Refine with AI chat"
           >
             <Pencil className="w-3.5 h-3.5" />
@@ -185,7 +185,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
           {/* Export */}
           <button
             onClick={handleExport}
-            className="flex items-center gap-1.5 h-8 px-2 md:px-3 rounded-lg bg-white/[0.08] hover:bg-white/[0.14] text-foreground/90 hover:text-foreground text-xs font-medium transition-colors"
+            className="flex items-center gap-1.5 h-8 px-2 md:px-3 rounded-lg bg-foreground/[0.08] hover:bg-foreground/[0.14] text-foreground/90 hover:text-foreground text-xs font-medium transition-colors"
           >
             <Download className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Export</span>
@@ -197,8 +197,8 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
             className={cn(
               "flex items-center gap-1.5 h-8 px-2 md:px-3 rounded-lg text-xs font-medium transition-colors",
               subdomain
-                ? "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30"
-                : "bg-white text-neutral-900 hover:bg-white/90"
+                ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 hover:bg-emerald-500/30"
+                : "bg-foreground text-background hover:bg-foreground/90"
             )}
           >
             <Globe className="w-3.5 h-3.5" />
@@ -219,7 +219,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
       {/* ===== MAIN CONTENT ===== */}
       <div className="flex-1 flex overflow-hidden">
         {/* Preview / Code (center) */}
-        <div className="flex-1 bg-neutral-950 flex flex-col overflow-hidden">
+        <div className="flex-1 bg-slate-50 dark:bg-neutral-950 flex flex-col overflow-hidden">
           {activeTab === "preview" ? (
             <div className={cn(
               "flex-1 flex justify-center items-start min-h-0",
@@ -239,7 +239,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
                 /* ===== TABLET — CSS iPad Pro frame ===== */
                 <div className="flex-1 flex justify-center items-center">
                   <div
-                    className="relative bg-[#1d1d1f] shadow-2xl shadow-black/60"
+                    className="relative bg-[#1d1d1f] dark:bg-[#111] shadow-2xl shadow-black/20 dark:shadow-black/60"
                     style={{ borderRadius: 24, padding: "18px 18px" }}
                   >
                     {/* Camera dot */}
@@ -248,7 +248,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
                     <div className="absolute top-[80px] -right-[2px] w-[2px] h-[30px] bg-[#333] rounded-r-sm" />
                     {/* Screen */}
                     <div
-                      className="overflow-hidden bg-black"
+                      className="overflow-hidden bg-black shadow-inner"
                       style={{ borderRadius: 8, width: 560, height: "calc(100vh - 180px)", maxHeight: 740 }}
                     >
                       <iframe
@@ -264,7 +264,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
                 /* ===== MOBILE — CSS iPhone 12 Pro frame ===== */
                 <div className="flex-1 flex justify-center items-center">
                   <div
-                    className="relative shadow-2xl shadow-black/60"
+                    className="relative shadow-2xl shadow-black/20 dark:shadow-black/60"
                     style={{ borderRadius: 32, padding: "10px 10px", background: "linear-gradient(145deg, #2c3e4a 0%, #1a2c35 50%, #1d2d36 100%)" }}
                   >
                     {/* Notch — classic iPhone 12 style */}
@@ -289,7 +289,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
                     <div className="absolute top-[122px] -left-[2.5px] w-[2.5px] h-[24px] rounded-l-sm" style={{ background: "linear-gradient(270deg, #2c3e4a, #3a5060)" }} />
                     {/* Screen */}
                     <div
-                      className="overflow-hidden bg-black relative"
+                      className="overflow-hidden bg-black relative shadow-inner"
                       style={{ borderRadius: 22, width: 230, height: "calc(100vh - 160px)", maxHeight: 500 }}
                     >
                       <iframe

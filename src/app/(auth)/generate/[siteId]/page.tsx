@@ -172,7 +172,7 @@ function GenerationProgress({ startTime }: { startTime: number }) {
 
             {/* Animated phase word — single line like Google */}
             <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-blue-400 shrink-0" />
+                <Sparkles className="w-4 h-4 text-primary shrink-0" />
                 <AnimatePresence mode="wait">
                     <motion.span
                         key={currentPhase}
@@ -188,7 +188,7 @@ function GenerationProgress({ startTime }: { startTime: number }) {
             </div>
 
             {/* Step-by-step checklist */}
-            <div className="space-y-1.5 pl-1 pt-1 border-t border-white/[0.04]">
+            <div className="space-y-1.5 pl-1 pt-1 border-t border-border/40">
                 {GENERATION_STEPS.slice(0, visibleSteps).map((step, i) => {
                     const isLast = i === visibleSteps - 1;
                     const isCompleted = i < visibleSteps - 1;
@@ -207,12 +207,12 @@ function GenerationProgress({ startTime }: { startTime: number }) {
                                     animate={{ scale: 1 }}
                                     className="w-3.5 h-3.5 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0"
                                 >
-                                    <svg className="w-2 h-2 text-emerald-400" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                                    <svg className="w-2 h-2 text-emerald-600 dark:text-emerald-400" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                                         <path d="M2 6l3 3 5-5" />
                                     </svg>
                                 </motion.div>
                             ) : (
-                                <svg className="w-3.5 h-3.5 animate-spin text-purple-400 shrink-0" viewBox="0 0 24 24" fill="none">
+                                <svg className="w-3.5 h-3.5 animate-spin text-primary shrink-0" viewBox="0 0 24 24" fill="none">
                                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="50 14" />
                                 </svg>
                             )}
@@ -229,7 +229,7 @@ function GenerationProgress({ startTime }: { startTime: number }) {
             </div>
 
             {/* Progress bar */}
-            <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
+            <div className="h-1 rounded-full bg-foreground/[0.06] overflow-hidden">
                 <motion.div
                     className="h-full rounded-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400"
                     initial={{ width: "0%" }}
@@ -783,7 +783,7 @@ function GeneratePageContent() {
                 return <strong key={i} className="text-foreground/90">{part.slice(2, -2)}</strong>;
             }
             if (part.startsWith("`") && part.endsWith("`")) {
-                return <code key={i} className="px-1 py-0.5 rounded bg-white/[0.06] text-xs font-mono text-foreground/80">{part.slice(1, -1)}</code>;
+                return <code key={i} className="px-1 py-0.5 rounded bg-foreground/[0.06] text-xs font-mono text-foreground/80">{part.slice(1, -1)}</code>;
             }
             return <span key={i}>{part}</span>;
         });
@@ -802,13 +802,13 @@ function GeneratePageContent() {
     }
 
     return (
-        <div className="h-screen bg-background flex flex-col overflow-hidden">
+        <div className="h-screen bg-background flex flex-col overflow-hidden text-foreground">
             {/* ===== TOP HEADER BAR ===== */}
-            <div className="h-12 border-b border-white/[0.06] bg-[rgba(10,10,25,0.6)] flex items-center justify-between px-3 md:px-5 shrink-0 z-20">
+            <div className="h-12 border-b border-border bg-background/60 backdrop-blur-md flex items-center justify-between px-3 md:px-5 shrink-0 z-20">
                 <div className="flex items-center gap-2">
                     <Link
                         href={`/editor/${siteId}`}
-                        className="flex items-center gap-2 h-8 px-4 rounded-full bg-white/[0.06] border border-white/[0.08] text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.12] transition-all"
+                        className="flex items-center gap-2 h-8 px-4 rounded-full bg-foreground/[0.06] border border-border text-sm text-muted-foreground hover:text-foreground hover:bg-foreground/[0.12] transition-all"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         <span className="hidden sm:inline">Back</span>
@@ -830,7 +830,7 @@ function GeneratePageContent() {
                             }
                         }}
                         disabled={!siteId}
-                        className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium bg-white/[0.06] text-muted-foreground hover:text-foreground hover:bg-white/[0.1] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium bg-foreground/[0.06] text-muted-foreground hover:text-foreground hover:bg-foreground/[0.1] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                         title="Version history"
                     >
                         <History className="w-3.5 h-3.5" />
@@ -842,8 +842,8 @@ function GeneratePageContent() {
                         className={cn(
                             "flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed",
                             subdomain
-                                ? "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30"
-                                : "bg-white text-black hover:bg-white/90"
+                                ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 hover:bg-emerald-500/30"
+                                : "bg-foreground text-background hover:bg-foreground/90"
                         )}
                         title={subdomain ? `Live at ${subdomain}` : "Publish site"}
                     >
@@ -861,7 +861,7 @@ function GeneratePageContent() {
                 {/* ===== LEFT SIDEBAR — Chat ===== */}
                 <div
                     ref={sidebarRef}
-                    className="relative w-full lg:w-[360px] lg:h-full border-b lg:border-b-0 bg-[rgba(10,10,25,0.5)] flex flex-col shrink-0"
+                    className="relative w-full lg:w-[360px] lg:h-full border-b lg:border-b-0 lg:border-r border-border bg-muted/30 dark:bg-neutral-950 flex flex-col shrink-0"
                 >
                     {/* Drag handle */}
                     <div
@@ -872,29 +872,29 @@ function GeneratePageContent() {
                         <div
                             className={cn(
                                 "w-[2px] h-full transition-colors duration-100",
-                                isDragging ? "bg-white/80" : "bg-transparent group-hover:bg-white/40"
+                                isDragging ? "bg-primary" : "bg-transparent group-hover:bg-primary/40"
                             )}
                         />
                     </div>
 
                     {/* AI model header */}
-                    <div className="px-4 py-3 border-b border-white/[0.06] flex items-center gap-2 h-14 shrink-0">
+                    <div className="px-4 py-3 border-b border-border flex items-center gap-2 h-14 shrink-0">
                     <span className="text-sm font-medium text-foreground">Weavo AI</span>
                     <div className="ml-auto flex items-center gap-1.5">
                         {status === "generating" && (
-                            <span className="text-[11px] text-amber-400 font-medium">Generating...</span>
+                            <span className="text-[11px] text-amber-500 dark:text-amber-400 font-medium">Generating...</span>
                         )}
                         {status === "preparing" && (
-                            <span className="text-[11px] text-blue-400 font-medium">Preparing...</span>
+                            <span className="text-[11px] text-blue-500 dark:text-blue-400 font-medium">Preparing...</span>
                         )}
                         {status === "done" && !isChatLoading && (
                             <CreditCounter className="scale-[0.9] origin-right" />
                         )}
                         {isChatLoading && (
-                            <span className="text-[11px] text-amber-400 font-medium">Updating...</span>
+                            <span className="text-[11px] text-amber-500 dark:text-amber-400 font-medium">Updating...</span>
                         )}
                         {status === "error" && (
-                            <span className="text-[11px] text-red-400 font-medium">Failed</span>
+                            <span className="text-[11px] text-red-500 dark:text-red-400 font-medium">Failed</span>
                         )}
                     </div>
                 </div>
@@ -904,14 +904,14 @@ function GeneratePageContent() {
                     {messages.map((msg, i) => (
                         <div key={i}>
                             {msg.role === "user" ? (
-                                <div className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-3">
+                                <div className="rounded-xl bg-foreground/[0.04] border border-border p-3">
                                     {/* Attached images — Gemini-style thumbnails */}
                                     {msg.images && msg.images.length > 0 && (
                                         <div className="flex flex-wrap gap-2 mb-2">
                                             {msg.images.map((img, imgIdx) => (
                                                 <div
                                                     key={imgIdx}
-                                                    className="relative group w-[120px] rounded-lg overflow-hidden border border-white/[0.08] bg-white/[0.03]"
+                                                    className="relative group w-[120px] rounded-lg overflow-hidden border border-border bg-foreground/[0.03]"
                                                 >
                                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                                     <img
@@ -936,23 +936,23 @@ function GeneratePageContent() {
                             ) : (
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                        <span className="text-purple-400 font-medium">Weavo AI</span>
+                                        <span className="text-primary font-medium">Weavo AI</span>
                                         <span>•</span>
                                         {msg.status === "loading" ? (
-                                            <span className="text-amber-400">Running...</span>
+                                            <span className="text-amber-500 dark:text-amber-400">Running...</span>
                                         ) : msg.status === "error" ? (
-                                            <span className="text-red-400">Failed after {msg.elapsed}s</span>
+                                            <span className="text-red-500 dark:text-red-400">Failed after {msg.elapsed}s</span>
                                         ) : (
-                                            <span className="text-emerald-400">Ran for {msg.elapsed}s</span>
+                                            <span className="text-emerald-600 dark:text-emerald-400">Ran for {msg.elapsed}s</span>
                                         )}
                                     </div>
 
                                     {msg.status === "loading" && !msg.content && (
                                         <div className="flex items-center gap-2">
                                             <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }}>
-                                                <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                                                <Sparkles className="w-3.5 h-3.5 text-primary" />
                                             </motion.div>
-                                            <span className="text-xs text-purple-400 font-medium">Processing your request...</span>
+                                            <span className="text-xs text-primary font-medium">Processing your request...</span>
                                         </div>
                                     )}
 
@@ -961,17 +961,17 @@ function GeneratePageContent() {
                                         // cursor so the user knows it's still going.
                                         <div className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
                                             {msg.content}
-                                            <span className="inline-block w-[2px] h-[1em] align-text-bottom bg-purple-400 ml-0.5 animate-pulse" />
+                                            <span className="inline-block w-[2px] h-[1em] align-text-bottom bg-primary ml-0.5 animate-pulse" />
                                         </div>
                                     )}
 
                                     {msg.status === "error" && (
-                                        <div className="text-sm text-red-400/80 leading-relaxed">
+                                        <div className="text-sm text-red-500 dark:text-red-400/80 leading-relaxed">
                                             <p>{msg.content}</p>
                                             {i === messages.length - 1 && (
                                                 <button
                                                     onClick={i === 1 ? handleRetry : undefined}
-                                                    className="mt-3 flex items-center gap-2 h-8 px-4 rounded-full bg-purple-600 text-white text-xs font-medium hover:bg-purple-700 transition-colors"
+                                                    className="mt-3 flex items-center gap-2 h-8 px-4 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:opacity-90 transition-colors"
                                                 >
                                                     <Zap className="w-3 h-3" />
                                                     Try Again
@@ -1000,15 +1000,15 @@ function GeneratePageContent() {
                                                 return <p key={li}>{renderContent(line)}</p>;
                                             })}
 
-                                            <div className="flex items-center gap-1 pt-2 border-t border-white/[0.06] mt-2 flex-wrap">
-                                                <button className="flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all">
+                                            <div className="flex items-center gap-1 pt-2 border-t border-border mt-2 flex-wrap">
+                                                <button className="flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-foreground/[0.06] transition-all">
                                                     <Flag className="w-3 h-3" />
                                                     Checkpoint
                                                 </button>
-                                                <button className="p-1.5 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.06] transition-all" title="Good response">
+                                                <button className="p-1.5 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-foreground/[0.06] transition-all" title="Good response">
                                                     <ThumbsUp className="w-3.5 h-3.5" />
                                                 </button>
-                                                <button className="p-1.5 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.06] transition-all" title="Bad response">
+                                                <button className="p-1.5 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-foreground/[0.06] transition-all" title="Bad response">
                                                     <ThumbsDown className="w-3.5 h-3.5" />
                                                 </button>
 
@@ -1020,8 +1020,8 @@ function GeneratePageContent() {
                                                                 className={cn(
                                                                     "flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-xs transition-all",
                                                                     showChanges
-                                                                        ? "text-purple-400 bg-purple-500/10 border border-purple-500/20"
-                                                                        : "text-muted-foreground hover:text-foreground hover:bg-white/[0.06]"
+                                                                        ? "text-primary bg-primary/10 border border-primary/20"
+                                                                        : "text-muted-foreground hover:text-foreground hover:bg-foreground/[0.06]"
                                                                 )}
                                                             >
                                                                 <Eye className="w-3 h-3" />
@@ -1029,7 +1029,7 @@ function GeneratePageContent() {
                                                             </button>
                                                             <button
                                                                 onClick={handleRestore}
-                                                                className="flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all"
+                                                                className="flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-foreground/[0.06] transition-all"
                                                             >
                                                                 <RotateCcw className="w-3 h-3" />
                                                                 Restore
@@ -1038,7 +1038,7 @@ function GeneratePageContent() {
                                                     )}
                                                     <button
                                                         onClick={() => copyToClipboard(msg.content)}
-                                                        className="p-1.5 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.06] transition-all"
+                                                        className="p-1.5 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-foreground/[0.06] transition-all"
                                                         title="Copy response"
                                                     >
                                                         <Copy className="w-3.5 h-3.5" />
@@ -1055,7 +1055,7 @@ function GeneratePageContent() {
                         <motion.div
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-3"
+                            className="rounded-xl bg-foreground/[0.02] border border-border p-3"
                         >
                             <GenerationProgress startTime={chatStartTime.current} />
                         </motion.div>
@@ -1068,7 +1068,7 @@ function GeneratePageContent() {
                     <div className="px-3 pt-2 shrink-0">
                         <div className="flex items-center gap-1.5">
                             <button
-                                className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-foreground hover:bg-white/[0.06] transition-all shrink-0"
+                                className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-foreground hover:bg-foreground/[0.06] transition-all shrink-0"
                                 title="Refresh suggestions"
                             >
                                 <RefreshCw className="w-3 h-3" />
@@ -1085,8 +1085,8 @@ function GeneratePageContent() {
                                         className={cn(
                                             "flex items-center gap-1.5 h-7 px-3 rounded-full text-xs whitespace-nowrap border transition-all shrink-0",
                                             i === 0
-                                                ? "border-purple-500/30 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20"
-                                                : "border-white/[0.08] bg-white/[0.03] text-muted-foreground hover:text-foreground hover:border-white/[0.15] hover:bg-white/[0.06]"
+                                                ? "border-primary/30 bg-primary/10 text-primary hover:bg-primary/20"
+                                                : "border-border bg-foreground/[0.03] text-muted-foreground hover:text-foreground hover:border-foreground/[0.15] hover:bg-foreground/[0.06]"
                                         )}
                                     >
                                         {i === 0 && <Sparkles className="w-3 h-3" />}
@@ -1097,7 +1097,7 @@ function GeneratePageContent() {
 
                             <button
                                 onClick={scrollSuggestions}
-                                className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-foreground hover:bg-white/[0.06] transition-all shrink-0"
+                                className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-foreground hover:bg-foreground/[0.06] transition-all shrink-0"
                                 title="More suggestions"
                             >
                                 <ChevronRight className="w-3 h-3" />
@@ -1105,7 +1105,7 @@ function GeneratePageContent() {
 
                             <button
                                 onClick={() => setShowSuggestions(false)}
-                                className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground hover:bg-white/[0.06] transition-all shrink-0"
+                                className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground hover:bg-foreground/[0.06] transition-all shrink-0"
                                 title="Dismiss suggestions"
                             >
                                 <X className="w-3 h-3" />
@@ -1116,7 +1116,7 @@ function GeneratePageContent() {
 
                 {/* Bottom chat input */}
                 <div
-                    className="p-3 border-t border-white/[0.06] mt-auto shrink-0"
+                    className="p-3 border-t border-border mt-auto shrink-0"
                     onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     onDrop={(e) => {
                         e.preventDefault();
@@ -1134,14 +1134,14 @@ function GeneratePageContent() {
                         onChange={(e) => handleImageUpload(e.target.files)}
                     />
 
-                    <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] overflow-hidden focus-within:border-purple-500/30 transition-colors">
+                    <div className="rounded-xl border border-border bg-foreground/[0.03] overflow-hidden focus-within:border-primary/30 transition-colors">
                         {/* Attached images preview — shown above the input */}
                         {attachedImages.length > 0 && (
                             <div className="flex flex-wrap gap-2 px-3 pt-3 pb-1">
                                 {attachedImages.map((img, idx) => (
                                     <div
                                         key={idx}
-                                        className="relative group w-[100px] rounded-lg overflow-hidden border border-white/[0.1] bg-white/[0.04]"
+                                        className="relative group w-[100px] rounded-lg overflow-hidden border border-border bg-foreground/[0.04]"
                                     >
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
@@ -1173,7 +1173,7 @@ function GeneratePageContent() {
                             disabled={!canChat}
                             className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none disabled:opacity-40 px-3 py-2.5"
                         />
-                        <div className="flex items-center justify-between px-2 py-1.5 border-t border-white/[0.04]">
+                        <div className="flex items-center justify-between px-2 py-1.5 border-t border-border/40">
                             <div className="flex items-center gap-1">
                                 <button
                                     onClick={() => imageInputRef.current?.click()}
@@ -1181,20 +1181,20 @@ function GeneratePageContent() {
                                     className={cn(
                                         "p-1.5 rounded-lg transition-all disabled:cursor-not-allowed",
                                         attachedImages.length > 0
-                                            ? "text-purple-400 bg-purple-500/10"
-                                            : "text-muted-foreground/40 hover:text-foreground hover:bg-white/[0.06]"
+                                            ? "text-primary bg-primary/10"
+                                            : "text-muted-foreground/40 hover:text-foreground hover:bg-foreground/[0.06]"
                                     )}
                                     title="Attach reference image"
                                 >
                                     <ImageIcon className="w-4 h-4" />
                                 </button>
-                                <button disabled={!canChat} className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground hover:bg-white/[0.06] transition-all disabled:cursor-not-allowed" title="Voice input">
+                                <button disabled={!canChat} className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground hover:bg-foreground/[0.06] transition-all disabled:cursor-not-allowed" title="Voice input">
                                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" /></svg>
                                 </button>
                                 <button
                                     onClick={() => imageInputRef.current?.click()}
                                     disabled={!canChat}
-                                    className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground hover:bg-white/[0.06] transition-all disabled:cursor-not-allowed"
+                                    className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-foreground hover:bg-foreground/[0.06] transition-all disabled:cursor-not-allowed"
                                     title="Add file"
                                 >
                                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" /></svg>
@@ -1206,8 +1206,8 @@ function GeneratePageContent() {
                                 className={cn(
                                     "w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all",
                                     canChat && (chatInput.trim() || attachedImages.length > 0)
-                                        ? "bg-white text-black hover:bg-white/90"
-                                        : "bg-white/[0.06] text-muted-foreground/40 cursor-not-allowed"
+                                        ? "bg-foreground text-background hover:opacity-90"
+                                        : "bg-foreground/[0.06] text-muted-foreground/40 cursor-not-allowed"
                                 )}
                                 title="Send message"
                             >
@@ -1221,7 +1221,7 @@ function GeneratePageContent() {
             {/* ===== MAIN CONTENT — Preview / Code ===== */}
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Sub-bar */}
-                <div className="h-11 border-b border-white/[0.06] flex items-center justify-between px-3 md:px-4 shrink-0 relative">
+                <div className="h-11 border-b border-border flex items-center justify-between px-3 md:px-4 shrink-0 relative bg-background/50">
                     {/* Left group — Preview/Code toggle */}
                     <div className="flex items-center gap-1 shrink-0">
                         <button
@@ -1229,8 +1229,8 @@ function GeneratePageContent() {
                             className={cn(
                                 "text-sm px-3 py-1 rounded-lg transition-colors",
                                 activeTab === "preview"
-                                    ? "font-medium text-foreground bg-white/[0.06] border border-white/[0.08]"
-                                    : "text-muted-foreground hover:bg-white/[0.04]"
+                                    ? "font-medium text-foreground bg-foreground/[0.06] border border-border"
+                                    : "text-muted-foreground hover:bg-foreground/[0.04]"
                             )}
                         >
                             {(status === "generating" || status === "preparing") && "• "}Preview
@@ -1240,8 +1240,8 @@ function GeneratePageContent() {
                             className={cn(
                                 "text-sm px-3 py-1 rounded-lg transition-colors",
                                 activeTab === "code"
-                                    ? "font-medium text-foreground bg-white/[0.06] border border-white/[0.08]"
-                                    : "text-muted-foreground hover:bg-white/[0.04]"
+                                    ? "font-medium text-foreground bg-foreground/[0.06] border border-border"
+                                    : "text-muted-foreground hover:bg-foreground/[0.04]"
                             )}
                         >
                             Code
@@ -1259,7 +1259,7 @@ function GeneratePageContent() {
                                     className={cn(
                                         "p-2 rounded-lg transition-colors",
                                         previewDevice === device
-                                            ? "bg-white/10 text-foreground"
+                                            ? "bg-foreground/10 text-foreground"
                                             : "text-muted-foreground hover:text-foreground"
                                     )}
                                 >
@@ -1275,7 +1275,7 @@ function GeneratePageContent() {
                             href={siteId ? `/preview/${siteId}` : "#"}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 rounded-lg text-foreground/80 hover:text-foreground hover:bg-white/[0.08] transition-all inline-flex items-center justify-center"
+                            className="p-1.5 rounded-lg text-foreground/80 hover:text-foreground hover:bg-foreground/[0.08] transition-all inline-flex items-center justify-center"
                             title="Open fullscreen"
                         >
                             <Maximize2 className="w-4 h-4" />
@@ -1289,7 +1289,7 @@ function GeneratePageContent() {
                         {/* PREVIEW TAB */}
                         {activeTab === "preview" && (
                             <div className={cn(
-                                "flex-1 flex justify-center items-start min-h-0",
+                                "flex-1 flex justify-center items-start min-h-0 bg-slate-50 dark:bg-neutral-950",
                                 // Desktop: no padding, iframe fills; tablet/mobile: pad so the
                                 // device frame doesn't touch the edges, and let the container
                                 // scroll if the frame is taller than the viewport.
@@ -1314,13 +1314,13 @@ function GeneratePageContent() {
                                     <div className="flex-1 flex items-center justify-center p-8">
                                         <div className="text-center">
                                             <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-3">
-                                                <AlertTriangle className="w-6 h-6 text-red-400" />
+                                                <AlertTriangle className="w-6 h-6 text-red-500 dark:text-red-400" />
                                             </div>
                                             <h2 className="text-lg font-semibold">Generation failed</h2>
-                                            <p className="text-sm text-red-400/80 mt-1 max-w-md">{errorMsg}</p>
+                                            <p className="text-sm text-red-500 dark:text-red-400/80 mt-1 max-w-md">{errorMsg}</p>
                                             <button
                                                 onClick={handleRetry}
-                                                className="mt-4 flex items-center gap-2 mx-auto h-9 px-5 rounded-full bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors"
+                                                className="mt-4 flex items-center gap-2 mx-auto h-9 px-5 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-colors"
                                             >
                                                 <Zap className="w-3.5 h-3.5" />
                                                 Try Again
@@ -1339,7 +1339,7 @@ function GeneratePageContent() {
                                         /* ===== TABLET — CSS iPad Pro frame ===== */
                                         <div className="flex-1 flex justify-center items-center">
                                             <div
-                                                className="relative bg-[#1d1d1f] shadow-2xl shadow-black/60"
+                                                className="relative bg-[#1d1d1f] dark:bg-[#111] shadow-2xl shadow-black/20 dark:shadow-black/60"
                                                 style={{ borderRadius: 24, padding: "18px 18px" }}
                                             >
                                                 {/* Camera dot */}
@@ -1348,7 +1348,7 @@ function GeneratePageContent() {
                                                 <div className="absolute top-[80px] -right-[2px] w-[2px] h-[30px] bg-[#333] rounded-r-sm" />
                                                 {/* Screen */}
                                                 <div
-                                                    className="overflow-hidden bg-black"
+                                                    className="overflow-hidden bg-black shadow-inner"
                                                     style={{ borderRadius: 8, width: 560, height: "calc(100vh - 180px)", maxHeight: 740 }}
                                                 >
                                                     <iframe
@@ -1364,7 +1364,7 @@ function GeneratePageContent() {
                                         /* ===== MOBILE — CSS iPhone 12 Pro frame ===== */
                                         <div className="flex-1 flex justify-center items-center">
                                             <div
-                                                className="relative shadow-2xl shadow-black/60"
+                                                className="relative shadow-2xl shadow-black/20 dark:shadow-black/60"
                                                 style={{ borderRadius: 32, padding: "10px 10px", background: "linear-gradient(145deg, #2c3e4a 0%, #1a2c35 50%, #1d2d36 100%)" }}
                                             >
                                                 {/* Notch — classic iPhone 12 style */}
@@ -1389,7 +1389,7 @@ function GeneratePageContent() {
                                                 <div className="absolute top-[122px] -left-[2.5px] w-[2.5px] h-[24px] rounded-l-sm" style={{ background: "linear-gradient(270deg, #2c3e4a, #3a5060)" }} />
                                                 {/* Screen */}
                                                 <div
-                                                    className="overflow-hidden bg-black relative"
+                                                    className="overflow-hidden bg-black relative shadow-inner"
                                                     style={{ borderRadius: 22, width: 230, height: "calc(100vh - 160px)", maxHeight: 500 }}
                                                 >
                                                     <iframe
@@ -1471,16 +1471,16 @@ function GeneratePageContent() {
                             animate={{ x: 0 }}
                             exit={{ x: "100%" }}
                             transition={{ type: "spring", damping: 30, stiffness: 280 }}
-                            className="fixed top-0 right-0 h-full w-full sm:w-[380px] bg-[rgba(12,12,28,0.98)] border-l border-white/10 z-[100] flex flex-col"
+                            className="fixed top-0 right-0 h-full w-full sm:w-[380px] bg-popover dark:bg-[rgba(12,12,28,0.98)] border-l border-border z-[100] flex flex-col"
                         >
-                            <div className="h-12 px-4 border-b border-white/10 flex items-center justify-between shrink-0">
+                            <div className="h-12 px-4 border-b border-border flex items-center justify-between shrink-0">
                                 <div className="flex items-center gap-2">
                                     <History className="w-4 h-4 text-muted-foreground" />
                                     <span className="text-sm font-medium">Version history</span>
                                 </div>
                                 <button
                                     onClick={() => setHistoryOpen(false)}
-                                    className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/[0.06]"
+                                    className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-foreground/[0.06]"
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
@@ -1497,7 +1497,7 @@ function GeneratePageContent() {
                                         {versions.map((v) => (
                                             <li
                                                 key={v.id}
-                                                className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-3 hover:border-white/[0.15] transition-all"
+                                                className="rounded-lg border border-border bg-foreground/[0.03] p-3 hover:border-foreground/[0.1] transition-all"
                                             >
                                                 <div className="flex items-start justify-between gap-2 mb-2">
                                                     <div className="min-w-0">
@@ -1537,7 +1537,7 @@ function GeneratePageContent() {
                                                             setRestoringId(null);
                                                         }
                                                     }}
-                                                    className="w-full flex items-center justify-center gap-1.5 h-7 rounded-md text-[11px] font-medium bg-white/[0.06] hover:bg-white/[0.12] text-foreground disabled:opacity-50 transition-all"
+                                                    className="w-full flex items-center justify-center gap-1.5 h-7 rounded-md text-[11px] font-medium bg-foreground/[0.06] hover:bg-foreground/[0.12] text-foreground disabled:opacity-50 transition-all"
                                                 >
                                                     <RotateCcw className="w-3 h-3" />
                                                     {restoringId === v.id ? "Restoring…" : "Restore this version"}
