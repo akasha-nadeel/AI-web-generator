@@ -175,7 +175,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
           {/* Edit with AI chat — flips to the /generate page */}
           <Link
             href={`/generate/${siteId}`}
-            className="flex items-center gap-1.5 h-8 px-2 md:px-3 rounded-lg bg-lime-400/10 hover:bg-lime-400/20 text-lime-600 dark:text-lime-300 hover:text-lime-700 dark:hover:text-lime-200 text-xs font-medium transition-colors"
+            className="flex items-center gap-1.5 h-8 px-2 md:px-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-xs font-medium transition-colors"
             title="Refine with AI chat"
           >
             <Pencil className="w-3.5 h-3.5" />
