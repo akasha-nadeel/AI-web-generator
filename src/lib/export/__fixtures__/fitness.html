@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IRON - Premium Fitness & Strength Training</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Bebas Neue', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            cream: '#F5F0EA',
+            dark: '#0C0C0C',
+            accent: '#F25014',
+            gray: '#888888',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes scaleUp {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    .animate { opacity: 0; animation: fadeInUp 0.8s ease forwards; }
+    .animate-fade { opacity: 0; animation: fadeIn 0.8s ease forwards; }
+    .animate-slide { opacity: 0; animation: slideInRight 0.8s ease forwards; }
+    .animate-scale { opacity: 0; animation: scaleUp 0.8s ease forwards; }
+    
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+    .delay-6 { animation-delay: 0.6s; }
+    .delay-7 { animation-delay: 0.7s; }
+    .delay-8 { animation-delay: 0.8s; }
+    .delay-9 { animation-delay: 0.9s; }
+    .delay-10 { animation-delay: 1.0s; }
+    
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Fade gradient text effect */
+    .fade-gradient {
+      background: linear-gradient(to right, #0C0C0C 0%, #0C0C0C 60%, #888888 85%, #F5F0EA 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* Grayscale image */
+    .grayscale-img {
+      filter: grayscale(100%);
+    }
+    
+    /* Accordion animation */
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+    }
+    
+    .accordion-content.open {
+      max-height: 500px;
+      opacity: 1;
+    }
+    
+    .accordion-arrow {
+      transition: transform 0.3s ease;
+    }
+    
+    .accordion-arrow.open {
+      transform: rotate(180deg);
+    }
+    
+    /* Ghost wordmark */
+    .ghost-text {
+      color: rgba(136, 136, 136, 0.15);
+      font-family: 'Bebas Neue', sans-serif;
+      font-weight: 900;
+      font-size: clamp(120px, 25vw, 400px);
+      line-height: 0.9;
+      pointer-events: none;
+    }
+    
+    /* Orange accent punctuation */
+    .accent-text {
+      color: #F25014;
+    }
+    
+    .accent-small {
+      font-size: 10px;
+      letter-spacing: 2px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #F25014;
+    }
+    
+    /* Pill buttons */
+    .pill-btn {
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .pill-btn-orange {
+      background-color: #F25014;
+      color: white;
+    }
+    
+    .pill-btn-orange:hover {
+      background-color: #E03C08;
+      transform: scale(1.05);
+    }
+    
+    .pill-btn-dark {
+      background-color: #0C0C0C;
+      color: white;
+      border: 1px solid #F5F0EA;
+    }
+    
+    .pill-btn-dark:hover {
+      background-color: #1a1a1a;
+    }
+    
+    .pill-btn-white {
+      background-color: #FFFFFF;
+      color: #0C0C0C;
+    }
+    
+    .pill-btn-white:hover {
+      background-color: #F5F0EA;
+    }
+    
+    /* Hover effects */
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .link-hover {
+      transition: color 0.2s ease;
+    }
+    
+    .link-hover:hover {
+      color: #F25014;
+    }
+    
+    .project-card-hover:hover {
+      transform: scale(1.02);
+    }
+    
+    /* Navigation styles */
+    nav a {
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    
+    nav a:hover {
+      color: #F25014;
+    }
+    
+    /* Mobile menu */
+    #mobile-menu {
+      background-color: #0C0C0C;
+      border-top: 1px solid #1a1a1a;
+    }
+    
+    #mobile-menu a {
+      display: block;
+      padding: 12px 20px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+  </style>
+</head>
+<body class="bg-dark text-white">
+  <!-- Navigation -->
+  <nav class="fixed w-full top-0 z-50 bg-dark border-b border-gray-900">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4">
+      <div class="flex items-center justify-between">
+        <!-- Logo -->
+        <div class="flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 6h12"/>
+            <path d="M17 4v5"/>
+            <path d="M7 4v5"/>
+            <path d="M7 15v5"/>
+            <path d="M17 15v5"/>
+            <path d="M6 18h12"/>
+            <path d="M3 6h1"/>
+            <path d="M20 6h1"/>
+            <path d="M3 18h1"/>
+            <path d="M20 18h1"/>
+            <path d="M12 6v12"/>
+          </svg>
+          <span class="font-heading font-bold text-xl hidden sm:inline">IRON</span>
+        </div>
+        
+        <!-- Desktop Nav Links -->
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#home" class="link-hover">Home</a>
+          <a href="#programs" class="link-hover">Programs</a>
+          <a href="#trainers" class="link-hover">Trainers</a>
+          <a href="#about" class="link-hover">About</a>
+          <a href="#pricing" class="link-hover">Pricing</a>
+          <a href="#faq" class="link-hover">FAQ</a>
+        </div>
+        
+        <!-- CTA + Mobile Menu Button -->
+        <div class="flex items-center gap-4">
+          <button class="pill-btn pill-btn-orange hidden sm:inline-block">Get in Touch</button>
+          <button class="md:hidden text-white" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" x2="20" y1="12" y2="12"/>
+              <line x1="4" x2="20" y1="6" y2="6"/>
+              <line x1="4" x2="20" y1="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden">
+      <a href="#home">Home</a>
+      <a href="#programs">Programs</a>
+      <a href="#trainers">Trainers</a>
+      <a href="#about">About</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <div class="px-4 py-4 border-t border-gray-900">
+        <button class="pill-btn pill-btn-orange w-full">Get in Touch</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="home" class="relative min-h-screen pt-20 overflow-hidden" data-reveal>
+    <!-- Grayscale Hero Image -->
+    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1200" alt="Gym Interior" class="absolute inset-0 w-full h-full object-cover grayscale-img" loading="lazy">
+    
+    <!-- Dark overlay gradient -->
+    <div class="absolute inset-0 bg-gradient-to-b from-dark/40 via-transparent to-dark/80"></div>
+    
+    <!-- Hero Content -->
+    <div class="relative z-10 h-screen flex flex-col items-center justify-center px-4 text-center">
+      <div class="animate delay-2">
+        <p class="accent-small mb-6">PREMIUM STRENGTH TRAINING</p>
+      </div>
+      
+      <div class="animate delay-3">
+        <h1 class="font-heading font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-none mb-6 max-w-4xl mx-auto">
+          BUILD YOUR
+          <br>
+          <span class="accent-text">IRON</span>
+          <br>
+          FOUNDATION
+        </h1>
+      </div>
+      
+      <div class="animate delay-4 max-w-2xl mx-auto mb-8">
+        <p class="text-base md:text-lg text-gray-400 leading-relaxed">
+          Elite strength training for athletes and fitness enthusiasts. Transform your body, elevate your mind, forge your legacy.
+        </p>
+      </div>
+      
+      <div class="animate delay-5 flex flex-col sm:flex-row gap-4 items-center justify-center">
+        <button class="pill-btn pill-btn-orange">Start Training</button>
+        <button class="pill-btn pill-btn-dark">Learn More</button>
+      </div>
+    </div>
+    
+    <!-- Massive Orange Name Wordmark overlapping bottom -->
+    <div class="absolute bottom-0 left-0 right-0 z-20 overflow-hidden pointer-events-none" style="height: 200px;">
+      <div class="animate delay-6 font-heading font-black text-accent" style="font-size: clamp(120px, 25vw, 280px); line-height: 0.9; margin-bottom: -20px; text-align: center;">
+        IRON
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section (Cream Background) -->
+  <section class="bg-cream text-dark py-24 md:py-32 lg:py-40" id="strength-training" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <!-- Section Label -->
+      <div class="flex items-center justify-center mb-12">
+        <p class="accent-small" style="color: #F25014;">WHAT WE OFFER</p>
+      </div>
+      
+      <!-- Fade Gradient Intro Paragraph -->
+      <div class="max-w-3xl mx-auto mb-20 animate delay-1">
+        <p class="text-lg md:text-xl fade-gradient leading-relaxed">
+          At IRON, we don't just sell memberships—we build champions. Our comprehensive training programs combine cutting-edge strength methodology with personalized coaching. Whether you're a beginner discovering your potential or an elite athlete pushing boundaries, our expert trainers craft programs that deliver measurable results in weeks, not months. We pride ourselves on community, accountability, and transformation.
+        </p>
+      </div>
+      
+      <!-- Services Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Service 1 -->
+        <div class="animate delay-2 card-hover bg-dark/5 p-8 rounded-xl">
+          <div class="mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 6h12"/>
+              <path d="M17 4v5"/>
+              <path d="M7 4v5"/>
+              <path d="M7 15v5"/>
+              <path d="M17 15v5"/>
+              <path d="M6 18h12"/>
+            </svg>
+          </div>
+          <h3 class="font-heading font-bold text-2xl mb-3">Strength Training</h3>
+          <p class="text-dark/70">Science-backed programs designed to maximize muscle growth and functional strength development.</p>
+        </div>
+        
+        <!-- Service 2 -->
+        <div class="animate delay-3 card-hover bg-dark/5 p-8 rounded-xl">
+          <div class="mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+          </div>
+          <h3 class="font-heading font-bold text-2xl mb-3">Personal Coaching</h3>
+          <p class="text-dark/70">One-on-one guidance from certified trainers who understand your goals and push you beyond limits.</p>
+        </div>
+        
+        <!-- Service 3 -->
+        <div class="animate delay-4 card-hover bg-dark/5 p-8 rounded-xl">
+          <div class="mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h3 class="font-heading font-bold text-2xl mb-3">Group Classes</h3>
+          <p class="text-dark/70">High-energy collective training sessions that build community and fuel your competitive spirit.</p>
+        </div>
+        
+        <!-- Service 4 -->
+        <div class="animate delay-5 card-hover bg-dark/5 p-8 rounded-xl">
+          <div class="mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M2 12h20"/>
+            </svg>
+          </div>
+          <h3 class="font-heading font-bold text-2xl mb-3">Nutrition Planning</h3>
+          <p class="text-dark/70">Custom meal plans and nutritional strategies tailored to your training program and fitness goals.</p>
+        </div>
+        
+        <!-- Service 5 -->
+        <div class="animate delay-6 card-hover bg-dark/5 p-8 rounded-xl">
+          <div class="mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12h18M3 6h18M3 18h18"/>
+            </svg>
+          </div>
+          <h3 class="font-heading font-bold text-2xl mb-3">Recovery Therapy</h3>
+          <p class="text-dark/70">Advanced recovery techniques including massage, mobility work, and cold therapy services.</p>
+        </div>
+        
+        <!-- Service 6 -->
+        <div class="animate delay-7 card-hover bg-dark/5 p-8 rounded-xl">
+          <div class="mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+          <h3 class="font-heading font-bold text-2xl mb-3">Progress Tracking</h3>
+          <p class="text-dark/70">Data-driven analytics showing your gains, PRs, and transformation over time with detailed reports.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Programs Section (Dark Background) -->
+  <section id="programs" class="bg-dark py-24 md:py-32 lg:py-40" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <!-- Section Label -->
+      <div class="flex items-center justify-center mb-12">
+        <p class="accent-small">OUR TRAINING PROGRAMS</p>
+      </div>
+      
+      <!-- Accordion Programs -->
+      <div class="max-w-3xl mx-auto space-y-6">
+        <!-- Program 1 -->
+        <div class="animate delay-1">
+          <button class="w-full flex items-center justify-between py-6 border-b border-gray-800 hover:border-accent transition-colors duration-300" onclick="toggleAccordion(0)">
+            <h3 class="font-heading font-bold text-4xl md:text-5xl text-left">Powerlifting 101</h3>
+            <span class="accordion-arrow text-accent" id="arrow-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </span>
+          </button>
+          <div class="accordion-content" id="content-0">
+            <div class="py-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <p class="text-gray-400 mb-4">Master the fundamental lifts: squat, bench press, and deadlift. This 12-week progressive program builds a foundation of strength and technique under expert supervision.</p>
+                <ul class="space-y-3 text-sm">
+                  <li class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>3 sessions per week</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Form correction included</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Progressive overload tracking</span>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <img src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&q=80&w=500" alt="Powerlifting" class="w-full h-64 object-cover rounded-lg grayscale-img" loading="lazy">
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Program 2 -->
+        <div class="animate delay-2">
+          <button class="w-full flex items-center justify-between py-6 border-b border-gray-800 hover:border-accent transition-colors duration-300" onclick="toggleAccordion(1)">
+            <h3 class="font-heading font-bold text-4xl md:text-5xl text-left">Hypertrophy Builder</h3>
+            <span class="accordion-arrow text-accent" id="arrow-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </span>
+          </button>
+          <div class="accordion-content" id="content-1">
+            <div class="py-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <p class="text-gray-400 mb-4">Designed for maximum muscle growth with strategic volume, intensity, and recovery protocols. Build the physique you've always wanted with science-backed hypertrophy principles.</p>
+                <ul class="space-y-3 text-sm">
+                  <li class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>4-5 sessions per week</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Body composition analysis</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Nutrition guide included</span>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=500" alt="Hypertrophy" class="w-full h-64 object-cover rounded-lg grayscale-img" loading="lazy">
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Program 3 -->
+        <div class="animate delay-3">
+          <button class="w-full flex items-center justify-between py-6 border-b border-gray-800 hover:border-accent transition-colors duration-300" onclick="toggleAccordion(2)">
+            <h3 class="font-heading font-bold text-4xl md:text-5xl text-left">Athlete Performance</h3>
+            <span class="accordion-arrow text-accent" id="arrow-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </span>
+          </button>
+          <div class="accordion-content" id="content-2">
+            <div class="py-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <p class="text-gray-400 mb-4">Sport-specific training for competitive athletes. Enhance speed, power, agility, and sport-specific strength with program design from certified strength and conditioning coaches.</p>
+                <ul class="space-y-3 text-sm">
+                  <li class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Custom sport analysis</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Performance testing</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Periodized training plans</span>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Athlete" class="w-full h-64 object-cover rounded-lg grayscale-img" loading="lazy">
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Program 4 -->
+        <div class="animate delay-4">
+          <button class="w-full flex items-center justify-between py-6 border-b border-gray-800 hover:border-accent transition-colors duration-300" onclick="toggleAccordion(3)">
+            <h3 class="font-heading font-bold text-4xl md:text-5xl text-left">Beginner Foundations</h3>
+            <span class="accordion-arrow text-accent" id="arrow-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </span>
+          </button>
+          <div class="accordion-content" id="content-3">
+            <div class="py-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <p class="text-gray-400 mb-4">Start your fitness journey with confidence. Build exercise fundamentals, establish healthy habits, and gain the knowledge to train safely and effectively long-term.</p>
+                <ul class="space-y-3 text-sm">
+                  <li class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>2-3 sessions per week</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Zero experience required</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Injury prevention focus</span>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <img src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&q=80&w=500" alt="Beginner" class="w-full h-64 object-cover rounded-lg grayscale-img" loading="lazy">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trainers Section (Cream Background) -->
+  <section id="trainers" class="bg-cream text-dark py-24 md:py-32 lg:py-40" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <!-- Section Label -->
+      <div class="flex items-center justify-center mb-12">
+        <p class="accent-small" style="color: #F25014;">MEET THE TEAM</p>
+      </div>
+      
+      <h2 class="font-heading font-black text-4xl md:text-5xl lg:text-6xl text-center mb-20 animate delay-1">
+        Expert Trainers <br> <span style="color: #F25014;">Ready to Elevate You</span>
+      </h2>
+      
+      <!-- Trainers Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <!-- Trainer 1 -->
+        <div class="animate delay-2 card-hover">
+          <div class="mb-6 h-64 bg-dark rounded-xl overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=400" alt="Trainer" class="w-full h-full object-cover grayscale-img" loading="lazy">
+          </div>
+          <h3 class="font-heading font-bold text-2xl mb-2">Marcus Stone</h3>
+          <p class="text-dark/70 text-sm mb-4">Strength Coach, Certified ISSA</p>
+          <p class="text-sm text-dark/60">Specializing in powerlifting and strength development for competitive athletes.</p>
+        </div>
+        
+        <!-- Trainer 2 -->
+        <div class="animate delay-3 card-hover">
+          <div class="mb-6 h-64 bg-dark rounded-xl overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=400" alt="Trainer" class="w-full h-full object-cover grayscale-img" loading="lazy">
+          </div>
+          <h3 class="font-heading font-bold text-2xl mb-2">Sarah Mitchell</h3>
+          <p class="text-dark/70 text-sm mb-4">Hypertrophy Specialist, NASM-CES</p>
+          <p class="text-sm text-dark/60">Expert in muscle building and body composition transformation programs.</p>
+        </div>
+        
+        <!-- Trainer 3 -->
+        <div class="animate delay-4 card-hover">
+          <div class="mb-6 h-64 bg-dark rounded-xl overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400" alt="Trainer" class="w-full h-full object-cover grayscale-img" loading="lazy">
+          </div>
+          <h3 class="font-heading font-bold text-2xl mb-2">James Chen</h3>
+          <p class="text-dark/70 text-sm mb-4">Performance Coach, CSCS</p>
+          <p class="text-sm text-dark/60">Dedicated to athletic performance enhancement and sport-specific training.</p>
+        </div>
+        
+        <!-- Trainer 4 -->
+        <div class="animate delay-5 card-hover">
+          <div class="mb-6 h-64 bg-dark rounded-xl overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Trainer" class="w-full h-full object-cover grayscale-img" loading="lazy">
+          </div>
+          <h3 class="font-heading font-bold text-2xl mb-2">Lisa Rodriguez</h3>
+          <p class="text-dark/70 text-sm mb-4">Wellness Coach, Certified Nutritionist</p>
+          <p class="text-sm text-dark/60">Holistic approach combining training with nutrition and recovery strategies.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section (Dark Background) -->
+  <section id="about" class="bg-dark py-24 md:py-32 lg:py-40" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <!-- Section Label -->
+      <div class="flex items-center justify-center mb-12">
+        <p class="accent-small">ABOUT IRON</p>
+      </div>
+      
+      <!-- Split Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <!-- Left Content -->
+        <div class="animate delay-1 lg:order-1 order-2">
+          <h2 class="font-heading font-black text-4xl md:text-5xl mb-8">
+            Forging <span class="accent-text">Champions</span><br>Since 2015
+          </h2>
+          <p class="text-gray-400 mb-6 leading-relaxed">
+            IRON was founded on a simple belief: everyone deserves access to world-class strength training and coaching. What started as a small garage gym has evolved into a state-of-the-art facility serving hundreds of dedicated athletes and fitness enthusiasts.
+          </p>
+          <p class="text-gray-400 mb-8 leading-relaxed">
+            We've transformed lives through scientifically-backed training, genuine community support, and relentless pursuit of excellence. Our members don't just reach their goals—they exceed them.
+          </p>
+          <div class="space-y-4">
+            <div class="flex items-start gap-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <div>
+                <h4 class="font-bold mb-1">Science-Based Programming</h4>
+                <p class="text-gray-400 text-sm">All our programs are grounded in peer-reviewed research and real-world results.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <div>
+                <h4 class="font-bold mb-1">Expert Certification</h4>
+                <p class="text-gray-400 text-sm">All trainers hold current NASM, ISSA, or CSCS certifications or equivalent credentials.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <div>
+                <h4 class="font-bold mb-1">Premium Equipment</h4>
+                <p class="text-gray-400 text-sm">We invest in the best strength and conditioning equipment available.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right Image -->
+        <div class="animate delay-2 lg:order-2 order-1">
+          <div class="rounded-xl overflow-hidden shadow-2xl">
+            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=600" alt="Gym Facility" class="w-full h-96 object-cover grayscale-img" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Statistics Section (Cream Background) -->
+  <section class="bg-cream text-dark py-24 md:py-32 lg:py-40" id="by-the-numbers" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <h2 class="font-heading font-black text-4xl md:text-5xl text-center mb-20 animate delay-1">
+        By The Numbers
+      </h2>
+      
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <!-- Stat 1 -->
+        <div class="animate delay-2 text-center">
+          <div class="text-6xl md:text-7xl font-bold text-accent mb-4">2,500+</div>
+          <p class="text-lg text-dark/70">Active Members</p>
+        </div>
+        
+        <!-- Stat 2 -->
+        <div class="animate delay-3 text-center">
+          <div class="text-6xl md:text-7xl font-bold text-accent mb-4">95%</div>
+          <p class="text-lg text-dark/70">Retention Rate</p>
+        </div>
+        
+        <!-- Stat 3 -->
+        <div class="animate delay-4 text-center">
+          <div class="text-6xl md:text-7xl font-bold text-accent mb-4">8+</div>
+          <p class="text-lg text-dark/70">Years Excellence</p>
+        </div>
+        
+        <!-- Stat 4 -->
+        <div class="animate delay-5 text-center">
+          <div class="text-6xl md:text-7xl font-bold text-accent mb-4">45K+</div>
+          <p class="text-lg text-dark/70">PRs Achieved</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section (Dark Background) -->
+  <section class="bg-dark py-24 md:py-32 lg:py-40" id="section" data-reveal>
+    <div class="max-w-4xl mx-auto px-4 md:px-6 lg:px-8">
+      <!-- Section Label -->
+      <div class="flex items-center justify-center mb-12">
+        <p class="accent-small">WHAT OUR MEMBERS SAY</p>
+      </div>
+      
+      <!-- Testimonials Carousel -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Testimonial 1 -->
+        <div class="animate delay-1 card-hover bg-cream/5 backdrop-blur p-8 rounded-xl border border-white/10">
+          <div class="text-5xl text-accent mb-4">"</div>
+          <p class="text-gray-300 mb-6 leading-relaxed">
+            The best investment I've made in my health. The trainers actually care about your progress, not just collecting membership fees. Transformed my body in 6 months.
+          </p>
+          <div class="flex items-center gap-4">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100" alt="Member" class="w-12 h-12 rounded-full object-cover grayscale-img" loading="lazy">
+            <div>
+              <p class="font-bold text-sm">David Torres</p>
+              <p class="text-gray-400 text-xs">Member, 18 months</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Testimonial 2 -->
+        <div class="animate delay-2 card-hover bg-cream/5 backdrop-blur p-8 rounded-xl border border-white/10">
+          <div class="text-5xl text-accent mb-4">"</div>
+          <p class="text-gray-300 mb-6 leading-relaxed">
+            As a competitive athlete, I needed specialized coaching. IRON delivered exactly that. My lifting numbers have skyrocketed, and the community pushes me daily.
+          </p>
+          <div class="flex items-center gap-4">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=100" alt="Member" class="w-12 h-12 rounded-full object-cover grayscale-img" loading="lazy">
+            <div>
+              <p class="font-bold text-sm">Jessica Lee</p>
+              <p class="text-gray-400 text-xs">Member, 24 months</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Testimonial 3 -->
+        <div class="animate delay-3 card-hover bg-cream/5 backdrop-blur p-8 rounded-xl border border-white/10">
+          <div class="text-5xl text-accent mb-4">"</div>
+          <p class="text-gray-300 mb-6 leading-relaxed">
+            Started as a complete beginner, and the foundational program was perfect. The instructors made me feel comfortable, and now I'm hitting PRs I never thought possible.
+          </p>
+          <div class="flex items-center gap-4">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=100" alt="Member" class="w-12 h-12 rounded-full object-cover grayscale-img" loading="lazy">
+            <div>
+              <p class="font-bold text-sm">Marcus Phillips</p>
+              <p class="text-gray-400 text-xs">Member, 12 months</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section (Cream Background) -->
+  <section id="pricing" class="bg-cream text-dark py-24 md:py-32 lg:py-40" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <!-- Section Label -->
+      <div class="flex items-center justify-center mb-12">
+        <p class="accent-small" style="color: #F25014;">MEMBERSHIP PLANS</p>
+      </div>
+      
+      <h2 class="font-heading font-black text-4xl md:text-5xl text-center mb-20 animate delay-1">
+        Choose Your <span style="color: #F25014;">Iron Path</span>
+      </h2>
+      
+      <!-- Pricing Cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
+        <!-- Standard Plan -->
+        <div class="animate delay-2 card-hover bg-white p-12 rounded-2xl border-2 border-dark/10">
+          <h3 class="font-heading font-bold text-3xl mb-2">Standard Member</h3>
+          <p class="text-dark/60 mb-8">Perfect for fitness enthusiasts</p>
+          
+          <div class="mb-8">
+            <span class="font-heading font-black text-5xl">$79</span>
+            <span class="text-dark/60">/month</span>
+          </div>
+          
+          <button class="pill-btn pill-btn-dark w-full mb-8">Get Started</button>
+          
+          <ul class="space-y-4 text-sm">
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>24/7 gym access</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>All equipment access</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Group classes</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Progress tracking app</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Community access</span>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- Premium Plan -->
+        <div class="animate delay-3 card-hover bg-dark p-12 rounded-2xl border-2 border-accent relative">
+          <!-- TOP PICK Badge -->
+          <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+            <span class="bg-accent text-white px-4 py-2 rounded-full text-xs font-bold">TOP PICK</span>
+          </div>
+          
+          <h3 class="font-heading font-bold text-3xl mb-2 text-white">Elite Coach Member</h3>
+          <p class="text-gray-400 mb-8">For serious athletes & transformations</p>
+          
+          <div class="mb-8">
+            <span class="font-heading font-black text-5xl text-white">$199</span>
+            <span class="text-gray-400">/month</span>
+          </div>
+          
+          <button class="pill-btn pill-btn-white w-full mb-8">Get Started</button>
+          
+          <ul class="space-y-4 text-sm text-gray-300">
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Everything in Standard</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>2 personal training sessions/week</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Custom program design</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Nutrition consultation</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Recovery & mobility services</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F25014" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Unlimited email support</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section (Dark Background) -->
+  <section id="faq" class="bg-dark py-24 md:py-32 lg:py-40" data-reveal>
+    <div class="max-w-4xl mx-auto px-4 md:px-6 lg:px-8">
+      <!-- Section Label -->
+      <div class="flex items-center justify-center mb-12">
+        <p class="accent-small">FREQUENTLY ASKED</p>
+      </div>
+      
+      <h2 class="font-heading font-black text-4xl md:text-5xl text-center mb-20 animate delay-1">
+        Your Questions<br><span class="accent-text">Answered</span>
+      </h2>
+      
+      <!-- FAQ Accordion -->
+      <div class="space-y-6">
+        <!-- FAQ 1 -->
+        <div class="animate delay-2">
+          <button class="w-full flex items-center justify-between py-6 px-6 bg-cream/5 backdrop-blur rounded-xl hover:bg-cream/10 transition-colors duration-300" onclick="toggleFAQ(0)">
+            <h3 class="font-bold text-lg text-left">Do I need prior gym experience?</h3>
+            <span class="accordion-arrow text-accent" id="faq-arrow-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </span>
+          </button>
+          <div class="accordion-content" id="faq-content-0">
+            <div class="px-6 py-4 bg-cream/5 backdrop-blur rounded-b-xl">
+              <p class="text-gray-400">Absolutely not! Our Beginner Foundations program is specifically designed for people starting from scratch. All our trainers excel at teaching proper form and building confidence in newcomers.</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- FAQ 2 -->
+        <div class="animate delay-3">
+          <button class="w-full flex items-center justify-between py-6 px-6 bg-cream/5 backdrop-blur rounded-xl hover:bg-cream/10 transition-colors duration-300" onclick="toggleFAQ(1)">
+            <h3 class="font-bold text-lg text-left">What's your cancellation policy?</h3>
+            <span class="accordion-arrow text-accent" id="faq-arrow-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </span>
+          </button>
+          <div class="accordion-content" id="faq-content-1">
+            <div class="px-6 py-4 bg-cream/5 backdrop-blur rounded-b-xl">
+              <p class="text-gray-400">We offer month-to-month memberships with no long-term contracts. You can cancel anytime with 14 days notice. We're confident you'll love IRON and won't want to leave.</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- FAQ 3 -->
+        <div class="animate delay-4">
+          <button class="w-full flex items-center justify-between py-6 px-6 bg-cream/5 backdrop-blur rounded-xl hover:bg-cream/10 transition-colors duration-300" onclick="toggleFAQ(2)">
+            <h3 class="font-bold text-lg text-left">Can I switch programs?</h3>
+            <span class="accordion-arrow text-accent" id="faq-arrow-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </span>
+          </button>
+          <div class="accordion-content" id="faq-content-2">
+            <div class="px-6 py-4 bg-cream/5 backdrop-blur rounded-b-xl">
+              <p class="text-gray-400">Yes! You can switch programs at any time. Our coaches will help you transition smoothly and ensure your new program aligns with your current goals and fitness level.</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- FAQ 4 -->
+        <div class="animate delay-5">
+          <button class="w-full flex items-center justify-between py-6 px-6 bg-cream/5 backdrop-blur rounded-xl hover:bg-cream/10 transition-colors duration-300" onclick="toggleFAQ(3)">
+            <h3 class="font-bold text-lg text-left">What if I have an injury or limitation?</h3>
+            <span class="accordion-arrow text-accent" id="faq-arrow-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </span>
+          </button>
+          <div class="accordion-content" id="faq-content-3">
+            <div class="px-6 py-4 bg-cream/5 backdrop-blur rounded-b-xl">
+              <p class="text-gray-400">Our coaches are trained to work with various injuries and limitations. During your initial assessment, we'll understand your needs and create a modified program that keeps you safe while moving toward your goals.</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- FAQ 5 -->
+        <div class="animate delay-6">
+          <button class="w-full flex items-center justify-between py-6 px-6 bg-cream/5 backdrop-blur rounded-xl hover:bg-cream/10 transition-colors duration-300" onclick="toggleFAQ(4)">
+            <h3 class="font-bold text-lg text-left">Do you offer trial sessions?</h3>
+            <span class="accordion-arrow text-accent" id="faq-arrow-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </span>
+          </button>
+          <div class="accordion-content" id="faq-content-4">
+            <div class="px-6 py-4 bg-cream/5 backdrop-blur rounded-b-xl">
+              <p class="text-gray-400">Yes! We offer a complimentary consultation and gym tour. You can also get a 3-day trial pass to experience IRON before committing to a membership.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section (Dark Background with Orange Accent) -->
+  <section class="bg-dark py-24 md:py-32 lg:py-40 relative overflow-hidden" id="ready-to-transform" data-reveal>
+    <!-- Ghost Wordmark Background -->
+    <div class="ghost-text absolute -right-20 -top-32 opacity-100">IRON</div>
+    
+    <div class="max-w-4xl mx-auto px-4 md:px-6 lg:px-8 text-center relative z-10">
+      <h2 class="font-heading font-black text-4xl md:text-5xl lg:text-6xl mb-8 animate delay-1">
+        Ready to <span class="accent-text">Transform?</span>
+      </h2>
+      
+      <p class="text-gray-400 text-lg mb-12 max-w-2xl mx-auto animate delay-2">
+        Join thousands of athletes and fitness enthusiasts who've found their strength at IRON. Your transformation starts today.
+      </p>
+      
+      <div class="animate delay-3 flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <button class="pill-btn pill-btn-orange text-base px-8">Start Your Free Trial</button>
+        <button class="pill-btn pill-btn-dark text-base px-8">Schedule a Consultation</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-dark border-t border-gray-900 py-16 md:py-20" id="footer" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+        <!-- Logo Column -->
+        <div class="col-span-2 md:col-span-1">
+          <div class="flex items-center gap-2 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+              <path d="M6 6h12"/>
+              <path d="M17 4v5"/>
+              <path d="M7 4v5"/>
+              <path d="M7 15v5"/>
+              <path d="M17 15v5"/>
+              <path d="M6 18h12"/>
+            </svg>
+            <span class="font-heading font-bold">IRON</span>
+          </div>
+          <p class="text-gray-500 text-sm">Premium strength training for champions.</p>
+        </div>
+        
+        <!-- Links Column 1 -->
+        <div>
+          <h4 class="font-bold text-white mb-4">Navigate</h4>
+          <ul class="space-y-3 text-sm text-gray-400">
+            <li><a href="#home" class="link-hover">Home</a></li>
+            <li><a href="#programs" class="link-hover">Programs</a></li>
+            <li><a href="#trainers" class="link-hover">Trainers</a></li>
+            <li><a href="#about" class="link-hover">About</a></li>
+          </ul>
+        </div>
+        
+        <!-- Links Column 2 -->
+        <div>
+          <h4 class="font-bold text-white mb-4">Information</h4>
+          <ul class="space-y-3 text-sm text-gray-400">
+            <li><a href="#pricing" class="link-hover">Pricing</a></li>
+            <li><a href="#faq" class="link-hover">FAQ</a></li>
+            <li><a href="#" class="link-hover">Contact</a></li>
+            <li><a href="#" class="link-hover">Blog</a></li>
+          </ul>
+        </div>
+        
+        <!-- Links Column 3 -->
+        <div>
+          <h4 class="font-bold text-white mb-4">Connect</h4>
+          <ul class="space-y-3 text-sm text-gray-400">
+            <li><a href="#" class="link-hover">Instagram</a></li>
+            <li><a href="#" class="link-hover">Facebook</a></li>
+            <li><a href="#" class="link-hover">Twitter</a></li>
+            <li><a href="#" class="link-hover">YouTube</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Divider -->
+      <div class="border-t border-gray-900 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+        <p>&copy; 2024 IRON. All rights reserved.</p>
+        <div class="flex gap-6 mt-4 md:mt-0">
+          <a href="#" class="link-hover">Privacy Policy</a>
+          <a href="#" class="link-hover">Terms of Service</a>
+          <a href="#" class="link-hover">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    }
+    
+    // Close mobile menu when a link is clicked
+    document.querySelectorAll('#mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.add('hidden');
+      });
+    });
+    
+    // Accordion toggle for programs
+    function toggleAccordion(index) {
+      const content = document.getElementById(`content-${index}`);
+      const arrow = document.getElementById(`arrow-${index}`);
+      
+      // Close all other accordions
+      for (let i = 0; i < 4; i++) {
+        if (i !== index) {
+          const otherContent = document.getElementById(`content-${i}`);
+          const otherArrow = document.getElementById(`arrow-${i}`);
+          if (otherContent) {
+            otherContent.classList.remove('open');
+            otherArrow.classList.remove('open');
+          }
+        }
+      }
+      
+      // Toggle current accordion
+      content.classList.toggle('open');
+      arrow.classList.toggle('open');
+    }
+    
+    // FAQ accordion toggle
+    function toggleFAQ(index) {
+      const content = document.getElementById(`faq-content-${index}`);
+      const arrow = document.getElementById(`faq-arrow-${index}`);
+      
+      // Close all other FAQs
+      for (let i = 0; i < 5; i++) {
+        if (i !== index) {
+          const otherContent = document.getElementById(`faq-content-${i}`);
+          const otherArrow = document.getElementById(`faq-arrow-${i}`);
+          if (otherContent) {
+            otherContent.classList.remove('open');
+            otherArrow.classList.remove('open');
+          }
+        }
+      }
+      
+      // Toggle current FAQ
+      content.classList.toggle('open');
+      arrow.classList.toggle('open');
+    }
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+<!-- WEAVO_RUNTIME -->
+<script>(function(){
+var hide=function(el){el.style.opacity='0';el.style.transform='translateY(24px)';el.style.transition='opacity .7s ease, transform .7s ease';};
+var show=function(el,d){el.style.transitionDelay=(d||0)+'ms';el.style.opacity='1';el.style.transform='none';};
+var solos=document.querySelectorAll('[data-reveal]');
+var groups=document.querySelectorAll('[data-reveal-stagger]');
+solos.forEach(hide);
+groups.forEach(function(g){Array.prototype.forEach.call(g.children,hide);});
+if('IntersectionObserver' in window){
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var el=e.target;if(el.hasAttribute('data-reveal-stagger')){Array.prototype.forEach.call(el.children,function(c,i){show(c,i*80);});}else{show(el);}io.unobserve(el);});},{rootMargin:'0px 0px -80px 0px',threshold:0.05});
+solos.forEach(function(el){io.observe(el);});
+groups.forEach(function(el){io.observe(el);});
+}else{
+solos.forEach(function(el){show(el);});
+groups.forEach(function(g){Array.prototype.forEach.call(g.children,function(c){show(c);});});
+}
+document.addEventListener('click',function(e){
+var a=e.target.closest&&e.target.closest('a[href^="#"]');
+if(a){var id=a.getAttribute('href').slice(1);if(id){var t=document.getElementById(id);if(t){e.preventDefault();var h=document.querySelector('header,nav');var off=h?h.offsetHeight:0;window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-off-8,behavior:'smooth'});var m=document.querySelector('[data-mobile-menu]');if(m&&!m.classList.contains('hidden'))m.classList.add('hidden');}return;}}
+var mt=e.target.closest&&e.target.closest('[data-mobile-toggle]');
+if(mt){e.preventDefault();var menu=document.querySelector('[data-mobile-menu]');if(menu)menu.classList.toggle('hidden');return;}
+var at=e.target.closest&&e.target.closest('[data-accordion-trigger]');
+if(at){var item=at.closest('[data-accordion-item]')||at.parentElement;if(item){var content=item.querySelector('[data-accordion-content]');if(content)content.classList.toggle('hidden');var icon=at.querySelector('[data-accordion-icon]');if(icon){icon.style.transition='transform .3s ease';icon.style.transform=content&&!content.classList.contains('hidden')?'rotate(180deg)':'rotate(0deg)';}}}
+});
+})();</script>
+<!-- /WEAVO_RUNTIME -->
+</body>
+</html>

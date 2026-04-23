@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIBRARY - Premium Book Marketplace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            accent: '#FF6A00',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { font-family: 'Inter', sans-serif; overflow-x: hidden; background-color: #0A0A0A; }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .animate { opacity: 0; animation: fadeInUp 0.8s ease forwards; }
+    .animate-fade { opacity: 0; animation: fadeIn 0.8s ease forwards; }
+    .animate-left { opacity: 0; animation: slideInLeft 0.8s ease forwards; }
+    .animate-right { opacity: 0; animation: slideInRight 0.8s ease forwards; }
+    
+    .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; } .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; } .delay-6 { animation-delay: 0.6s; }
+    .delay-7 { animation-delay: 0.7s; } .delay-8 { animation-delay: 0.8s; }
+    .delay-9 { animation-delay: 0.9s; } .delay-10 { animation-delay: 1.0s; }
+    
+    .marquee-container {
+      display: flex;
+      animation: marquee 20s linear infinite;
+    }
+    .marquee-item { flex-shrink: 0; }
+    
+    .float-animation {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    .italic-serif {
+      font-style: italic;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #FF6A00 0%, #FFB380 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body class="bg-zinc-950 text-white">
+  
+  <!-- Navigation -->
+  <nav class="fixed top-0 w-full z-50 bg-zinc-950/95 backdrop-blur border-b border-zinc-800">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#home" class="flex items-center gap-2 font-heading font-bold text-xl">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+        <span>LIBRARY</span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center gap-8">
+        <a href="#home" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors duration-200">Home</a>
+        <a href="#programs" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors duration-200">Programs</a>
+        <a href="#gallery" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors duration-200">Gallery</a>
+        <a href="#trainers" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors duration-200">About</a>
+        <a href="#testimonials" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors duration-200">Reviews</a>
+      </nav>
+
+      <!-- Desktop CTA -->
+      <button onclick="document.getElementById('contact-modal').classList.remove('hidden')" class="hidden md:block px-6 py-2 bg-accent hover:bg-orange-600 text-white text-sm font-semibold rounded-full transition-all duration-300 hover:scale-105">
+        Contact Us
+      </button>
+
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" x2="20" y1="12" y2="12"/>
+          <line x1="4" x2="20" y1="6" y2="6"/>
+          <line x1="4" x2="20" y1="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-zinc-800 bg-zinc-950">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-4">
+        <a href="#home" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors">Home</a>
+        <a href="#programs" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors">Programs</a>
+        <a href="#gallery" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors">Gallery</a>
+        <a href="#trainers" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors">About</a>
+        <a href="#testimonials" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors">Reviews</a>
+        <button onclick="document.getElementById('contact-modal').classList.remove('hidden')" class="w-full px-6 py-2 bg-accent hover:bg-orange-600 text-white text-sm font-semibold rounded-full transition-all duration-300">
+          Contact Us
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="home" class="relative min-h-screen pt-24 overflow-hidden" style="background-color: #08b1f7;" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 lg:py-32 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+      
+      <!-- Left Content -->
+      <div class="animate-left">
+        <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-8 text-white">
+          Discover <span class="italic-serif">Literary</span> Excellence with <span class="gradient-text">AI</span>
+        </h1>
+        
+        <ul class="space-y-4 mb-12">
+          <li class="flex items-start gap-3 text-white/90">
+            <span class="text-white font-bold">•</span>
+            <span>Curated collections from thousands of premium titles</span>
+          </li>
+          <li class="flex items-start gap-3 text-white/90">
+            <span class="text-white font-bold">•</span>
+            <span>Smart recommendations powered by advanced algorithms</span>
+          </li>
+          <li class="flex items-start gap-3 text-white/90">
+            <span class="text-white font-bold">•</span>
+            <span>Instant digital delivery and secure checkouts</span>
+          </li>
+          <li class="flex items-start gap-3 text-white/90">
+            <span class="text-white font-bold">•</span>
+            <span>Exclusive author interviews and literary events</span>
+          </li>
+          <li class="flex items-start gap-3 text-white/90">
+            <span class="text-white font-bold">•</span>
+            <span>Personalized reading profiles and achievements</span>
+          </li>
+        </ul>
+
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button onclick="document.getElementById('contact-modal').classList.remove('hidden')" class="px-8 py-3 bg-white hover:bg-white/90 text-[#08b1f7] font-semibold rounded-full transition-all duration-300 hover:scale-105 w-full sm:w-auto">
+            Start Reading Today
+          </button>
+          <button onclick="document.getElementById('programs').scrollIntoView()" class="px-8 py-3 border-2 border-white text-white hover:bg-white/20 font-semibold rounded-full transition-all duration-300 w-full sm:w-auto">
+            Explore Collection
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Content - Product Image with Floating Cards -->
+      <div class="animate-right relative h-[400px] md:h-[500px] lg:h-[600px]">
+        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=500" alt="Premium Books" class="w-full h-full object-cover rounded-2xl float-animation" loading="lazy"/>
+        
+        <!-- Floating Stats Card 1 -->
+        <div class="absolute top-8 left-4 bg-white/95 backdrop-blur border border-white/30 rounded-xl p-4 float-animation" style="animation-delay: 0.5s;">
+          <div class="text-2xl font-bold" style="color: #08b1f7;">92.3%</div>
+          <div class="text-xs text-gray-500">Customer Satisfaction</div>
+        </div>
+
+        <!-- Floating Stats Card 2 -->
+        <div class="absolute bottom-12 right-4 bg-white/95 backdrop-blur border border-white/30 rounded-xl p-4 float-animation" style="animation-delay: 1s;">
+          <div class="text-2xl font-bold" style="color: #08b1f7;">50K+</div>
+          <div class="text-xs text-gray-500">Books Available</div>
+        </div>
+
+        <!-- Floating Badge -->
+        <div class="absolute top-1/2 right-0 bg-white px-4 py-2 rounded-full text-sm font-bold float-animation" style="animation-delay: 0.3s; color: #08b1f7;">
+          Bestsellers Now
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Text Below Hero -->
+    <div class="text-center pb-12 animate delay-5">
+      <p class="text-white/80 text-sm md:text-base">Perform • Engage • Grow — All in One Platform</p>
+    </div>
+  </section>
+
+  <!-- Logo Marquee -->
+  <section class="bg-zinc-900/50 border-y border-zinc-800 py-12 overflow-hidden" id="section" data-reveal>
+    <div class="marquee-container opacity-50">
+      <div class="marquee-item px-12">
+        <span class="text-zinc-400 font-semibold">PENGUIN</span>
+      </div>
+      <div class="marquee-item px-12">
+        <span class="text-zinc-400 font-semibold">HARPER</span>
+      </div>
+      <div class="marquee-item px-12">
+        <span class="text-zinc-400 font-semibold">OXFORD</span>
+      </div>
+      <div class="marquee-item px-12">
+        <span class="text-zinc-400 font-semibold">BLOOMSBURY</span>
+      </div>
+      <div class="marquee-item px-12">
+        <span class="text-zinc-400 font-semibold">SCHOLASTIC</span>
+      </div>
+      <div class="marquee-item px-12">
+        <span class="text-zinc-400 font-semibold">PENGUIN</span>
+      </div>
+      <div class="marquee-item px-12">
+        <span class="text-zinc-400 font-semibold">HARPER</span>
+      </div>
+      <div class="marquee-item px-12">
+        <span class="text-zinc-400 font-semibold">OXFORD</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Programs Section -->
+  <section id="programs" class="bg-zinc-950 py-16 md:py-24 lg:py-32" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <!-- Section Label -->
+      <div class="text-center mb-12 animate">
+        <p class="text-xs font-semibold text-accent uppercase tracking-widest">Collections</p>
+        <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6">
+          Manage Your <span class="italic-serif">Reading</span> Journey
+        </h2>
+      </div>
+
+      <!-- Feature Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-16 animate delay-2">
+        <!-- Feature 1 -->
+        <div>
+          <div class="flex items-start gap-4 mb-6">
+            <div class="flex-shrink-0 w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-heading text-2xl md:text-3xl font-bold mb-3">Curated Collections</h3>
+              <ul class="space-y-2 text-zinc-300">
+                <li class="flex items-center gap-2">
+                  <span class="text-accent">•</span>
+                  <span>Expert-selected bestsellers</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="text-accent">•</span>
+                  <span>Genre-based recommendations</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="text-accent">•</span>
+                  <span>Monthly new releases</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="inline-block bg-accent/10 border border-accent/30 rounded-lg px-4 py-2 text-sm">
+            <span class="text-accent font-bold">87.5%</span> <span class="text-zinc-300">Discovery Rate</span>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div>
+          <div class="flex items-start gap-4 mb-6">
+            <div class="flex-shrink-0 w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="1"/>
+                <path d="M12 1v6m0 6v6"/>
+                <path d="M4.22 4.22l4.24 4.24m2.12 2.12l4.24 4.24"/>
+                <path d="M1 12h6m6 0h6"/>
+                <path d="M4.22 19.78l4.24-4.24m2.12-2.12l4.24-4.24"/>
+                <path d="M19.78 19.78l-4.24-4.24m-2.12-2.12l-4.24-4.24"/>
+                <path d="M19.78 4.22l-4.24 4.24m-2.12 2.12l-4.24 4.24"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-heading text-2xl md:text-3xl font-bold mb-3">Smart Recommendations</h3>
+              <ul class="space-y-2 text-zinc-300">
+                <li class="flex items-center gap-2">
+                  <span class="text-accent">•</span>
+                  <span>AI-powered reading suggestions</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="text-accent">•</span>
+                  <span>Personalized reading lists</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="text-accent">•</span>
+                  <span>Trending author highlights</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="inline-block bg-accent/10 border border-accent/30 rounded-lg px-4 py-2 text-sm">
+            <span class="text-accent font-bold">94.2%</span> <span class="text-zinc-300">Accuracy</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Mockup Image -->
+      <div class="animate delay-4 rounded-2xl overflow-hidden h-[400px] md:h-[500px]">
+        <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Reading Platform" class="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-500" loading="lazy"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery Section -->
+  <section id="gallery" class="bg-zinc-900 py-16 md:py-24 lg:py-32" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <!-- Section Label -->
+      <div class="flex items-end justify-between mb-12 animate">
+        <div>
+          <p class="text-xs font-semibold text-accent uppercase tracking-widest">Featured</p>
+          <h2 class="font-heading text-4xl md:text-5xl font-bold mt-4">
+            <span class="italic-serif">Bestselling</span> Titles
+          </h2>
+        </div>
+        <a href="#" class="hidden md:flex items-center gap-2 text-accent hover:text-orange-400 transition-colors">
+          View All
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/>
+            <path d="m12 5 7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Book Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate delay-2">
+        <!-- Book 1 -->
+        <div class="group overflow-hidden rounded-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+          <div class="relative overflow-hidden rounded-xl h-[320px] md:h-[400px]">
+            <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Book" class="w-full h-full object-cover hover:scale-[1.05] transition-transform duration-500" loading="lazy"/>
+            <div class="absolute top-4 right-4 bg-accent text-black px-3 py-1 rounded-full text-xs font-bold">
+              #1 Bestseller
+            </div>
+          </div>
+          <div class="bg-zinc-800 p-4">
+            <h3 class="font-heading font-bold text-lg mb-2">The Digital Mind</h3>
+            <p class="text-zinc-400 text-sm mb-3">By Sarah Chen</p>
+            <div class="flex items-center justify-between">
+              <span class="text-accent font-bold">$24.99</span>
+              <div class="flex gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span class="text-xs text-zinc-400">(324)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book 2 -->
+        <div class="group overflow-hidden rounded-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+          <div class="relative overflow-hidden rounded-xl h-[320px] md:h-[400px]">
+            <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Book" class="w-full h-full object-cover hover:scale-[1.05] transition-transform duration-500" loading="lazy"/>
+            <div class="absolute top-4 right-4 bg-accent text-black px-3 py-1 rounded-full text-xs font-bold">
+              New Release
+            </div>
+          </div>
+          <div class="bg-zinc-800 p-4">
+            <h3 class="font-heading font-bold text-lg mb-2">Voices of Tomorrow</h3>
+            <p class="text-zinc-400 text-sm mb-3">By Marcus Reed</p>
+            <div class="flex items-center justify-between">
+              <span class="text-accent font-bold">$22.99</span>
+              <div class="flex gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span class="text-xs text-zinc-400">(287)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book 3 -->
+        <div class="group overflow-hidden rounded-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+          <div class="relative overflow-hidden rounded-xl h-[320px] md:h-[400px]">
+            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&q=80&w=300" alt="Book" class="w-full h-full object-cover hover:scale-[1.05] transition-transform duration-500" loading="lazy"/>
+            <div class="absolute top-4 right-4 bg-accent text-black px-3 py-1 rounded-full text-xs font-bold">
+              Award Winner
+            </div>
+          </div>
+          <div class="bg-zinc-800 p-4">
+            <h3 class="font-heading font-bold text-lg mb-2">Echoes in Time</h3>
+            <p class="text-zinc-400 text-sm mb-3">By Elena Torres</p>
+            <div class="flex items-center justify-between">
+              <span class="text-accent font-bold">$26.99</span>
+              <div class="flex gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span class="text-xs text-zinc-400">(512)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book 4 -->
+        <div class="group overflow-hidden rounded-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+          <div class="relative overflow-hidden rounded-xl h-[320px] md:h-[400px]">
+            <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Book" class="w-full h-full object-cover hover:scale-[1.05] transition-transform duration-500" loading="lazy"/>
+            <div class="absolute top-4 right-4 bg-accent text-black px-3 py-1 rounded-full text-xs font-bold">
+              Editor's Pick
+            </div>
+          </div>
+          <div class="bg-zinc-800 p-4">
+            <h3 class="font-heading font-bold text-lg mb-2">The Last Chapter</h3>
+            <p class="text-zinc-400 text-sm mb-3">By James Mitchell</p>
+            <div class="flex items-center justify-between">
+              <span class="text-accent font-bold">$23.99</span>
+              <div class="flex gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span class="text-xs text-zinc-400">(418)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us Section -->
+  <section class="bg-black py-16 md:py-24 lg:py-32" id="extensive-catalog" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
+        <!-- Left Features -->
+        <div class="space-y-8 animate-left">
+          <div>
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center">
+                <span class="text-accent font-heading font-bold text-lg">01</span>
+              </div>
+              <div>
+                <h3 class="font-heading text-xl md:text-2xl font-bold mb-2">Extensive Catalog</h3>
+                <p class="text-zinc-400">Access over 50,000 titles across all genres, from classics to contemporary bestsellers.</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center">
+                <span class="text-accent font-heading font-bold text-lg">02</span>
+              </div>
+              <div>
+                <h3 class="font-heading text-xl md:text-2xl font-bold mb-2">Secure Payments</h3>
+                <p class="text-zinc-400">Industry-leading encryption ensures your personal and financial information stays protected.</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center">
+                <span class="text-accent font-heading font-bold text-lg">03</span>
+              </div>
+              <div>
+                <h3 class="font-heading text-xl md:text-2xl font-bold mb-2">24/7 Support</h3>
+                <p class="text-zinc-400">Our expert team is always available to assist with any questions or concerns you may have.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Image -->
+        <div class="flex justify-center animate-fade delay-3">
+          <div class="w-64 h-64 rounded-full overflow-hidden border-4 border-accent/30">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=400" alt="Reading Community" class="w-full h-full object-cover" loading="lazy"/>
+          </div>
+        </div>
+
+        <!-- Right Features -->
+        <div class="space-y-8 animate-right">
+          <div>
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center">
+                <span class="text-accent font-heading font-bold text-lg">04</span>
+              </div>
+              <div>
+                <h3 class="font-heading text-xl md:text-2xl font-bold mb-2">Fast Delivery</h3>
+                <p class="text-zinc-400">Instant digital access to your purchases with seamless downloading across all devices.</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center">
+                <span class="text-accent font-heading font-bold text-lg">05</span>
+              </div>
+              <div>
+                <h3 class="font-heading text-xl md:text-2xl font-bold mb-2">Member Rewards</h3>
+                <p class="text-zinc-400">Earn points on every purchase and redeem them for exclusive discounts and early releases.</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center">
+                <span class="text-accent font-heading font-bold text-lg">06</span>
+              </div>
+              <div>
+                <h3 class="font-heading text-xl md:text-2xl font-bold mb-2">Community Features</h3>
+                <p class="text-zinc-400">Connect with fellow book lovers, share reviews, and discover recommendations from readers worldwide.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section id="testimonials" class="bg-zinc-950 py-16 md:py-24 lg:py-32" data-reveal>
+    <div class="max-w-4xl mx-auto px-4 md:px-6 lg:px-8 text-center">
+      <!-- Section Label -->
+      <div class="mb-12 animate">
+        <p class="text-xs font-semibold text-accent uppercase tracking-widest">Reviews</p>
+        <h2 class="font-heading text-4xl md:text-5xl font-bold mt-4">
+          <span class="italic-serif">Loved</span> by Readers
+        </h2>
+      </div>
+
+      <!-- Testimonials -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate delay-2">
+        <!-- Testimonial 1 -->
+        <div class="bg-zinc-900 rounded-2xl p-8 border border-zinc-800 hover:border-accent/50 transition-all duration-300 hover:shadow-2xl">
+          <div class="flex gap-1 mb-6 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <p class="text-lg italic-serif mb-6 text-zinc-300">
+            "LIBRARY transformed how I discover books. The AI recommendations are incredibly accurate, and I've found so many amazing titles I would have never discovered otherwise."
+          </p>
+          <div class="flex flex-col items-center gap-4">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150" alt="Reviewer" class="w-16 h-16 rounded-full object-cover border-2 border-accent" loading="lazy"/>
+            <div>
+              <p class="font-heading font-bold">Alexandra Mitchell</p>
+              <p class="text-sm text-zinc-400">Book Club Founder</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial 2 -->
+        <div class="bg-zinc-900 rounded-2xl p-8 border border-zinc-800 hover:border-accent/50 transition-all duration-300 hover:shadow-2xl">
+          <div class="flex gap-1 mb-6 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#FF6A00" stroke="#FF6A00" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <p class="text-lg italic-serif mb-6 text-zinc-300">
+            "The platform is beautifully designed and intuitive. Instant digital delivery means I can start reading within seconds. Absolutely worth every penny!"
+          </p>
+          <div class="flex flex-col items-center gap-4">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150" alt="Reviewer" class="w-16 h-16 rounded-full object-cover border-2 border-accent" loading="lazy"/>
+            <div>
+              <p class="font-heading font-bold">James Richardson</p>
+              <p class="text-sm text-zinc-400">Literature Professor</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Testimonial Stats -->
+      <div class="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 animate delay-4">
+        <div class="bg-zinc-900/50 rounded-xl p-6 border border-zinc-800">
+          <p class="text-4xl md:text-5xl font-bold text-accent mb-2">98.7%</p>
+          <p class="text-zinc-400">Customer Satisfaction Rate</p>
+        </div>
+        <div class="bg-zinc-900/50 rounded-xl p-6 border border-zinc-800">
+          <p class="text-4xl md:text-5xl font-bold text-accent mb-2">450K+</p>
+          <p class="text-zinc-400">Active Readers Worldwide</p>
+        </div>
+        <div class="bg-zinc-900/50 rounded-xl p-6 border border-zinc-800">
+          <p class="text-4xl md:text-5xl font-bold text-accent mb-2">4.9/5</p>
+          <p class="text-zinc-400">Average App Rating</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="bg-zinc-900 py-16 md:py-24 lg:py-32" data-reveal>
+    <div class="max-w-3xl mx-auto px-4 md:px-6 lg:px-8">
+      <!-- Section Label -->
+      <div class="text-center mb-12 animate">
+        <p class="text-xs font-semibold text-accent uppercase tracking-widest">Help Center</p>
+        <h2 class="font-heading text-4xl md:text-5xl font-bold mt-4">
+          Frequently Asked <span class="italic-serif">Questions</span>
+        </h2>
+      </div>
+
+      <!-- FAQ Items -->
+      <div class="space-y-4 animate delay-2">
+        <!-- FAQ 1 -->
+        <details class="group border border-zinc-800 rounded-lg p-6 hover:border-accent/50 transition-colors duration-300 cursor-pointer">
+          <summary class="flex items-center justify-between font-heading font-bold text-lg">
+            <span>How do I purchase and download books?</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-open:rotate-180 transition-transform duration-300">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </summary>
+          <p class="text-zinc-400 mt-4">Simply browse our catalog, add books to your cart, proceed to checkout with your preferred payment method, and receive instant access to download. Your purchases are linked to your account for lifetime access.</p>
+        </details>
+
+        <!-- FAQ 2 -->
+        <details class="group border border-zinc-800 rounded-lg p-6 hover:border-accent/50 transition-colors duration-300 cursor-pointer">
+          <summary class="flex items-center justify-between font-heading font-bold text-lg">
+            <span>What formats are available for digital books?</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-open:rotate-180 transition-transform duration-300">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </summary>
+          <p class="text-zinc-400 mt-4">We offer books in multiple formats including ePub, PDF, MOBI, and HTML5. You can choose the format that best suits your reading device and preferences.</p>
+        </details>
+
+        <!-- FAQ 3 -->
+        <details class="group border border-zinc-800 rounded-lg p-6 hover:border-accent/50 transition-colors duration-300 cursor-pointer">
+          <summary class="flex items-center justify-between font-heading font-bold text-lg">
+            <span>Do you offer refunds for digital purchases?</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-open:rotate-180 transition-transform duration-300">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </summary>
+          <p class="text-zinc-400 mt-4">We offer a 14-day money-back guarantee on all digital purchases. If you're not satisfied, contact our support team for a full refund, no questions asked.</p>
+        </details>
+
+        <!-- FAQ 4 -->
+        <details class="group border border-zinc-800 rounded-lg p-6 hover:border-accent/50 transition-colors duration-300 cursor-pointer">
+          <summary class="flex items-center justify-between font-heading font-bold text-lg">
+            <span>Can I share books with family members?</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-open:rotate-180 transition-transform duration-300">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </summary>
+          <p class="text-zinc-400 mt-4">Yes! Our Family Sharing plan allows up to 6 family members to access the same books with individual reading progress tracking. Premium plans include this feature at no additional cost.</p>
+        </details>
+
+        <!-- FAQ 5 -->
+        <details class="group border border-zinc-800 rounded-lg p-6 hover:border-accent/50 transition-colors duration-300 cursor-pointer">
+          <summary class="flex items-center justify-between font-heading font-bold text-lg">
+            <span>How does the membership program work?</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-open:rotate-180 transition-transform duration-300">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </summary>
+          <p class="text-zinc-400 mt-4">Members earn 1 point per dollar spent on book purchases. Accumulated points can be redeemed for discounts, exclusive titles, and early access to new releases. Higher membership tiers unlock additional benefits.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trainers/About Section -->
+  <section id="trainers" class="bg-zinc-950 py-16 md:py-24 lg:py-32" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <!-- Section Label -->
+      <div class="text-center mb-12 animate">
+        <p class="text-xs font-semibold text-accent uppercase tracking-widest">Our Team</p>
+        <h2 class="font-heading text-4xl md:text-5xl font-bold mt-4">
+          Meet the <span class="italic-serif">Experts</span>
+        </h2>
+      </div>
+
+      <!-- Team Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 animate delay-2">
+        <!-- Team Member 1 -->
+        <div class="group text-center hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-zinc-900/50 rounded-xl overflow-hidden p-6 border border-zinc-800">
+          <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Team Member" class="w-40 h-40 mx-auto rounded-full object-cover mb-6 border-4 border-accent hover:scale-[1.05] transition-transform duration-300" loading="lazy"/>
+          <h3 class="font-heading font-bold text-xl mb-2">Emma Richardson</h3>
+          <p class="text-accent text-sm font-semibold mb-3">Founder & CEO</p>
+          <p class="text-zinc-400 text-sm">15+ years in digital publishing with a passion for making literature accessible to everyone worldwide.</p>
+        </div>
+
+        <!-- Team Member 2 -->
+        <div class="group text-center hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-zinc-900/50 rounded-xl overflow-hidden p-6 border border-zinc-800">
+          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300" alt="Team Member" class="w-40 h-40 mx-auto rounded-full object-cover mb-6 border-4 border-accent hover:scale-[1.05] transition-transform duration-300" loading="lazy"/>
+          <h3 class="font-heading font-bold text-xl mb-2">David Chen</h3>
+          <p class="text-accent text-sm font-semibold mb-3">Chief Technology Officer</p>
+          <p class="text-zinc-400 text-sm">AI and machine learning specialist dedicated to creating smart recommendation algorithms.</p>
+        </div>
+
+        <!-- Team Member 3 -->
+        <div class="group text-center hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-zinc-900/50 rounded-xl overflow-hidden p-6 border border-zinc-800">
+          <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=300" alt="Team Member" class="w-40 h-40 mx-auto rounded-full object-cover mb-6 border-4 border-accent hover:scale-[1.05] transition-transform duration-300" loading="lazy"/>
+          <h3 class="font-heading font-bold text-xl mb-2">Sarah Williams</h3>
+          <p class="text-accent text-sm font-semibold mb-3">Head of Content</p>
+          <p class="text-zinc-400 text-sm">Book curator with deep connections to authors and publishers across the globe.</p>
+        </div>
+
+        <!-- Team Member 4 -->
+        <div class="group text-center hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-zinc-900/50 rounded-xl overflow-hidden p-6 border border-zinc-800">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=300" alt="Team Member" class="w-40 h-40 mx-auto rounded-full object-cover mb-6 border-4 border-accent hover:scale-[1.05] transition-transform duration-300" loading="lazy"/>
+          <h3 class="font-heading font-bold text-xl mb-2">Michael Torres</h3>
+          <p class="text-accent text-sm font-semibold mb-3">Customer Experience Lead</p>
+          <p class="text-zinc-400 text-sm">Dedicated to ensuring every reader has an exceptional experience on our platform.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="bg-accent text-black py-16 md:py-24 lg:py-32" id="ready-to-transform-your-reading-journey" data-reveal>
+    <div class="max-w-4xl mx-auto px-4 md:px-6 lg:px-8 text-center animate">
+      <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+        Ready to Transform Your <span class="italic-serif">Reading</span> Journey?
+      </h2>
+      <p class="text-lg md:text-xl mb-8 opacity-90">Join hundreds of thousands of readers experiencing literature in a whole new way.</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button onclick="document.getElementById('contact-modal').classList.remove('hidden')" class="px-8 py-3 bg-black text-accent hover:bg-zinc-900 font-semibold rounded-full transition-all duration-300 hover:scale-105 w-full sm:w-auto">
+          Get Started Free
+        </button>
+        <button onclick="document.getElementById('programs').scrollIntoView()" class="px-8 py-3 border-2 border-black text-black hover:bg-orange-500 font-semibold rounded-full transition-all duration-300 w-full sm:w-auto">
+          Explore More
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter Section -->
+  <section class="bg-zinc-900 py-16 md:py-24 lg:py-32" id="stay-updated" data-reveal>
+    <div class="max-w-3xl mx-auto px-4 md:px-6 lg:px-8 text-center animate">
+      <h2 class="font-heading text-3xl md:text-4xl font-bold mb-4">Stay Updated</h2>
+      <p class="text-zinc-400 mb-8">Get monthly recommendations and exclusive offers delivered to your inbox.</p>
+      <form class="flex flex-col sm:flex-row gap-3" onsubmit="return false;">
+        <input type="email" placeholder="Enter your email" class="flex-1 px-4 py-3 bg-zinc-800 border-2 border-zinc-700 focus:border-accent rounded-full text-white placeholder-zinc-500 transition-colors outline-none" required/>
+        <button type="submit" class="px-8 py-3 bg-accent hover:bg-orange-600 text-white font-semibold rounded-full transition-all duration-300 hover:scale-105 w-full sm:w-auto">
+          Subscribe
+        </button>
+      </form>
+      <p class="text-xs text-zinc-500 mt-4">We respect your privacy. Unsubscribe anytime.</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-black border-t border-zinc-800 py-16 md:py-20" id="footer" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <!-- Footer Top -->
+      <div class="flex flex-col md:flex-row items-start justify-between mb-12 pb-12 border-b border-zinc-800">
+        <!-- Logo -->
+        <a href="#home" class="flex items-center gap-2 font-heading font-bold text-xl mb-8 md:mb-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          <span>LIBRARY</span>
+        </a>
+
+        <!-- Social Icons -->
+        <div class="flex gap-4">
+          <a href="#" class="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center hover:bg-accent hover:text-black transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+            </svg>
+          </a>
+          <a href="#" class="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center hover:bg-accent hover:text-black transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
+            </svg>
+          </a>
+          <a href="#" class="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center hover:bg-accent hover:text-black transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+            </svg>
+          </a>
+          <a href="#" class="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center hover:bg-accent hover:text-black transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17Z"/>
+              <path d="m10 15 5-3-5-3z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Footer Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+        <!-- Product -->
+        <div>
+          <h4 class="font-heading font-bold mb-4">Product</h4>
+          <ul class="space-y-3">
+            <li><a href="#programs" class="text-zinc-400 hover:text-accent transition-colors">Browse Books</a></li>
+            <li><a href="#" class="text-zinc-400 hover:text-accent transition-colors">Pricing</a></li>
+            <li><a href="#" class="text-zinc-400 hover:text-accent transition-colors">Features</a></li>
+            <li><a href="#" class="text-zinc-400 hover:text-accent transition-colors">Mobile App</a></li>
+          </ul>
+        </div>
+
+        <!-- Company -->
+        <div>
+          <h4 class="font-heading font-bold mb-4">Company</h4>
+          <ul class="space-y-3">
+            <li><a href="#trainers" class="text-zinc-400 hover:text-accent transition-colors">About Us</a></li>
+            <li><a href="#" class="text-zinc-400 hover:text-accent transition-colors">Blog</a></li>
+            <li><a href="#" class="text-zinc-400 hover:text-accent transition-colors">Careers</a></li>
+            <li><a href="#" class="text-zinc-400 hover:text-accent transition-colors">Press</a></li>
+          </ul>
+        </div>
+
+        <!-- Support -->
+        <div>
+          <h4 class="font-heading font-bold mb-4">Support</h4>
+          <ul class="space-y-3">
+            <li><a href="#faq" class="text-zinc-400 hover:text-accent transition-colors">FAQ</a></li>
+            <li><a href="#" class="text-zinc-400 hover:text-accent transition-colors">Help Center</a></li>
+            <li><a href="#" class="text-zinc-400 hover:text-accent transition-colors">Contact</a></li>
+            <li><a href="#" class="text-zinc-400 hover:text-accent transition-colors">Status</a></li>
+          </ul>
+        </div>
+
+        <!-- Legal -->
+        <div>
+          <h4 class="font-heading font-bold mb-4">Legal</h4>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-zinc-400 hover:text-accent transition-colors">Privacy</a></li>
+            <li><a href="#" class="text-zinc-400 hover:text-accent transition-colors">Terms</a></li>
+            <li><a href="#" class="text-zinc-400 hover:text-accent transition-colors">Cookie Policy</a></li>
+            <li><a href="#" class="text-zinc-400 hover:text-accent transition-colors">Accessibility</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="mt-12 pt-12 border-t border-zinc-800 flex flex-col md:flex-row items-center justify-between text-zinc-500 text-sm">
+        <p>&copy; 2024 LIBRARY. All rights reserved.</p>
+        <p>Crafted with passion for book lovers worldwide</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Contact Modal -->
+  <div id="contact-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur p-4">
+    <div class="bg-zinc-900 rounded-2xl border border-zinc-800 max-w-md w-full p-8 animate">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="font-heading text-2xl font-bold">Get in Touch</h3>
+        <button onclick="document.getElementById('contact-modal').classList.add('hidden')" class="text-zinc-400 hover:text-white transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <form class="space-y-4" onsubmit="return false;">
+        <input type="text" placeholder="Your Name" class="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 focus:border-accent rounded-lg text-white placeholder-zinc-500 transition-colors outline-none" required/>
+        <input type="email" placeholder="Your Email" class="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 focus:border-accent rounded-lg text-white placeholder-zinc-500 transition-colors outline-none" required/>
+        <textarea placeholder="Your Message" rows="4" class="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 focus:border-accent rounded-lg text-white placeholder-zinc-500 transition-colors outline-none resize-none"></textarea>
+        <button type="submit" class="w-full px-6 py-3 bg-accent hover:bg-orange-600 text-white font-semibold rounded-lg transition-all duration-300 hover:scale-105">
+          Send Message
+        </button>
+      </form>
+      
+      <div class="mt-6 pt-6 border-t border-zinc-800 space-y-4">
+        <div class="flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          <span class="text-zinc-400">+1 (555) 123-4567</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+          </svg>
+          <span class="text-zinc-400">support@library.com</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mobile menu toggle
+    const mobileMenuBtn = document.querySelector('button[onclick="document.getElementById(\'mobile-menu\').classList.toggle(\'hidden\')"]');
+    if (mobileMenuBtn) {
+      mobileMenuBtn.addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+      });
+    }
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href !== '#' && document.querySelector(href)) {
+          e.preventDefault();
+          document.querySelector(href).scrollIntoView({ behavior: 'smooth' });
+          document.getElementById('mobile-menu').classList.add('hidden');
+        }
+      });
+    });
+
+    // Contact modal close
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.getElementById('contact-modal').classList.add('hidden');
+      }
+    });
+
+    // Close modal on background click
+    document.getElementById('contact-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('contact-modal')) {
+        document.getElementById('contact-modal').classList.add('hidden');
+      }
+    });
+  </script>
+<!-- WEAVO_RUNTIME -->
+<script>(function(){
+var EASE='cubic-bezier(.22,1,.36,1)';
+var inViewport=function(el){var r=el.getBoundingClientRect();return r.top<window.innerHeight&&r.bottom>0;};
+var hide=function(el){el.style.willChange='opacity, transform';el.style.opacity='0';el.style.transform='translateY(28px)';el.style.transition='opacity .65s '+EASE+', transform .65s '+EASE;};
+var show=function(el,d){el.style.transitionDelay=(d||0)+'ms';el.style.opacity='1';el.style.transform='none';setTimeout(function(){el.style.willChange='auto';},900+(d||0));};
+var solos=document.querySelectorAll('[data-reveal]');
+var groups=document.querySelectorAll('[data-reveal-stagger]');
+// Skip elements already in viewport on initial paint — they should appear instantly without flash.
+var hideIfBelow=function(el){if(!inViewport(el))hide(el);};
+solos.forEach(hideIfBelow);
+groups.forEach(function(g){if(!inViewport(g))Array.prototype.forEach.call(g.children,hide);});
+if('IntersectionObserver' in window){
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var el=e.target;requestAnimationFrame(function(){if(el.hasAttribute('data-reveal-stagger')){Array.prototype.forEach.call(el.children,function(c,i){show(c,i*70);});}else{show(el);}});io.unobserve(el);});},{rootMargin:'0px 0px -60px 0px',threshold:0.01});
+solos.forEach(function(el){if(!inViewport(el))io.observe(el);});
+groups.forEach(function(el){if(!inViewport(el))io.observe(el);});
+}
+document.addEventListener('click',function(e){
+var a=e.target.closest&&e.target.closest('a[href^="#"]');
+if(a){var id=a.getAttribute('href').slice(1);if(id){var t=document.getElementById(id);if(t){e.preventDefault();var h=document.querySelector('header,nav');var off=h?h.offsetHeight:0;window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-off-8,behavior:'smooth'});var m=document.querySelector('[data-mobile-menu]');if(m&&!m.classList.contains('hidden'))m.classList.add('hidden');}return;}}
+var mt=e.target.closest&&e.target.closest('[data-mobile-toggle]');
+if(mt){e.preventDefault();var menu=document.querySelector('[data-mobile-menu]');if(menu)menu.classList.toggle('hidden');return;}
+var at=e.target.closest&&e.target.closest('[data-accordion-trigger]');
+if(at){var item=at.closest('[data-accordion-item]')||at.parentElement;if(item){var content=item.querySelector('[data-accordion-content]');if(content)content.classList.toggle('hidden');var icon=at.querySelector('[data-accordion-icon]');if(icon){icon.style.transition='transform .3s ease';icon.style.transform=content&&!content.classList.contains('hidden')?'rotate(180deg)':'rotate(0deg)';}}}
+});
+})();</script>
+<!-- /WEAVO_RUNTIME -->
+</body>
+</html>

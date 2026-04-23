@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex Studio® — Creative Agency</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Inter', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            accent: '#3b82f6',
+            green: '#4ade80',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { font-family: 'Inter', sans-serif; overflow-x: hidden; background: #111; }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(32px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .animate { opacity: 0; animation: fadeInUp 0.8s ease forwards; }
+    .animate-fade { opacity: 0; animation: fadeIn 0.9s ease forwards; }
+    .animate-scale { opacity: 0; animation: scaleIn 0.7s ease forwards; }
+    .animate-left { opacity: 0; animation: slideInLeft 0.8s ease forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+    .delay-6 { animation-delay: 0.6s; }
+    .delay-7 { animation-delay: 0.7s; }
+    .delay-8 { animation-delay: 0.8s; }
+    .delay-9 { animation-delay: 0.9s; }
+    .delay-10 { animation-delay: 1.0s; }
+    .delay-11 { animation-delay: 1.1s; }
+    .delay-12 { animation-delay: 1.2s; }
+
+    /* Scrollbar hide */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Hero brand name */
+    .hero-brand {
+      font-size: clamp(56px, 14vw, 190px);
+      font-weight: 900;
+      letter-spacing: -4px;
+      line-height: 0.9;
+      text-transform: capitalize;
+    }
+
+    /* Section titles italic */
+    .section-title {
+      font-size: clamp(36px, 6vw, 80px);
+      font-weight: 900;
+      font-style: italic;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    /* Section label with bullet */
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .section-label::before {
+      content: '';
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #111;
+      flex-shrink: 0;
+    }
+    .section-label.light::before { background: #fff; }
+    .section-label.blue::before { background: #3b82f6; }
+
+    /* Nav pill */
+    .nav-pill {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 40px;
+    }
+
+    /* Hero CTAs */
+    .hero-cta-ghost {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 40px;
+      padding: 12px 24px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .hero-cta-ghost:hover { background: rgba(255,255,255,0.12); }
+    .hero-cta-ghost::after {
+      content: '';
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #4ade80;
+      flex-shrink: 0;
+    }
+    .hero-cta-solid {
+      background: #fff;
+      color: #111;
+      border-radius: 40px;
+      padding: 12px 24px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .hero-cta-solid:hover { background: #e5e5e5; transform: translateY(-1px); }
+
+    /* Scroll down rotated text */
+    .scroll-down-text {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* Project cards */
+    .project-card {
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.4s ease;
+    }
+    .project-card:hover { transform: scale(1.02); }
+    .project-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
+    .project-card:hover img { transform: scale(1.05); }
+
+    /* Team cards */
+    .team-card {
+      background: #161616;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 32px;
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .team-card:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .team-card::before {
+      content: '';
+      position: absolute;
+      top: 12px; left: 12px;
+      width: 20px; height: 20px;
+      border-top: 2px solid rgba(255,255,255,0.15);
+      border-left: 2px solid rgba(255,255,255,0.15);
+      border-radius: 2px 0 0 0;
+    }
+    .team-card::after {
+      content: '';
+      position: absolute;
+      bottom: 12px; right: 12px;
+      width: 20px; height: 20px;
+      border-bottom: 2px solid rgba(255,255,255,0.15);
+      border-right: 2px solid rgba(255,255,255,0.15);
+      border-radius: 0 0 2px 0;
+    }
+
+    /* Process cards */
+    .process-card {
+      border-radius: 20px;
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+    .process-card:hover { transform: translateY(-4px); }
+    .process-watermark {
+      position: absolute;
+      bottom: -20px;
+      right: -10px;
+      font-size: 120px;
+      font-weight: 900;
+      font-style: italic;
+      opacity: 0.06;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Pricing cards */
+    .pricing-card {
+      background: #141414;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 36px;
+      transition: transform 0.3s ease;
+    }
+    .pricing-card:hover { transform: translateY(-4px); }
+    .pricing-card.featured {
+      background: #1a1a2e;
+      border-color: rgba(59,130,246,0.3);
+    }
+
+    /* FAQ items */
+    .faq-item {
+      border-top: 1px solid #e5e5e5;
+    }
+    .faq-content {
+      display: none;
+      overflow: hidden;
+    }
+    .faq-content.open {
+      display: block;
+      animation: fadeInUp 0.3s ease forwards;
+    }
+    .faq-icon {
+      transition: transform 0.3s ease;
+      font-size: 20px;
+      line-height: 1;
+    }
+    .faq-icon.open {
+      transform: rotate(45deg);
+    }
+
+    /* Light section border */
+    .light-section {
+      background: #f5f5f5;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    /* Testimonial card */
+    .testimonial-main-card {
+      background: #fff;
+      border-radius: 20px;
+      border: 1px solid #eee;
+    }
+
+    /* Stat cards */
+    .stat-card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    /* Mobile menu */
+    #mobile-menu {
+      transition: all 0.3s ease;
+    }
+
+    /* Blog cards */
+    .blog-card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .blog-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.08); }
+
+    /* Contact section */
+    .contact-input {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: #fff;
+      padding: 14px 18px;
+      font-size: 14px;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+    .contact-input:focus { border-color: rgba(59,130,246,0.5); }
+    .contact-input::placeholder { color: rgba(255,255,255,0.3); }
+
+    /* Stagger team */
+    .team-stagger-2 { margin-top: 60px; }
+    .team-stagger-3 { margin-top: 120px; }
+
+    @media (max-width: 768px) {
+      .team-stagger-2, .team-stagger-3 { margin-top: 0; }
+      .hero-brand { letter-spacing: -2px; }
+      .section-title { letter-spacing: -1px; }
+    }
+  </style>
+</head>
+<body class="bg-[#111] text-white">
+
+  <!-- ============================
+       NAVIGATION
+  ============================= -->
+  <nav class="fixed top-0 left-0 right-0 z-50 px-4 md:px-8 py-5">
+    <div class="max-w-[1200px] mx-auto flex items-center justify-between">
+      <!-- Logo -->
+      <div class="flex items-center gap-2 animate animate-fade">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        <span style="font-size:14px; font-weight:700; letter-spacing:-0.5px;">Apex Studio</span>
+      </div>
+
+      <!-- Desktop Nav Pill -->
+      <div class="hidden md:flex nav-pill items-center gap-1 px-2 py-1.5">
+        <a href="#about" class="px-4 py-2 text-xs font-500 text-white/70 hover:text-white transition-colors duration-200 rounded-full hover:bg-white/05">About</a>
+        <a href="#projects" class="px-4 py-2 text-xs font-500 text-white/70 hover:text-white transition-colors duration-200 rounded-full hover:bg-white/05">Work</a>
+        <a href="#services" class="px-4 py-2 text-xs font-500 text-white/70 hover:text-white transition-colors duration-200 rounded-full hover:bg-white/05">Services</a>
+        <a href="#team" class="px-4 py-2 text-xs font-500 text-white/70 hover:text-white transition-colors duration-200 rounded-full hover:bg-white/05">Team</a>
+        <a href="#pricing" class="px-4 py-2 text-xs font-500 text-white/70 hover:text-white transition-colors duration-200 rounded-full hover:bg-white/05">Pricing</a>
+      </div>
+
+      <!-- Right side CTAs -->
+      <div class="hidden md:flex items-center gap-3 animate animate-fade">
+        <a href="#contact" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:40px;padding:10px 20px;font-size:12px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:#fff;transition:all 0.3s ease;text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">Book a Call</a>
+        <a href="#contact" style="background:#fff;color:#111;border-radius:40px;padding:10px 20px;font-size:12px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;transition:all 0.3s ease;text-decoration:none;" onmouseover="this.style.background='#e5e5e5'" onmouseout="this.style.background='#fff'">
+          Get Started
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <!-- Mobile Hamburger -->
+      <button id="menu-btn" class="md:hidden p-2 text-white/80 hover:text-white transition-colors" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden fixed inset-0 z-50 bg-[#111]/98 backdrop-blur-lg flex flex-col justify-center px-8">
+      <button class="absolute top-5 right-5 p-2 text-white/70 hover:text-white" onclick="document.getElementById('mobile-menu').classList.add('hidden')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+      <nav class="flex flex-col gap-6">
+        <a href="#about" onclick="document.getElementById('mobile-menu').classList.add('hidden')" style="font-size:32px;font-weight:800;font-style:italic;letter-spacing:-1px;color:#fff;text-decoration:none;opacity:0.9">About</a>
+        <a href="#projects" onclick="document.getElementById('mobile-menu').classList.add('hidden')" style="font-size:32px;font-weight:800;font-style:italic;letter-spacing:-1px;color:#fff;text-decoration:none;opacity:0.9">Work</a>
+        <a href="#services" onclick="document.getElementById('mobile-menu').classList.add('hidden')" style="font-size:32px;font-weight:800;font-style:italic;letter-spacing:-1px;color:#fff;text-decoration:none;opacity:0.9">Services</a>
+        <a href="#team" onclick="document.getElementById('mobile-menu').classList.add('hidden')" style="font-size:32px;font-weight:800;font-style:italic;letter-spacing:-1px;color:#fff;text-decoration:none;opacity:0.9">Team</a>
+        <a href="#pricing" onclick="document.getElementById('mobile-menu').classList.add('hidden')" style="font-size:32px;font-weight:800;font-style:italic;letter-spacing:-1px;color:#fff;text-decoration:none;opacity:0.9">Pricing</a>
+        <a href="#contact" onclick="document.getElementById('mobile-menu').classList.add('hidden')" style="font-size:32px;font-weight:800;font-style:italic;letter-spacing:-1px;color:#3b82f6;text-decoration:none;">Contact</a>
+      </nav>
+    </div>
+  </nav>
+
+  <!-- ============================
+       HERO SECTION
+  ============================= -->
+  <section class="relative min-h-screen flex flex-col justify-between overflow-hidden" style="background:#111;" data-reveal>
+    <!-- Background Image -->
+    <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Hero background" class="absolute inset-0 w-full h-full object-cover" style="opacity:0.45;">
+    <!-- Gradient Overlay -->
+    <div class="absolute inset-0" style="background:linear-gradient(135deg, rgba(10,10,30,0.7) 0%, rgba(17,17,17,0.5) 50%, rgba(5,5,20,0.8) 100%);"></div>
+    <!-- Additional fluid abstract overlay -->
+    <div class="absolute inset-0" style="background:radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.08) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.06) 0%, transparent 50%), radial-gradient(ellipse at 60% 80%, rgba(16,185,129,0.05) 0%, transparent 40%);"></div>
+
+    <!-- Scroll Down text -->
+    <div class="absolute right-6 bottom-20 z-20 hidden md:flex items-center gap-3">
+      <div class="w-px h-12 bg-white/20"></div>
+      <span class="scroll-down-text">Scroll Down</span>
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-10 max-w-[1200px] mx-auto px-4 md:px-8 w-full flex flex-col justify-between min-h-screen py-24 md:py-32">
+      <!-- Top spacer -->
+      <div></div>
+
+      <!-- Main brand -->
+      <div class="flex flex-col items-start">
+        <div class="mb-4 animate animate-fade delay-1">
+          <span class="section-label light" style="color:rgba(255,255,255,0.5);">Premium Creative Agency</span>
+        </div>
+        <h1 class="hero-brand text-white animate delay-2" style="line-height:0.88;">
+          Apex<br/>
+          <span style="color:rgba(255,255,255,0.25);">Studio</span><sup style="font-size:0.2em;vertical-align:super;color:rgba(255,255,255,0.4);font-weight:400;">®</sup>
+        </h1>
+        <div class="flex items-center gap-4 mt-8 animate delay-3">
+          <div style="width:36px;height:1px;background:rgba(255,255,255,0.4);"></div>
+          <span style="font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.5);">Strategy · Design · Technology</span>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mt-12 md:mt-0 animate delay-4">
+        <div class="flex items-start gap-4">
+          <span style="color:rgba(255,255,255,0.2);font-size:24px;line-height:1.4;">/</span>
+          <p style="font-size:14px;color:rgba(255,255,255,0.5);font-style:italic;max-width:280px;line-height:1.6;">We turn ambitious ideas into striking digital realities through strategy, design, and relentless attention to detail.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <a href="#about" class="hero-cta-ghost">Explore Work</a>
+          <a href="#contact" class="hero-cta-solid">
+            Start a Project
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       ABOUT SECTION
+  ============================= -->
+  <section id="about" class="light-section" style="padding:96px 0;" data-reveal>
+    <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+      <div class="flex flex-col md:flex-row gap-12 md:gap-16 items-start">
+
+        <!-- Left: Image -->
+        <div class="w-full md:w-[45%] animate-left delay-1">
+          <div style="border-radius:16px;overflow:hidden;aspect-ratio:4/5;position:relative;">
+            <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="About Apex Studio" class="w-full h-full object-cover" loading="lazy">
+            <!-- Floating badge -->
+            <div style="position:absolute;bottom:24px;left:24px;background:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 8px 32px rgba(0,0,0,0.15);">
+              <div style="font-size:11px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Est. 2018</div>
+              <div style="font-size:18px;font-weight:800;color:#111;letter-spacing:-0.5px;">6 Years of Excellence</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Content -->
+        <div class="w-full md:w-[55%] flex flex-col gap-8">
+          <div class="animate delay-2">
+            <span class="section-label" style="color:#888;">Why choose us</span>
+          </div>
+
+          <h2 class="section-title animate delay-3" style="color:#111;font-size:clamp(40px,5.5vw,72px);">
+            We craft brands that <em>matter</em>
+          </h2>
+
+          <div class="animate delay-4">
+            <p style="font-size:14px;line-height:1.8;color:#666;max-width:480px;">
+              At Apex Studio, we believe great design is more than aesthetics — it's a business advantage. Our team of <strong style="color:#111;font-weight:700;">strategic thinkers</strong>, <strong style="color:#111;font-weight:700;">pixel-perfect designers</strong>, and <strong style="color:#111;font-weight:700;">full-stack engineers</strong> collaborate to deliver digital experiences that captivate users and drive measurable growth.
+            </p>
+          </div>
+
+          <!-- Stat Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 animate delay-5">
+            <div class="stat-card">
+              <div style="font-size:clamp(32px,4vw,48px);font-weight:900;letter-spacing:-2px;color:#111;font-style:italic;">23+</div>
+              <div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Design Awards</div>
+            </div>
+            <div class="stat-card">
+              <div style="font-size:clamp(32px,4vw,48px);font-weight:900;letter-spacing:-2px;color:#111;font-style:italic;">200+</div>
+              <div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Projects Delivered</div>
+            </div>
+            <div class="stat-card">
+              <div style="font-size:clamp(32px,4vw,48px);font-weight:900;letter-spacing:-2px;color:#111;font-style:italic;">20k</div>
+              <div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Satisfied Clients</div>
+            </div>
+          </div>
+
+          <div class="animate delay-6">
+            <a href="#projects" style="display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#111;text-decoration:none;border-bottom:1px solid #111;padding-bottom:2px;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">
+              View Our Work
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       PROJECTS SECTION
+  ============================= -->
+  <section id="projects" class="light-section" style="padding:96px 0;" data-reveal>
+    <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+      <div class="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
+        <div>
+          <span class="section-label animate delay-1" style="color:#888;">Case studies</span>
+          <h2 class="section-title mt-3 animate delay-2" style="color:#111;">Selected Work</h2>
+        </div>
+        <a href="#contact" class="animate delay-3" style="display:inline-flex;align-items:center;gap:6px;background:#111;color:#fff;border-radius:12px;padding:12px 20px;font-size:13px;font-weight:600;text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+          All Projects
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <!-- Row 1: 2 columns -->
+      <div class="grid gap-4 mb-4 animate delay-3" style="grid-template-columns: 1.85fr 1fr;">
+        <div class="project-card animate delay-4" style="height:380px;">
+          <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Project Nexus" loading="lazy">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);"></div>
+          <div style="position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 12px;">
+            <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:1px;">01.</span>
+          </div>
+          <div style="position:absolute;bottom:24px;left:24px;">
+            <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Brand Identity</div>
+            <h3 style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px;">Project Nexus</h3>
+          </div>
+        </div>
+        <div class="project-card animate delay-5" style="height:380px;">
+          <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=600&h=600" alt="Aurora Platform" loading="lazy">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 60%);"></div>
+          <div style="position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 12px;">
+            <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:1px;">02.</span>
+          </div>
+          <div style="position:absolute;bottom:24px;left:24px;">
+            <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">UI/UX Design</div>
+            <h3 style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px;">Aurora Platform</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: 3 columns -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="project-card animate delay-6" style="height:280px;">
+          <img src="https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&q=80&w=500&h=400" alt="Pulse Commerce" loading="lazy">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 60%);"></div>
+          <div style="position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 12px;">
+            <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:1px;">03.</span>
+          </div>
+          <div style="position:absolute;bottom:20px;left:20px;">
+            <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">E-Commerce</div>
+            <h3 style="font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.5px;">Pulse Commerce</h3>
+          </div>
+        </div>
+        <div class="project-card animate delay-7" style="height:280px;">
+          <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Vanta App" loading="lazy">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 60%);"></div>
+          <div style="position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 12px;">
+            <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:1px;">04.</span>
+          </div>
+          <div style="position:absolute;bottom:20px;left:20px;">
+            <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Mobile App</div>
+            <h3 style="font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.5px;">Vanta App</h3>
+          </div>
+        </div>
+        <div class="project-card animate delay-8" style="height:280px;">
+          <img src="https://images.unsplash.com/photo-1535016120720-40c646be5580?auto=format&fit=crop&q=80&w=500&h=400" alt="Grid Motion" loading="lazy">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 60%);"></div>
+          <div style="position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 12px;">
+            <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:1px;">05.</span>
+          </div>
+          <div style="position:absolute;bottom:20px;left:20px;">
+            <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Motion Design</div>
+            <h3 style="font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.5px;">Grid Motion</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       TEAM SECTION
+  ============================= -->
+  <section id="team" style="background:#0a0a0a;padding:96px 0;" data-reveal>
+    <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+      <div class="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
+        <div>
+          <span class="section-label light animate delay-1" style="color:rgba(255,255,255,0.4);">Our Crew</span>
+          <h2 class="section-title mt-3 animate delay-2" style="color:#fff;">The Minds<br/><em style="color:rgba(255,255,255,0.25);">Behind It</em></h2>
+        </div>
+        <p class="animate delay-3" style="font-size:13px;color:rgba(255,255,255,0.4);max-width:280px;line-height:1.7;">A diverse team of creatives, strategists, and engineers united by a passion for exceptional work.</p>
+      </div>
+
+      <!-- Team Grid: Staggered -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="team-card animate delay-3">
+          <div style="width:80px;height:80px;border-radius:50%;overflow:hidden;margin-bottom:20px;">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=160&h=160" alt="Marcus Reid" class="w-full h-full object-cover" loading="lazy">
+          </div>
+          <h3 style="font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:4px;">Marcus Reid</h3>
+          <p style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.4);margin-bottom:16px;">Creative Director</p>
+          <p style="font-size:12px;color:rgba(255,255,255,0.3);line-height:1.6;">Leads visual strategy with 12+ years of brand-building expertise across global markets.</p>
+        </div>
+
+        <div class="team-card animate delay-4 team-stagger-2">
+          <div style="width:80px;height:80px;border-radius:50%;overflow:hidden;margin-bottom:20px;">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=160&h=160" alt="Priya Sharma" class="w-full h-full object-cover" loading="lazy">
+          </div>
+          <h3 style="font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:4px;">Priya Sharma</h3>
+          <p style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.4);margin-bottom:16px;">Head of UX</p>
+          <p style="font-size:12px;color:rgba(255,255,255,0.3);line-height:1.6;">Crafts user journeys that convert. Specialist in product design and research-driven interfaces.</p>
+        </div>
+
+        <div class="team-card animate delay-5 team-stagger-3">
+          <div style="width:80px;height:80px;border-radius:50%;overflow:hidden;margin-bottom:20px;">
+            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=160&h=160" alt="Daniel Kovacs" class="w-full h-full object-cover" loading="lazy">
+          </div>
+          <h3 style="font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:4px;">Daniel Kovacs</h3>
+          <p style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.4);margin-bottom:16px;">Tech Lead</p>
+          <p style="font-size:12px;color:rgba(255,255,255,0.3);line-height:1.6;">Full-stack architect building scalable, performant digital products with modern frameworks.</p>
+        </div>
+
+        <div class="team-card animate delay-6">
+          <div style="width:80px;height:80px;border-radius:50%;overflow:hidden;margin-bottom:20px;">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=160&h=160" alt="Léa Fontaine" class="w-full h-full object-cover" loading="lazy">
+          </div>
+          <h3 style="font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:4px;">Léa Fontaine</h3>
+          <p style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.4);margin-bottom:16px;">Strategy Director</p>
+          <p style="font-size:12px;color:rgba(255,255,255,0.3);line-height:1.6;">Connects brand vision to business outcomes through data-informed creative strategy.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       TESTIMONIALS SECTION
+  ============================= -->
+  <section id="testimonials" class="light-section" style="padding:96px 0;" data-reveal>
+    <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+      <div class="mb-12">
+        <span class="section-label animate delay-1" style="color:#888;">Client Feedback</span>
+        <h2 class="section-title mt-3 animate delay-2" style="color:#111;">What they <em>say</em></h2>
+      </div>
+
+      <!-- Main Testimonial Card -->
+      <div class="testimonial-main-card p-8 md:p-12 mb-8 animate delay-3">
+        <div class="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
+          <div class="w-full md:w-[65%]">
+            <div class="flex gap-1 mb-6">
+              <span style="color:#e8a838;font-size:18px;">★★★★★</span>
+            </div>
+            <blockquote style="font-size:clamp(20px,3vw,28px);font-weight:700;font-style:italic;color:#111;line-height:1.4;letter-spacing:-0.5px;margin-bottom:24px;">
+              "Apex Studio didn't just redesign our product — they fundamentally transformed how our customers experience it. The strategy, execution, and attention to detail were unlike anything we'd seen before."
+            </blockquote>
+            <div class="flex items-center gap-4">
+              <div style="width:48px;height:48px;border-radius:50%;overflow:hidden;">
+                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=96&h=96" alt="James Thornton" class="w-full h-full object-cover" loading="lazy">
+              </div>
+              <div>
+                <div style="font-size:14px;font-weight:700;color:#111;">James Thornton</div>
+                <div style="font-size:12px;color:#888;font-weight:500;">CEO, Thornton Ventures</div>
+              </div>
+            </div>
+          </div>
+          <div class="w-full md:w-[35%]">
+            <div style="border-radius:12px;overflow:hidden;aspect-ratio:4/5;">
+              <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400&h=500" alt="Testimonial portrait" class="w-full h-full object-cover" loading="lazy">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary testimonials -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+        <div class="animate delay-4" style="background:#fff;border:1px solid #eee;border-radius:16px;padding:28px;">
+          <div class="flex gap-1 mb-4"><span style="color:#e8a838;font-size:14px;">★★★★★</span></div>
+          <p style="font-size:13px;color:#555;line-height:1.7;font-style:italic;margin-bottom:16px;">"The brand identity they created is simply stunning. Every touchpoint feels intentional and premium."</p>
+          <div class="flex items-center gap-3">
+            <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=72&h=72" alt="" class="w-full h-full object-cover" loading="lazy"></div>
+            <div><div style="font-size:13px;font-weight:700;color:#111;">Sofia Morales</div><div style="font-size:11px;color:#888;">CMO, Luminate</div></div>
+          </div>
+        </div>
+        <div class="animate delay-5" style="background:#fff;border:1px solid #eee;border-radius:16px;padding:28px;">
+          <div class="flex gap-1 mb-4"><span style="color:#e8a838;font-size:14px;">★★★★★</span></div>
+          <p style="font-size:13px;color:#555;line-height:1.7;font-style:italic;margin-bottom:16px;">"Our website conversion rate increased by 340% within three months of launch. Incredible ROI."</p>
+          <div class="flex items-center gap-3">
+            <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=72&h=72" alt="" class="w-full h-full object-cover" loading="lazy"></div>
+            <div><div style="font-size:13px;font-weight:700;color:#111;">Nadia Chen</div><div style="font-size:11px;color:#888;">Founder, Gridline</div></div>
+          </div>
+        </div>
+        <div class="animate delay-6" style="background:#fff;border:1px solid #eee;border-radius:16px;padding:28px;">
+          <div class="flex gap-1 mb-4"><span style="color:#e8a838;font-size:14px;">★★★★★</span></div>
+          <p style="font-size:13px;color:#555;line-height:1.7;font-style:italic;margin-bottom:16px;">"Working with Apex felt like having a world-class team embedded in our company. Exceptional."</p>
+          <div class="flex items-center gap-3">
+            <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=72&h=72" alt="" class="w-full h-full object-cover" loading="lazy"></div>
+            <div><div style="font-size:13px;font-weight:700;color:#111;">Ryan Ostler</div><div style="font-size:11px;color:#888;">VP Product, Veritas</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 animate delay-7" style="border-top:1px solid #e5e5e5;padding-top:40px;">
+        <div class="text-center">
+          <div style="font-size:48px;font-weight:900;font-style:italic;letter-spacing:-2px;color:#111;">98%</div>
+          <div style="font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Client Retention</div>
+        </div>
+        <div class="text-center" style="border-left:1px solid #e5e5e5;border-right:1px solid #e5e5e5;">
+          <div style="font-size:48px;font-weight:900;font-style:italic;letter-spacing:-2px;color:#111;">4.9</div>
+          <div style="font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Average Rating</div>
+        </div>
+        <div class="text-center">
+          <div style="font-size:48px;font-weight:900;font-style:italic;letter-spacing:-2px;color:#111;">340%</div>
+          <div style="font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Avg. Conversion Lift</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       PROCESS / SERVICES SECTION
+  ============================= -->
+  <section id="services" class="light-section" style="padding:96px 0;" data-reveal>
+    <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+      <div class="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
+        <div>
+          <span class="section-label animate delay-1" style="color:#888;">How we work</span>
+          <h2 class="section-title mt-3 animate delay-2" style="color:#111;">Our Process</h2>
+        </div>
+        <p class="animate delay-3" style="font-size:13px;color:#888;max-width:280px;line-height:1.7;">Every engagement follows a proven methodology that consistently delivers exceptional outcomes.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- Step 01 — Dark -->
+        <div class="process-card animate delay-3" style="background:#111;color:#fff;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.4);margin-bottom:32px;">.01</div>
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </div>
+          <h3 style="font-size:18px;font-weight:800;letter-spacing:-0.3px;margin-bottom:12px;">Discover</h3>
+          <p style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.7;">Deep-dive research into your brand, audience, and competitive landscape to uncover real opportunities.</p>
+          <div class="process-watermark" style="color:#fff;">.01</div>
+        </div>
+
+        <!-- Step 02 — White -->
+        <div class="process-card animate delay-4" style="background:#fff;border:1px solid #eee;color:#111;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#bbb;margin-bottom:32px;">.02</div>
+          <div style="width:40px;height:40px;border-radius:10px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          </div>
+          <h3 style="font-size:18px;font-weight:800;letter-spacing:-0.3px;margin-bottom:12px;">Strategize</h3>
+          <p style="font-size:12px;color:#888;line-height:1.7;">Develop a precise roadmap connecting your goals to creative and technical solutions.</p>
+          <div class="process-watermark" style="color:#111;">.02</div>
+        </div>
+
+        <!-- Step 03 — White -->
+        <div class="process-card animate delay-5" style="background:#fff;border:1px solid #eee;color:#111;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#bbb;margin-bottom:32px;">.03</div>
+          <div style="width:40px;height:40px;border-radius:10px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+          </div>
+          <h3 style="font-size:18px;font-weight:800;letter-spacing:-0.3px;margin-bottom:12px;">Design</h3>
+          <p style="font-size:12px;color:#888;line-height:1.7;">Craft pixel-perfect, brand-aligned visuals that communicate value and inspire action.</p>
+          <div class="process-watermark" style="color:#111;">.03</div>
+        </div>
+
+        <!-- Step 04 — White -->
+        <div class="process-card animate delay-6" style="background:#fff;border:1px solid #eee;color:#111;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#bbb;margin-bottom:32px;">.04</div>
+          <div style="width:40px;height:40px;border-radius:10px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h3 style="font-size:18px;font-weight:800;letter-spacing:-0.3px;margin-bottom:12px;">Build & Launch</h3>
+          <p style="font-size:12px;color:#888;line-height:1.7;">Engineer robust, scalable digital products with flawless execution and meticulous QA.</p>
+          <div class="process-watermark" style="color:#111;">.04</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       PRICING SECTION
+  ============================= -->
+  <section id="pricing" style="background:#0a0a0a;padding:96px 0;" data-reveal>
+    <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+      <div class="text-center mb-16">
+        <span class="section-label light animate delay-1" style="color:rgba(255,255,255,0.4);">Transparent pricing</span>
+        <h2 class="section-title mt-3 animate delay-2" style="color:#fff;">Simple Plans,<br/><em style="color:rgba(255,255,255,0.25);">Real Results</em></h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Starter -->
+        <div class="pricing-card animate delay-3">
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:24px;">Starter</div>
+          <div style="margin-bottom:24px;">
+            <span style="font-size:14px;color:rgba(255,255,255,0.4);vertical-align:top;margin-top:8px;display:inline-block;">$</span>
+            <span style="font-size:64px;font-weight:900;letter-spacing:-3px;color:#fff;">2,900</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.4);"> / project</span>
+          </div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.7;margin-bottom:28px;">Perfect for startups and small businesses launching their first digital presence.</p>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px;">
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.6);">Brand Identity Package</span></div>
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.6);">5-Page Website Design</span></div>
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.6);">Mobile Responsive</span></div>
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.6);">2 Revision Rounds</span></div>
+          </div>
+          <button style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:14px;padding:14px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">Get Started</button>
+        </div>
+
+        <!-- Pro — Featured -->
+        <div class="pricing-card featured animate delay-4" style="position:relative;">
+          <div style="position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:#3b82f6;color:#fff;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 16px;border-radius:0 0 10px 10px;">Most Popular</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#3b82f6;text-transform:uppercase;margin-bottom:24px;margin-top:16px;">Professional</div>
+          <div style="margin-bottom:24px;">
+            <span style="font-size:14px;color:rgba(255,255,255,0.4);vertical-align:top;margin-top:8px;display:inline-block;">$</span>
+            <span style="font-size:64px;font-weight:900;letter-spacing:-3px;color:#fff;">7,900</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.4);"> / project</span>
+          </div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.7;margin-bottom:28px;">For growing businesses ready to elevate their digital presence and accelerate growth.</p>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px;">
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#4ade80;font-size:11px;font-weight:700;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.7);">Full Brand System</span></div>
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#4ade80;font-size:11px;font-weight:700;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.7);">Custom Web Application</span></div>
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#4ade80;font-size:11px;font-weight:700;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.7);">UX Research & Strategy</span></div>
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#4ade80;font-size:11px;font-weight:700;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.7);">SEO & Performance Optimization</span></div>
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#4ade80;font-size:11px;font-weight:700;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.7);">Unlimited Revisions</span></div>
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#4ade80;font-size:11px;font-weight:700;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.7);">90-Day Post-Launch Support</span></div>
+          </div>
+          <button style="width:100%;background:#3b82f6;border:none;color:#fff;border-radius:14px;padding:14px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">Get Started</button>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="pricing-card animate delay-5">
+          <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:24px;">Enterprise</div>
+          <div style="margin-bottom:24px;">
+            <span style="font-size:32px;font-weight:900;letter-spacing:-1px;color:#fff;display:block;line-height:1.2;">Custom</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.4);">Tailored to your scale</span>
+          </div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.7;margin-bottom:28px;">For organizations requiring a dedicated studio partnership and enterprise-grade solutions.</p>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px;">
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.6);">Dedicated Project Team</span></div>
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.6);">Multi-Platform Systems</span></div>
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.6);">Priority SLA & Support</span></div>
+            <div class="flex items-center gap-3"><span style="width:20px;height:20px;border-radius:50%;background:rgba(74,222,128,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</span><span style="font-size:13px;color:rgba(255,255,255,0.6);">NDA & Custom Contracts</span></div>
+          </div>
+          <button style="width:100%;background:#fff;border:none;color:#111;border-radius:14px;padding:14px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.background='#e5e5e5'" onmouseout="this.style.background='#fff'">Book a Call</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       FAQ SECTION
+  ============================= -->
+  <section id="faq" class="light-section" style="padding:96px 0;" data-reveal>
+    <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+      <div class="max-w-3xl mx-auto">
+        <div class="text-center mb-16">
+          <span class="section-label animate delay-1" style="color:#888;">FAQs</span>
+          <h2 class="section-title mt-3 animate delay-2" style="color:#111;">Common <em>Questions</em></h2>
+        </div>
+
+        <!-- FAQ Items -->
+        <div class="animate delay-3">
+          <div class="faq-item py-6 cursor-pointer" onclick="toggleFaq(this)">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-start gap-5">
+                <span style="font-size:11px;font-weight:700;letter-spacing:2px;color:#bbb;margin-top:2px;">01.</span>
+                <h3 style="font-size:16px;font-weight:700;color:#111;letter-spacing:-0.2px;">How long does a typical project take?</h3>
+              </div>
+              <span class="faq-icon" style="color:#111;flex-shrink:0;">+</span>
+            </div>
+            <div class="faq-content pl-10 mt-4">
+              <p style="font-size:13px;color:#666;line-height:1.8;">Project timelines vary by scope. A brand identity typically takes 3–4 weeks; a full website design and development engagement runs 8–14 weeks. We provide a detailed project roadmap with milestones before any work begins so expectations are clear from day one.</p>
+            </div>
+          </div>
+
+          <div class="faq-item py-6 cursor-pointer" onclick="toggleFaq(this)">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-start gap-5">
+                <span style="font-size:11px;font-weight:700;letter-spacing:2px;color:#bbb;margin-top:2px;">02.</span>
+                <h3 style="font-size:16px;font-weight:700;color:#111;letter-spacing:-0.2px;">What industries do you work with?</h3>
+              </div>
+              <span class="faq-icon" style="color:#111;flex-shrink:0;">+</span>
+            </div>
+            <div class="faq-content pl-10 mt-4">
+              <p style="font-size:13px;color:#666;line-height:1.8;">We partner with ambitious brands across technology, fintech, luxury consumer goods, healthcare, media, and e-commerce. Our team's diverse background means we bring industry-informed perspective regardless of your vertical, while keeping a fresh, unbiased creative eye.</p>
+            </div>
+          </div>
+
+          <div class="faq-item py-6 cursor-pointer" onclick="toggleFaq(this)">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-start gap-5">
+                <span style="font-size:11px;font-weight:700;letter-spacing:2px;color:#bbb;margin-top:2px;">03.</span>
+                <h3 style="font-size:16px;font-weight:700;color:#111;letter-spacing:-0.2px;">Do you offer post-launch support and maintenance?</h3>
+              </div>
+              <span class="faq-icon" style="color:#111;flex-shrink:0;">+</span>
+            </div>
+            <div class="faq-content pl-10 mt-4">
+              <p style="font-size:13px;color:#666;line-height:1.8;">Yes. All Professional and Enterprise projects include a 90-day post-launch support period. After that, we offer flexible retainer arrangements for ongoing design, development, and strategic support. We believe in building long-term partnerships, not one-off transactions.</p>
+            </div>
+          </div>
+
+          <div class="faq-item py-6 cursor-pointer" onclick="toggleFaq(this)">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-start gap-5">
+                <span style="font-size:11px;font-weight:700;letter-spacing:2px;color:#bbb;margin-top:2px;">04.</span>
+                <h3 style="font-size:16px;font-weight:700;color:#111;letter-spacing:-0.2px;">What does the collaboration process look like?</h3>
+              </div>
+              <span class="faq-icon" style="color:#111;flex-shrink:0;">+</span>
+            </div>
+            <div class="faq-content pl-10 mt-4">
+              <p style="font-size:13px;color:#666;line-height:1.8;">We use a collaborative sprint model. After discovery, we share weekly deliverables via a dedicated project workspace. You'll have direct access to your project lead at all times, and feedback loops are structured to keep things efficient without becoming chaotic. No surprises.</p>
+            </div>
+          </div>
+
+          <div class="faq-item py-6 cursor-pointer" onclick="toggleFaq(this)">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-start gap-5">
+                <span style="font-size:11px;font-weight:700;letter-spacing:2px;color:#bbb;margin-top:2px;">05.</span>
+                <h3 style="font-size:16px;font-weight:700;color:#111;letter-spacing:-0.2px;">How do you handle intellectual property and ownership?</h3>
+              </div>
+              <span class="faq-icon" style="color:#111;flex-shrink:0;">+</span>
+            </div>
+            <div class="faq-content pl-10 mt-4">
+              <p style="font-size:13px;color:#666;line-height:1.8;">Upon final payment, full intellectual property rights for all deliverables transfer to you. We retain the right to display the work in our portfolio unless an NDA is in place. We're completely transparent about this from day one — your business outcomes and IP protection always come first.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       BLOG SECTION
+  ============================= -->
+  <section id="blog" class="light-section" style="padding:96px 0;" data-reveal>
+    <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+      <div class="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
+        <div>
+          <span class="section-label animate delay-1" style="color:#888;">Insights</span>
+          <h2 class="section-title mt-3 animate delay-2" style="color:#111;">Latest Articles</h2>
+        </div>
+        <a href="#" class="animate delay-3" style="font-size:13px;font-weight:600;color:#111;text-decoration:none;border-bottom:1px solid #111;padding-bottom:1px;">View All Articles →</a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="blog-card animate delay-3">
+          <div style="height:200px;overflow:hidden;">
+            <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=500&h=300" alt="The Design Audit" class="w-full h-full object-cover transition-transform duration-500" style="transform:scale(1);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+          </div>
+          <div style="padding:24px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span style="font-size:11px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:1px;">Design</span>
+              <span style="font-size:11px;color:#bbb;">·</span>
+              <span style="font-size:11px;color:#888;">5 min read</span>
+            </div>
+            <h3 style="font-size:16px;font-weight:800;color:#111;letter-spacing:-0.3px;margin-bottom:10px;line-height:1.3;">The Design Audit: Why Your Brand Needs One Every Year</h3>
+            <p style="font-size:12px;color:#888;line-height:1.7;">A systematic review of your visual identity reveals costly inconsistencies before they erode customer trust.</p>
+          </div>
+        </div>
+
+        <div class="blog-card animate delay-4">
+          <div style="height:200px;overflow:hidden;">
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=500&h=300" alt="Conversion Rate" class="w-full h-full object-cover transition-transform duration-500" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+          </div>
+          <div style="padding:24px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span style="font-size:11px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:1px;">Strategy</span>
+              <span style="font-size:11px;color:#bbb;">·</span>
+              <span style="font-size:11px;color:#888;">8 min read</span>
+            </div>
+            <h3 style="font-size:16px;font-weight:800;color:#111;letter-spacing:-0.3px;margin-bottom:10px;line-height:1.3;">Conversion Rate Optimization: Design Decisions That Actually Move the Needle</h3>
+            <p style="font-size:12px;color:#888;line-height:1.7;">The micro-decisions that separate a 2% conversion rate from a 6% one are almost always design-driven.</p>
+          </div>
+        </div>
+
+        <div class="blog-card animate delay-5">
+          <div style="height:200px;overflow:hidden;">
+            <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=500&h=300" alt="Building Systems" class="w-full h-full object-cover transition-transform duration-500" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+          </div>
+          <div style="padding:24px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span style="font-size:11px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:1px;">Technology</span>
+              <span style="font-size:11px;color:#bbb;">·</span>
+              <span style="font-size:11px;color:#888;">6 min read</span>
+            </div>
+            <h3 style="font-size:16px;font-weight:800;color:#111;letter-spacing:-0.3px;margin-bottom:10px;line-height:1.3;">Building Design Systems That Scale: A Technical & Creative Guide</h3>
+            <p style="font-size:12px;color:#888;line-height:1.7;">How to create a living component library that keeps your product visually consistent at any scale.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       CONTACT SECTION
+  ============================= -->
+  <section id="contact" style="background:#0a0a0a;padding:96px 0;" data-reveal>
+    <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+      <div class="flex flex-col lg:flex-row gap-16 items-start">
+
+        <!-- Left content -->
+        <div class="w-full lg:w-[45%]">
+          <span class="section-label light animate delay-1" style="color:rgba(255,255,255,0.4);">Get in touch</span>
+          <h2 class="section-title mt-4 mb-6 animate delay-2" style="color:#fff;">
+            Let's Build<br/>
+            <em style="color:rgba(255,255,255,0.25);">Something</em><br/>
+            Remarkable.
+          </h2>
+          <p class="animate delay-3" style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.8;max-width:360px;margin-bottom:40px;">
+            We're selective about the projects we take on — and that's exactly why the ones we do take on succeed. Tell us about your vision.
+          </p>
+
+          <!-- Contact Info -->
+          <div class="flex flex-col gap-5 animate delay-4">
+            <div class="flex items-center gap-4">
+              <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              </div>
+              <div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Email</div>
+                <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:500;">hello@apexstudio.co</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </div>
+              <div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Phone</div>
+                <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:500;">+1 (415) 820-4400</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Location</div>
+                <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:500;">San Francisco, CA · Remote Worldwide</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Social -->
+          <div class="flex items-center gap-3 mt-10 animate delay-5">
+            <a href="#" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);transition:all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.12)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.5)'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+            </a>
+            <a href="#" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);transition:all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.12)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.5)'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+            </a>
+            <a href="#" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);transition:all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.12)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.5)'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+            </a>
+            <a href="#" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);transition:all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.12)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.5)'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Form -->
+        <div class="w-full lg:w-[55%] animate delay-4">
+          <div style="background:#141414;border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:40px;">
+            <h3 style="font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:6px;">Start a Conversation</h3>
+            <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:28px;">We typically respond within 24 hours.</p>
+
+            <form onsubmit="return false;" style="display:flex;flex-direction:column;gap:16px;">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">First Name</label>
+                  <input type="text" placeholder="Alex" class="contact-input">
+                </div>
+                <div>
+                  <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">Last Name</label>
+                  <input type="text" placeholder="Johnson" class="contact-input">
+                </div>
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">Email Address</label>
+                <input type="email" placeholder="alex@company.com" class="contact-input">
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">Project Type</label>
+                <select class="contact-input" style="appearance:none;">
+                  <option value="" style="background:#141414;">Select a service...</option>
+                  <option value="brand" style="background:#141414;">Brand Identity</option>
+                  <option value="web" style="background:#141414;">Website Design & Development</option>
+                  <option value="ux" style="background:#141414;">UX/Product Design</option>
+                  <option value="motion" style="background:#141414;">Motion & Animation</option>
+                  <option value="strategy" style="background:#141414;">Digital Strategy</option>
+                  <option value="other" style="background:#141414;">Other / Not Sure Yet</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">Tell Us About Your Project</label>
+                <textarea placeholder="Describe your vision, goals, timeline, and any specific challenges..." class="contact-input" rows="4" style="resize:vertical;"></textarea>
+              </div>
+              <button type="submit" style="background:#fff;color:#111;border:none;border-radius:14px;padding:16px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:0.3px;" onmouseover="this.style.background='#e5e5e5';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#fff';this.style.transform='translateY(0)'">
+                Send Message
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       FOOTER
+  ============================= -->
+  <footer style="background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.06);padding:64px 0 32px;" data-reveal>
+    <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+
+      <!-- Top row -->
+      <div class="flex flex-col md:flex-row justify-between gap-12 mb-16">
+        <!-- Brand -->
+        <div class="w-full md:w-[30%]">
+          <div class="flex items-center gap-2 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <span style="font-size:15px;font-weight:800;letter-spacing:-0.5px;">Apex Studio<sup style="font-size:0.55em;font-weight:400;opacity:0.5;">®</sup></span>
+          </div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.35);line-height:1.8;max-width:240px;">We turn ambitious ideas into striking digital realities through strategy, design, and relentless attention to detail.</p>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:16px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:#4ade80;"></div>
+            <span style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:500;">Available for new projects</span>
+          </div>
+        </div>
+
+        <!-- Links grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 w-full md:w-auto">
+          <div>
+            <h4 style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">Services</h4>
+            <ul style="display:flex;flex-direction:column;gap:10px;list-style:none;padding:0;margin:0;">
+              <li><a href="#" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Brand Identity</a></li>
+              <li><a href="#" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Web Design</a></li>
+              <li><a href="#" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">UX Design</a></li>
+              <li><a href="#" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Development</a></li>
+              <li><a href="#" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Motion Design</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">Company</h4>
+            <ul style="display:flex;flex-direction:column;gap:10px;list-style:none;padding:0;margin:0;">
+              <li><a href="#about" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">About</a></li>
+              <li><a href="#team" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Team</a></li>
+              <li><a href="#projects" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Work</a></li>
+              <li><a href="#blog" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Journal</a></li>
+              <li><a href="#contact" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">Newsletter</h4>
+            <p style="font-size:12px;color:rgba(255,255,255,0.35);line-height:1.7;margin-bottom:12px;">Monthly insights on design, strategy, and creative culture.</p>
+            <div style="display:flex;gap:8px;">
+              <input type="email" placeholder="Your email" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;padding:10px 14px;font-size:12px;outline:none;min-width:0;font-family:'Inter',sans-serif;" onfocus="this.style.borderColor='rgba(59,130,246,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+              <button style="background:#3b82f6;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;transition:background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">→</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:28px;display:flex;flex-direction:column;gap:12px;" class="sm:flex-row sm:justify-between sm:items-center">
+        <p style="font-size:12px;color:rgba(255,255,255,0.25);">© 2024 Apex Studio Inc. All rights reserved.</p>
+        <div style="display:flex;gap:20px;">
+          <a href="#" style="font-size:12px;color:rgba(255,255,255,0.25);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">Privacy Policy</a>
+          <a href="#" style="font-size:12px;color:rgba(255,255,255,0.25);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">Terms of Service</a>
+          <a href="#" style="font-size:12px;color:rgba(255,255,255,0.25);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // FAQ Toggle
+    function toggleFaq(item) {
+      const content = item.querySelector('.faq-content');
+      const icon = item.querySelector('.faq-icon');
+      const isOpen = content.classList.contains('open');
+
+      // Close all
+      document.querySelectorAll('.faq-content').forEach(c => c.classList.remove('open'));
+      document.querySelectorAll('.faq-icon').forEach(i => {
+        i.classList.remove('open');
+        i.textContent = '+';
+      });
+
+      // Toggle current
+      if (!isOpen) {
+        content.classList.add('open');
+        icon.classList.add('open');
+        icon.textContent = '×';
+      }
+    }
+
+    // Mobile menu close on link click
+    document.querySelectorAll('#mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.add('hidden');
+      });
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href === '#') return;
+        const target = document.querySelector(href);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Nav background on scroll
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        nav.style.background = 'rgba(17,17,17,0.95)';
+        nav.style.backdropFilter = 'blur(12px)';
+        nav.style.borderBottom = '1px solid rgba(255,255,255,0.06)';
+        nav.style.paddingTop = '12px';
+        nav.style.paddingBottom = '12px';
+      } else {
+        nav.style.background = 'transparent';
+        nav.style.backdropFilter = 'none';
+        nav.style.borderBottom = 'none';
+        nav.style.paddingTop = '20px';
+        nav.style.paddingBottom = '20px';
+      }
+    });
+  </script>
+<!-- WEAVO_RUNTIME -->
+<script>/* runtime injected at generation time */</script>
+<!-- /WEAVO_RUNTIME -->
+</body>
+</html>

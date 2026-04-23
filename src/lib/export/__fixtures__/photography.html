@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studio Hub - Professional Photography</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .animate { opacity: 0; animation: fadeInUp 0.8s ease forwards; }
+    .animate-fade { opacity: 0; animation: fadeIn 0.8s ease forwards; }
+    .animate-scale { opacity: 0; animation: scaleIn 0.6s ease forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+    .delay-6 { animation-delay: 0.6s; }
+    .delay-7 { animation-delay: 0.7s; }
+    .delay-8 { animation-delay: 0.8s; }
+    .delay-9 { animation-delay: 0.9s; }
+    .delay-10 { animation-delay: 1.0s; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-white text-stone-900">
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-stone-100">
+    <div class="max-w-7xl mx-auto px-4 md:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-3 animate">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+            <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+            <circle cx="12" cy="13" r="3"/>
+          </svg>
+          <span class="text-xl font-heading font-bold">Studio Hub</span>
+        </div>
+        
+        <div class="hidden md:flex items-center space-x-8 animate delay-1">
+          <a href="#home" class="text-stone-600 hover:text-amber-500 transition-colors duration-200">Home</a>
+          <a href="#about" class="text-stone-600 hover:text-amber-500 transition-colors duration-200">About</a>
+          <a href="#gallery" class="text-stone-600 hover:text-amber-500 transition-colors duration-200">Gallery</a>
+          <a href="#pricing" class="text-stone-600 hover:text-amber-500 transition-colors duration-200">Pricing</a>
+          <a href="#contact" class="text-stone-600 hover:text-amber-500 transition-colors duration-200">Contact</a>
+        </div>
+        
+        <button class="bg-stone-900 text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-stone-800 transition-all duration-300 animate delay-2">
+          Book Session
+        </button>
+        
+        <button class="md:hidden" id="mobile-menu-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" x2="20" y1="12" y2="12"/>
+            <line x1="4" x2="20" y1="6" y2="6"/>
+            <line x1="4" x2="20" y1="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div class="hidden md:hidden bg-white border-t border-stone-100" id="mobile-menu">
+      <div class="px-4 py-6 space-y-4">
+        <a href="#home" class="block text-stone-600 hover:text-amber-500">Home</a>
+        <a href="#about" class="block text-stone-600 hover:text-amber-500">About</a>
+        <a href="#gallery" class="block text-stone-600 hover:text-amber-500">Gallery</a>
+        <a href="#pricing" class="block text-stone-600 hover:text-amber-500">Pricing</a>
+        <a href="#contact" class="block text-stone-600 hover:text-amber-500">Contact</a>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Hero Section -->
+  <section id="home" class="pt-24 pb-16 md:pt-32 md:pb-24 bg-stone-50" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div class="space-y-8">
+          <h1 class="text-5xl md:text-7xl lg:text-8xl font-heading font-bold leading-tight animate">
+            Capturing <em class="text-amber-500 font-normal">moments</em> that matter
+          </h1>
+          <p class="text-lg md:text-xl text-stone-600 max-w-2xl animate delay-1">
+            Professional photography services that transform your special moments into timeless memories. From intimate portraits to grand celebrations, we craft visual stories that speak to your heart.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 animate delay-2">
+            <button class="bg-stone-900 text-white px-8 py-4 rounded-full font-medium hover:bg-stone-800 hover:scale-105 transition-all duration-300">
+              View Portfolio
+            </button>
+            <button class="border border-stone-300 text-stone-700 px-8 py-4 rounded-full font-medium hover:border-amber-500 hover:text-amber-500 transition-all duration-300">
+              Get Quote
+            </button>
+          </div>
+        </div>
+        <div class="relative animate delay-3">
+          <div class="aspect-square overflow-hidden rounded-2xl shadow-2xl">
+            <img src="https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&q=80&w=800&h=800" 
+                 alt="Professional Photography - Wedding couple in beautiful lighting" 
+                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                 loading="eager"
+                 onload="this.style.opacity='1'"
+                 onerror="this.src='https://images.unsplash.com/photo-1606216794074-735e91aa2c92?auto=format&fit=crop&q=80&w=800&h=800'"
+                 style="opacity:0;transition:opacity 0.3s">
+          </div>
+          <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-amber-500/10 rounded-2xl -z-10"></div>
+          <div class="absolute -top-6 -right-6 w-24 h-24 bg-stone-900/10 rounded-2xl -z-10"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Gallery Preview -->
+  <section id="gallery" class="py-24 bg-white" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-8">
+      <div class="text-center mb-16 animate delay-4">
+        <h2 class="text-4xl md:text-5xl font-heading font-bold mb-6">Recent Works</h2>
+        <p class="text-xl text-stone-600 max-w-3xl mx-auto">
+          A curated collection of our finest photography, showcasing the beauty and emotion in every frame
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div class="group cursor-pointer animate delay-5">
+          <div class="aspect-[4/5] overflow-hidden rounded-xl">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=600&h=750" 
+                 alt="Portrait Photography" 
+                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                 loading="lazy">
+          </div>
+          <div class="mt-4">
+            <h3 class="font-heading font-semibold text-lg">Portrait Session</h3>
+            <p class="text-stone-600">Professional headshots & lifestyle portraits</p>
+          </div>
+        </div>
+        
+        <div class="group cursor-pointer animate delay-6">
+          <div class="aspect-[4/5] overflow-hidden rounded-xl">
+            <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=600&h=750" 
+                 alt="Wedding Photography" 
+                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                 loading="lazy">
+          </div>
+          <div class="mt-4">
+            <h3 class="font-heading font-semibold text-lg">Wedding Day</h3>
+            <p class="text-stone-600">Capturing love stories in their finest moments</p>
+          </div>
+        </div>
+        
+        <div class="group cursor-pointer animate delay-7">
+          <div class="aspect-[4/5] overflow-hidden rounded-xl">
+            <img src="https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&q=80&w=600&h=750" 
+                 alt="Landscape Photography" 
+                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                 loading="lazy">
+          </div>
+          <div class="mt-4">
+            <h3 class="font-heading font-semibold text-lg">Nature & Landscapes</h3>
+            <p class="text-stone-600">The raw beauty of natural environments</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center animate delay-8">
+        <button class="border border-stone-300 text-stone-700 px-8 py-3 rounded-full font-medium hover:border-amber-500 hover:text-amber-500 transition-all duration-300">
+          View Full Gallery
+        </button>
+      </div>
+    </div>
+  </section>
+  
+  <!-- About Section -->
+  <section id="about" class="py-24 bg-stone-50" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-8">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div class="relative animate delay-9">
+          <div class="aspect-[4/3] overflow-hidden rounded-2xl">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800&h=600" 
+                 alt="Photographer at work" 
+                 class="w-full h-full object-cover"
+                 loading="lazy">
+          </div>
+        </div>
+        <div class="space-y-8 animate delay-10">
+          <h2 class="text-4xl md:text-5xl font-heading font-bold">
+            Where <em class="text-amber-500 font-normal">creativity</em> meets expertise
+          </h2>
+          <div class="space-y-6 text-lg text-stone-600">
+            <p>
+              With over a decade of experience in professional photography, Studio Hub has been trusted by hundreds of clients to capture their most precious moments.
+            </p>
+            <p>
+              Our approach combines technical excellence with artistic vision, ensuring that every photograph tells a unique story. From intimate family portraits to grand corporate events, we bring the same level of passion and attention to detail to every shoot.
+            </p>
+            <p>
+              What sets us apart is our ability to create a comfortable, relaxed environment where authentic emotions can shine through. We believe that the best photographs happen when people feel genuinely themselves.
+            </p>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-8 pt-8 border-t border-stone-200">
+            <div class="text-center">
+              <div class="text-3xl font-heading font-bold text-stone-900">500+</div>
+              <div class="text-stone-600 text-sm">Happy Clients</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-heading font-bold text-stone-900">10+</div>
+              <div class="text-stone-600 text-sm">Years Experience</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-heading font-bold text-stone-900">15</div>
+              <div class="text-stone-600 text-sm">Awards Won</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Services Grid -->
+  <section class="py-24 bg-white" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-heading font-bold mb-6">Our Services</h2>
+        <p class="text-xl text-stone-600 max-w-3xl mx-auto">
+          Comprehensive photography solutions tailored to capture your unique vision
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="group p-8 rounded-2xl bg-stone-50 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
+          <div class="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-heading font-semibold mb-3">Portrait Photography</h3>
+          <p class="text-stone-600 mb-4">Professional headshots, family portraits, and lifestyle photography that captures personality and emotion.</p>
+          <div class="text-stone-900 font-semibold">Starting at $150</div>
+        </div>
+        
+        <div class="group p-8 rounded-2xl bg-stone-50 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
+          <div class="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-heading font-semibold mb-3">Wedding Photography</h3>
+          <p class="text-stone-600 mb-4">Complete wedding day coverage from preparation to celebration, preserving every precious moment.</p>
+          <div class="text-stone-900 font-semibold">Starting at $2,500</div>
+        </div>
+        
+        <div class="group p-8 rounded-2xl bg-stone-50 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
+          <div class="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+              <path d="M2 12h20"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-heading font-semibold mb-3">Corporate Events</h3>
+          <p class="text-stone-600 mb-4">Professional documentation of conferences, seminars, and corporate gatherings.</p>
+          <div class="text-stone-900 font-semibold">Starting at $500</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Pricing Section -->
+  <section id="pricing" class="py-24 bg-stone-50" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-heading font-bold mb-6">Investment Plans</h2>
+        <p class="text-xl text-stone-600 max-w-3xl mx-auto">
+          Transparent pricing for exceptional photography services
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div class="bg-white rounded-2xl p-8 border border-stone-200 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
+          <h3 class="text-xl font-heading font-bold mb-2">Essential</h3>
+          <div class="text-3xl font-bold mb-4">$150<span class="text-lg font-normal text-stone-600">/session</span></div>
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">1-hour photo session</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">20 edited high-res images</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">Online gallery access</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">2-week delivery</span>
+            </li>
+          </ul>
+          <button class="w-full border border-stone-300 text-stone-700 py-3 rounded-full font-medium hover:border-amber-500 hover:text-amber-500 transition-all duration-300">
+            Choose Essential
+          </button>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-8 border-2 border-amber-500 relative hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
+          <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-amber-500 text-white px-6 py-2 rounded-full text-sm font-medium">
+            Most Popular
+          </div>
+          <h3 class="text-xl font-heading font-bold mb-2">Professional</h3>
+          <div class="text-3xl font-bold mb-4">$350<span class="text-lg font-normal text-stone-600">/session</span></div>
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">3-hour photo session</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">60 edited high-res images</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">Multiple location shoots</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">1-week delivery</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">Print release included</span>
+            </li>
+          </ul>
+          <button class="w-full bg-amber-500 text-white py-3 rounded-full font-medium hover:bg-amber-600 transition-all duration-300">
+            Choose Professional
+          </button>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-8 border border-stone-200 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
+          <h3 class="text-xl font-heading font-bold mb-2">Premium</h3>
+          <div class="text-3xl font-bold mb-4">$750<span class="text-lg font-normal text-stone-600">/session</span></div>
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">Full-day coverage</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">150+ edited images</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">Custom album design</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">48-hour sneak peek</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <span class="text-stone-600">Second photographer</span>
+            </li>
+          </ul>
+          <button class="w-full border border-stone-300 text-stone-700 py-3 rounded-full font-medium hover:border-amber-500 hover:text-amber-500 transition-all duration-300">
+            Choose Premium
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Contact Section -->
+  <section id="contact" class="py-24 bg-stone-900 text-white" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-8">
+      <div class="grid lg:grid-cols-2 gap-16 items-start">
+        <div class="space-y-8">
+          <h2 class="text-4xl md:text-5xl font-heading font-bold">
+            Let's create something <em class="text-amber-500 font-normal">beautiful</em> together
+          </h2>
+          <p class="text-xl text-stone-300">
+            Ready to capture your special moments? Get in touch and let's discuss how we can bring your vision to life.
+          </p>
+          
+          <div class="space-y-6">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+              </div>
+              <div>
+                <div class="font-medium">Phone</div>
+                <div class="text-stone-300">(555) 123-4567</div>
+              </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                  <rect x="2" y="4" width="20" height="16" rx="2"/>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+              </div>
+              <div>
+                <div class="font-medium">Email</div>
+                <div class="text-stone-300">hello@studiohub.com</div>
+              </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              </div>
+              <div>
+                <div class="font-medium">Studio Address</div>
+                <div class="text-stone-300">123 Photography Lane<br>Creative District, CD 12345</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <form class="bg-stone-800 rounded-2xl p-8">
+          <div class="space-y-6">
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium mb-2">First Name</label>
+                <input type="text" class="w-full bg-stone-700 border border-stone-600 rounded-lg px-4 py-3 focus:border-amber-500 focus:outline-none transition-colors">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Last Name</label>
+                <input type="text" class="w-full bg-stone-700 border border-stone-600 rounded-lg px-4 py-3 focus:border-amber-500 focus:outline-none transition-colors">
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium mb-2">Email</label>
+              <input type="email" class="w-full bg-stone-700 border border-stone-600 rounded-lg px-4 py-3 focus:border-amber-500 focus:outline-none transition-colors">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium mb-2">Service Interested</label>
+              <select class="w-full bg-stone-700 border border-stone-600 rounded-lg px-4 py-3 focus:border-amber-500 focus:outline-none transition-colors">
+                <option>Portrait Photography</option>
+                <option>Wedding Photography</option>
+                <option>Corporate Events</option>
+                <option>Other</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium mb-2">Message</label>
+              <textarea rows="4" class="w-full bg-stone-700 border border-stone-600 rounded-lg px-4 py-3 focus:border-amber-500 focus:outline-none transition-colors" placeholder="Tell us about your vision..."></textarea>
+            </div>
+            
+            <button type="submit" class="w-full bg-amber-500 text-stone-900 py-3 rounded-lg font-medium hover:bg-amber-400 transition-colors duration-300">
+              Send Message
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="bg-stone-50 border-t border-stone-200 py-16" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-8">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500">
+              <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+              <circle cx="12" cy="13" r="3"/>
+            </svg>
+            <span class="text-xl font-heading font-bold">Studio Hub</span>
+          </div>
+          <p class="text-stone-600">
+            Professional photography services that capture the essence of every moment with artistic vision and technical excellence.
+          </p>
+          <div class="flex gap-4">
+            <a href="#" class="w-10 h-10 bg-stone-200 rounded-full flex items-center justify-center hover:bg-amber-500 hover:text-white transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+              </svg>
+            </a>
+            <a href="#" class="w-10 h-10 bg-stone-200 rounded-full flex items-center justify-center hover:bg-amber-500 hover:text-white transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="font-heading font-semibold mb-4">Services</h4>
+          <ul class="space-y-2 text-stone-600">
+            <li><a href="#" class="hover:text-amber-500 transition-colors">Portrait Photography</a></li>
+            <li><a href="#" class="hover:text-amber-500 transition-colors">Wedding Photography</a></li>
+            <li><a href="#" class="hover:text-amber-500 transition-colors">Corporate Events</a></li>
+            <li><a href="#" class="hover:text-amber-500 transition-colors">Commercial Photography</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-heading font-semibold mb-4">Company</h4>
+          <ul class="space-y-2 text-stone-600">
+            <li><a href="#about" class="hover:text-amber-500 transition-colors">About Us</a></li>
+            <li><a href="#gallery" class="hover:text-amber-500 transition-colors">Portfolio</a></li>
+            <li><a href="#pricing" class="hover:text-amber-500 transition-colors">Pricing</a></li>
+            <li><a href="#contact" class="hover:text-amber-500 transition-colors">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-heading font-semibold mb-4">Contact Info</h4>
+          <ul class="space-y-2 text-stone-600">
+            <li>(555) 123-4567</li>
+            <li>hello@studiohub.com</li>
+            <li>123 Photography Lane<br>Creative District, CD 12345</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-stone-200 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <p class="text-stone-600">© 2024 Studio Hub. All rights reserved.</p>
+        <div class="flex gap-6 mt-4 md:mt-0">
+          <a href="#" class="text-stone-600 hover:text-amber-500 transition-colors text-sm">Privacy Policy</a>
+          <a href="#" class="text-stone-600 hover:text-amber-500 transition-colors text-sm">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <script>
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    mobileMenuButton.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+    
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+          // Close mobile menu after clicking
+          mobileMenu.classList.add('hidden');
+        }
+      });
+    });
+  </script>
+<!-- WEAVO_RUNTIME -->
+<script>/* runtime injected at generation time */</script>
+<!-- /WEAVO_RUNTIME -->
+</body>
+</html>

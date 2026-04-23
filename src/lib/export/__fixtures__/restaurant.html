@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APEX - Premium Food Delivery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            accent: {
+              orange: '#FF5722',
+              yellow: '#FFC107',
+              green: '#4CAF50',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    .animate { opacity: 0; animation: fadeInUp 0.8s ease forwards; }
+    .animate-fade { opacity: 0; animation: fadeIn 0.8s ease forwards; }
+    .animate-left { opacity: 0; animation: slideInLeft 0.8s ease forwards; }
+    .animate-right { opacity: 0; animation: slideInRight 0.8s ease forwards; }
+    .animate-scale { opacity: 0; animation: scaleIn 0.8s ease forwards; }
+    
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+    .delay-6 { animation-delay: 0.6s; }
+    .delay-7 { animation-delay: 0.7s; }
+    .delay-8 { animation-delay: 0.8s; }
+    .delay-9 { animation-delay: 0.9s; }
+    .delay-10 { animation-delay: 1.0s; }
+    
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    .topographic-pattern {
+      background-image: 
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M10 50 Q30 30 50 50 T90 50" stroke="rgba(255,255,255,0.1)" fill="none" stroke-width="0.5"/><path d="M10 60 Q30 40 50 60 T90 60" stroke="rgba(255,255,255,0.1)" fill="none" stroke-width="0.5"/><path d="M10 70 Q30 50 50 70 T90 70" stroke="rgba(255,255,255,0.1)" fill="none" stroke-width="0.5"/><path d="M10 40 Q30 20 50 40 T90 40" stroke="rgba(255,255,255,0.08)" fill="none" stroke-width="0.5"/></svg>');
+      background-size: 200px 200px;
+      background-repeat: repeat;
+    }
+
+    .food-doodle {
+      opacity: 0.08;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .badge-starburst {
+      position: relative;
+      display: inline-block;
+    }
+
+    .badge-starburst::before {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      background: conic-gradient(from 0deg, transparent, #FFC107, transparent 30deg);
+      border-radius: 50%;
+      animation: spin 20s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .dotted-line {
+      flex: 1;
+      border-bottom: 2px dotted #e5e5e5;
+      margin: 0 12px;
+    }
+
+    .avatar-stack img {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    .avatar-stack img:nth-child(2) {
+      margin-left: -12px;
+    }
+
+    .avatar-stack img:nth-child(3) {
+      margin-left: -12px;
+    }
+
+    .hero-text-emphasis {
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .discount-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #FFC107;
+      color: #0A0A0A;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .cta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: #FF5722;
+      color: white;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .cta-pill:hover {
+      background: #E64A19;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(255, 87, 34, 0.3);
+    }
+
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .image-hover {
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .image-hover img {
+      transition: transform 0.5s ease;
+    }
+
+    .image-hover:hover img {
+      transform: scale(1.05);
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 12px;
+    }
+
+    .feature-icon-bg {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+    }
+
+    .mobile-menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 40;
+      display: none;
+    }
+
+    .mobile-menu-overlay.active {
+      display: block;
+    }
+
+    /* Carousel */
+    .carousel {
+      scroll-snap-type: x mandatory;
+      overflow-x: auto;
+    }
+
+    .carousel-item {
+      scroll-snap-align: start;
+      flex-shrink: 0;
+    }
+
+    /* Form styling */
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #FF5722;
+      box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.1);
+    }
+
+    .testimonial-nav {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #FFC107;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #FFC107;
+    }
+
+    .testimonial-nav:hover {
+      background: #FFC107;
+      color: #0A0A0A;
+    }
+  </style>
+</head>
+<body class="bg-white text-zinc-900">
+  <!-- Navigation -->
+  <nav class="sticky top-0 z-50 bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#home" class="flex items-center gap-2 font-heading text-2xl font-bold text-zinc-900">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5722" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
+        </svg>
+        APEX
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center gap-8">
+        <a href="#home" class="text-sm font-medium text-zinc-900 hover:text-accent-orange transition-colors">Home</a>
+        <a href="#menu" class="text-sm font-medium text-zinc-600 hover:text-accent-orange transition-colors">Menu</a>
+        <a href="#about" class="text-sm font-medium text-zinc-600 hover:text-accent-orange transition-colors">About</a>
+        <a href="#gallery" class="text-sm font-medium text-zinc-600 hover:text-accent-orange transition-colors">Gallery</a>
+        <a href="#testimonials" class="text-sm font-medium text-zinc-600 hover:text-accent-orange transition-colors">Testimonials</a>
+        <a href="#contact" class="text-sm font-medium text-zinc-600 hover:text-accent-orange transition-colors">Contact</a>
+      </nav>
+
+      <!-- Desktop CTA -->
+      <div class="hidden md:flex items-center gap-4">
+        <button class="cta-pill text-sm">Order Now</button>
+      </div>
+
+      <!-- Mobile Menu Toggle -->
+      <button class="md:hidden" onclick="document.getElementById('mobile-menu').classList.toggle('hidden'); document.getElementById('menu-overlay').classList.toggle('active')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 bg-white p-4 flex flex-col gap-4">
+      <a href="#home" class="text-sm font-medium text-zinc-900 hover:text-accent-orange transition-colors">Home</a>
+      <a href="#menu" class="text-sm font-medium text-zinc-600 hover:text-accent-orange transition-colors">Menu</a>
+      <a href="#about" class="text-sm font-medium text-zinc-600 hover:text-accent-orange transition-colors">About</a>
+      <a href="#gallery" class="text-sm font-medium text-zinc-600 hover:text-accent-orange transition-colors">Gallery</a>
+      <a href="#testimonials" class="text-sm font-medium text-zinc-600 hover:text-accent-orange transition-colors">Testimonials</a>
+      <a href="#contact" class="text-sm font-medium text-zinc-600 hover:text-accent-orange transition-colors">Contact</a>
+      <button class="cta-pill w-full justify-center text-sm mt-2">Order Now</button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu Overlay -->
+  <div id="menu-overlay" class="mobile-menu-overlay" onclick="document.getElementById('mobile-menu').classList.add('hidden'); document.getElementById('menu-overlay').classList.remove('active')"></div>
+
+  <!-- Hero Section -->
+  <section id="home" class="relative min-h-[70vh] md:min-h-screen flex items-center pt-20 md:pt-0" data-reveal>
+    <div class="absolute inset-0">
+      <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=1200" alt="Hero food" class="w-full h-full object-cover" loading="lazy" />
+      <div class="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent"></div>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 md:px-6 lg:px-8 w-full">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+        <!-- Left Content -->
+        <div class="animate-left">
+          <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
+            Enjoy <span class="text-accent-orange hero-text-emphasis">Healthy</span> and <span class="text-accent-green hero-text-emphasis">Delicious</span> Food
+          </h1>
+          
+          <p class="text-base md:text-lg text-zinc-600 mb-8 leading-relaxed max-w-md">
+            Experience premium culinary excellence with our carefully crafted dishes using only the finest ingredients.
+          </p>
+
+          <!-- CTAs -->
+          <div class="flex flex-col sm:flex-row gap-4 mb-12">
+            <button class="cta-pill">Online Ordering</button>
+            <button class="cta-pill bg-zinc-900 text-white hover:bg-zinc-800">Reserve Table</button>
+          </div>
+
+          <!-- Social Proof -->
+          <div class="flex items-center gap-6">
+            <div class="flex -space-x-3">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=80" alt="User 1" class="w-9 h-9 rounded-full border-2 border-white object-cover" loading="lazy" />
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=80" alt="User 2" class="w-9 h-9 rounded-full border-2 border-white object-cover" loading="lazy" />
+              <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=80" alt="User 3" class="w-9 h-9 rounded-full border-2 border-white object-cover" loading="lazy" />
+            </div>
+            <div>
+              <div class="flex items-center gap-1 mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <p class="text-sm text-zinc-600">4.8 from 500+ Reviews</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature Bar -->
+  <section class="bg-amber-50 py-12 md:py-16" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-12">
+        <!-- Feature 1 -->
+        <div class="animate delay-1 flex items-center gap-4">
+          <div class="feature-icon-bg bg-accent-orange flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="10"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-heading font-bold text-zinc-900">Discount Voucher</h3>
+            <p class="text-sm text-zinc-600">Save up to 50% on orders</p>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="animate delay-2 flex items-center gap-4">
+          <div class="feature-icon-bg bg-accent-green flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"/><path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-heading font-bold text-zinc-900">Fresh Healthy Food</h3>
+            <p class="text-sm text-zinc-600">Sourced from local farms</p>
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="animate delay-3 flex items-center gap-4">
+          <div class="feature-icon-bg bg-amber-500 flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-heading font-bold text-zinc-900">Fast Serve</h3>
+            <p class="text-sm text-zinc-600">Delivered within 30 minutes</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dish Carousel Section -->
+  <section class="bg-white py-16 md:py-24" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <div class="mb-12">
+        <p class="section-label">FLAVOR HAVEN</p>
+        <div class="flex items-end justify-between mb-8">
+          <h2 class="font-heading text-3xl md:text-5xl font-bold">Our Signature Dishes</h2>
+          <a href="#menu" class="hidden md:flex text-accent-orange font-semibold items-center gap-2 hover:gap-3 transition-all">
+            See All
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="carousel scrollbar-hide flex gap-6 overflow-x-auto pb-4">
+        <!-- Dish 1 -->
+        <div class="carousel-item">
+          <div class="animate animate-scale delay-1 bg-amber-50 rounded-3xl p-6 w-56 flex-shrink-0 card-hover">
+            <div class="image-hover mb-6">
+              <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=300" alt="Grilled Salmon" class="w-full h-48 object-cover rounded-2xl" loading="lazy" />
+            </div>
+            <h3 class="font-heading font-bold text-zinc-900 mb-2">Grilled Salmon</h3>
+            <p class="text-sm text-zinc-600 mb-4">Premium Atlantic salmon with herbs</p>
+            <div class="flex items-center justify-between">
+              <span class="font-heading font-bold text-lg text-accent-orange">$24.99</span>
+              <button class="cta-pill text-sm">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dish 2 -->
+        <div class="carousel-item">
+          <div class="animate animate-scale delay-2 bg-amber-50 rounded-3xl p-6 w-56 flex-shrink-0 card-hover">
+            <div class="image-hover mb-6">
+              <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=300" alt="Caesar Salad" class="w-full h-48 object-cover rounded-2xl" loading="lazy" />
+            </div>
+            <h3 class="font-heading font-bold text-zinc-900 mb-2">Caesar Salad</h3>
+            <p class="text-sm text-zinc-600 mb-4">Crispy romaine with homemade dressing</p>
+            <div class="flex items-center justify-between">
+              <span class="font-heading font-bold text-lg text-accent-orange">$14.99</span>
+              <button class="cta-pill text-sm">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dish 3 -->
+        <div class="carousel-item">
+          <div class="animate animate-scale delay-3 bg-amber-50 rounded-3xl p-6 w-56 flex-shrink-0 card-hover">
+            <div class="image-hover mb-6">
+              <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Pasta Carbonara" class="w-full h-48 object-cover rounded-2xl" loading="lazy" />
+            </div>
+            <h3 class="font-heading font-bold text-zinc-900 mb-2">Pasta Carbonara</h3>
+            <p class="text-sm text-zinc-600 mb-4">Authentic Italian pasta with parmesan</p>
+            <div class="flex items-center justify-between">
+              <span class="font-heading font-bold text-lg text-accent-orange">$16.99</span>
+              <button class="cta-pill text-sm">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dish 4 -->
+        <div class="carousel-item">
+          <div class="animate animate-scale delay-4 bg-amber-50 rounded-3xl p-6 w-56 flex-shrink-0 card-hover">
+            <div class="image-hover mb-6">
+              <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=300" alt="Grilled Vegetables" class="w-full h-48 object-cover rounded-2xl" loading="lazy" />
+            </div>
+            <h3 class="font-heading font-bold text-zinc-900 mb-2">Grilled Vegetables</h3>
+            <p class="text-sm text-zinc-600 mb-4">Seasonal vegetables with olive oil</p>
+            <div class="flex items-center justify-between">
+              <span class="font-heading font-bold text-lg text-accent-orange">$12.99</span>
+              <button class="cta-pill text-sm">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="bg-stone-50 py-16 md:py-24" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <!-- Left: Images -->
+        <div class="animate-left">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="image-hover rounded-2xl overflow-hidden h-80">
+              <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Chef" class="w-full h-full object-cover" loading="lazy" />
+            </div>
+            <div class="image-hover rounded-2xl overflow-hidden h-80 md:mt-12">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400" alt="Food preparation" class="w-full h-full object-cover" loading="lazy" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Content -->
+        <div class="animate-right">
+          <p class="section-label">OUR STORY</p>
+          <h2 class="font-heading text-3xl md:text-5xl font-bold mb-6">Crafted with Passion</h2>
+          <p class="text-base md:text-lg text-zinc-600 mb-8 leading-relaxed">
+            APEX was founded with a simple mission: to bring premium culinary experiences to everyone. Our chefs are dedicated to creating dishes that not only taste exceptional but also nourish your body and soul.
+          </p>
+
+          <!-- Feature Cards -->
+          <div class="grid grid-cols-2 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg border border-gray-200 card-hover">
+              <div class="feature-icon-bg bg-accent-orange mb-4 mx-auto w-fit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <h3 class="font-heading font-bold text-center text-zinc-900 mb-2">100+ Reviews</h3>
+              <p class="text-xs text-center text-zinc-600">Trusted by thousands</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg border border-gray-200 card-hover">
+              <div class="feature-icon-bg bg-accent-yellow mb-4 mx-auto w-fit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-1.5-1.5a2.121 2.121 0 0 0-3 0l-2.5 2.5L2 16.5V22h5.5L20 7z"/></svg>
+              </div>
+              <h3 class="font-heading font-bold text-center text-zinc-900 mb-2">Expert Chefs</h3>
+              <p class="text-xs text-center text-zinc-600">15+ years experience</p>
+            </div>
+          </div>
+
+          <button class="cta-pill w-full md:w-auto">Learn More</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Promotional Banner Grid -->
+  <section class="bg-white py-16 md:py-24" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <p class="section-label">SPECIAL OFFERS</p>
+      <h2 class="font-heading text-3xl md:text-5xl font-bold mb-12">Limited Time Deals</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Promo Card 1 -->
+        <div class="animate delay-1 relative overflow-hidden rounded-2xl card-hover bg-accent-orange text-white group">
+          <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=500" alt="Promo 1" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity" loading="lazy" />
+          <div class="relative z-10 p-8 min-h-64 flex flex-col justify-between">
+            <div>
+              <div class="inline-block bg-accent-yellow text-accent-orange font-bold px-4 py-2 rounded-full text-sm mb-4">50% OFF</div>
+              <h3 class="font-heading text-2xl md:text-3xl font-bold">Premium Burgers</h3>
+              <p class="text-sm opacity-90 mt-2">Fresh beef patties with gourmet toppings</p>
+            </div>
+            <button class="bg-white text-accent-orange font-semibold px-6 py-3 rounded-full hover:bg-gray-100 transition-colors w-fit">Order Now</button>
+          </div>
+        </div>
+
+        <!-- Promo Card 2 -->
+        <div class="animate delay-2 relative overflow-hidden rounded-2xl card-hover bg-accent-green text-white group md:col-span-1 lg:row-span-2">
+          <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Promo 2" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity" loading="lazy" />
+          <div class="relative z-10 p-8 min-h-64 md:min-h-full flex flex-col justify-between">
+            <div>
+              <div class="inline-block bg-accent-yellow text-zinc-900 font-bold px-4 py-2 rounded-full text-sm mb-4">35% OFF</div>
+              <h3 class="font-heading text-2xl md:text-3xl font-bold">Healthy Bowls</h3>
+              <p class="text-sm opacity-90 mt-2">Nutritious ingredients combined perfectly</p>
+            </div>
+            <button class="bg-white text-accent-green font-semibold px-6 py-3 rounded-full hover:bg-gray-100 transition-colors w-fit">Order Now</button>
+          </div>
+        </div>
+
+        <!-- Promo Card 3 -->
+        <div class="animate delay-3 relative overflow-hidden rounded-2xl card-hover bg-zinc-900 text-white group">
+          <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=500" alt="Promo 3" class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity" loading="lazy" />
+          <div class="relative z-10 p-8 min-h-64 flex flex-col justify-between">
+            <div>
+              <div class="inline-block bg-accent-yellow text-zinc-900 font-bold px-4 py-2 rounded-full text-sm mb-4">Free Delivery</div>
+              <h3 class="font-heading text-2xl md:text-3xl font-bold">Family Combos</h3>
+              <p class="text-sm opacity-90 mt-2">Perfect for dinner with your loved ones</p>
+            </div>
+            <button class="bg-accent-orange text-white font-semibold px-6 py-3 rounded-full hover:bg-orange-600 transition-colors w-fit">Order Now</button>
+          </div>
+        </div>
+
+        <!-- Promo Card 4 -->
+        <div class="animate delay-4 relative overflow-hidden rounded-2xl card-hover bg-amber-500 text-white group md:col-span-2 lg:col-span-1">
+          <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=500" alt="Promo 4" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity" loading="lazy" />
+          <div class="relative z-10 p-8 min-h-48 flex flex-col justify-between">
+            <div>
+              <div class="inline-block bg-accent-yellow text-amber-700 font-bold px-4 py-2 rounded-full text-sm mb-4">25% OFF</div>
+              <h3 class="font-heading text-2xl md:text-3xl font-bold">Seafood Specials</h3>
+              <p class="text-sm opacity-90 mt-2">Fresh catch of the day</p>
+            </div>
+            <button class="bg-white text-amber-500 font-semibold px-6 py-3 rounded-full hover:bg-gray-100 transition-colors w-fit">Order Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us Section -->
+  <section class="bg-zinc-900 topographic-pattern text-white py-16 md:py-24 relative overflow-hidden" data-reveal>
+    <!-- Food Doodles -->
+    <svg class="food-doodle" style="top: 5%; left: 5%; width: 120px; height: 120px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+      <path d="M35 30 Q50 20 65 30 Q65 55 50 65 Q35 55 35 30" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+    </svg>
+    <svg class="food-doodle" style="bottom: 10%; right: 8%; width: 100px; height: 100px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <rect x="20" y="25" width="60" height="50" rx="5" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+      <line x1="30" y1="25" x2="30" y2="75" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+      <line x1="70" y1="25" x2="70" y2="75" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+    </svg>
+
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 relative z-10">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <!-- Left Content -->
+        <div class="animate-left">
+          <p class="section-label">WHY CHOOSE US</p>
+          <h2 class="font-heading text-3xl md:text-5xl font-bold mb-8">Excellence in Every Bite</h2>
+
+          <div class="space-y-6">
+            <!-- Feature 1 -->
+            <div class="flex gap-4 animate delay-1">
+              <div class="feature-icon-bg bg-accent-orange flex-shrink-0 text-sm font-bold">1</div>
+              <div>
+                <h3 class="font-heading font-bold mb-2">Premium Ingredients</h3>
+                <p class="text-sm opacity-80">We source only the finest ingredients from trusted suppliers</p>
+              </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="flex gap-4 animate delay-2">
+              <div class="feature-icon-bg bg-accent-orange flex-shrink-0 text-sm font-bold">2</div>
+              <div>
+                <h3 class="font-heading font-bold mb-2">Expert Preparation</h3>
+                <p class="text-sm opacity-80">Certified chefs with 15+ years of culinary experience</p>
+              </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="flex gap-4 animate delay-3">
+              <div class="feature-icon-bg bg-accent-orange flex-shrink-0 text-sm font-bold">3</div>
+              <div>
+                <h3 class="font-heading font-bold mb-2">Fast Delivery</h3>
+                <p class="text-sm opacity-80">Hot meals delivered to your door within 30 minutes</p>
+              </div>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="flex gap-4 animate delay-4">
+              <div class="feature-icon-bg bg-accent-orange flex-shrink-0 text-sm font-bold">4</div>
+              <div>
+                <h3 class="font-heading font-bold mb-2">100% Satisfaction</h3>
+                <p class="text-sm opacity-80">Money-back guarantee if you're not completely satisfied</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Image -->
+        <div class="animate-right hidden md:block">
+          <div class="image-hover rounded-2xl overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=600" alt="Premium dish" class="w-full h-[500px] object-cover" loading="lazy" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Menu Section -->
+  <section id="menu" class="bg-white py-16 md:py-24" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <!-- Left: Featured Menu Card -->
+        <div class="animate-left">
+          <div class="image-hover rounded-2xl overflow-hidden mb-6">
+            <img src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=500" alt="Special Menu" class="w-full h-80 object-cover" loading="lazy" />
+          </div>
+          <div class="bg-accent-orange text-white p-6 rounded-xl">
+            <h3 class="font-heading text-2xl font-bold mb-2">Chef's Special</h3>
+            <p class="text-sm opacity-90 mb-4">Limited time seasonal creation featuring the finest ingredients</p>
+            <button class="bg-white text-accent-orange font-semibold px-6 py-2 rounded-full hover:bg-gray-100 transition-colors">View Details</button>
+          </div>
+        </div>
+
+        <!-- Right: Menu Items -->
+        <div class="animate-right">
+          <p class="section-label">FOOD MENU</p>
+          <h2 class="font-heading text-3xl md:text-5xl font-bold mb-10">Delicious Offerings</h2>
+
+          <div class="space-y-6">
+            <!-- Menu Item 1 -->
+            <div class="flex items-center gap-4 pb-4 border-b border-gray-200 animate delay-1">
+              <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=100" alt="Grilled Fish" class="w-16 h-16 rounded-full object-cover flex-shrink-0" loading="lazy" />
+              <div class="flex-1">
+                <h3 class="font-heading font-bold text-zinc-900">Grilled Fish Fillet</h3>
+                <p class="text-xs text-zinc-600">Lemon butter sauce</p>
+              </div>
+              <span class="font-heading font-bold text-accent-orange">$18.99</span>
+            </div>
+
+            <!-- Menu Item 2 -->
+            <div class="flex items-center gap-4 pb-4 border-b border-gray-200 animate delay-2">
+              <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=100" alt="Pasta" class="w-16 h-16 rounded-full object-cover flex-shrink-0" loading="lazy" />
+              <div class="flex-1">
+                <h3 class="font-heading font-bold text-zinc-900">Vegetable Pasta</h3>
+                <p class="text-xs text-zinc-600">Fresh seasonal vegetables</p>
+              </div>
+              <span class="font-heading font-bold text-accent-orange">$14.99</span>
+            </div>
+
+            <!-- Menu Item 3 -->
+            <div class="flex items-center gap-4 pb-4 border-b border-gray-200 animate delay-3">
+              <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Bowl" class="w-16 h-16 rounded-full object-cover flex-shrink-0" loading="lazy" />
+              <div class="flex-1">
+                <h3 class="font-heading font-bold text-zinc-900">Buddha Bowl</h3>
+                <p class="text-xs text-zinc-600">Quinoa, vegetables & tahini</p>
+              </div>
+              <span class="font-heading font-bold text-accent-orange">$13.99</span>
+            </div>
+
+            <!-- Menu Item 4 -->
+            <div class="flex items-center gap-4 pb-4 animate delay-4">
+              <img src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=100" alt="Steak" class="w-16 h-16 rounded-full object-cover flex-shrink-0" loading="lazy" />
+              <div class="flex-1">
+                <h3 class="font-heading font-bold text-zinc-900">Prime Rib Steak</h3>
+                <p class="text-xs text-zinc-600">Herb-crusted, medium-rare</p>
+              </div>
+              <span class="font-heading font-bold text-accent-orange">$26.99</span>
+            </div>
+          </div>
+
+          <button class="cta-pill w-full md:w-auto mt-8">View Full Menu</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery Section -->
+  <section id="gallery" class="bg-stone-50 py-16 md:py-24" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <p class="section-label">VISUAL FEAST</p>
+      <h2 class="font-heading text-3xl md:text-5xl font-bold mb-12">Food Gallery</h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Gallery Item 1 -->
+        <div class="animate delay-1 image-hover rounded-xl overflow-hidden h-64 sm:h-72 lg:h-80 col-span-1 sm:col-span-1 lg:col-span-2 lg:row-span-2">
+          <img src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=600" alt="Gallery 1" class="w-full h-full object-cover" loading="lazy" />
+        </div>
+
+        <!-- Gallery Item 2 -->
+        <div class="animate delay-2 image-hover rounded-xl overflow-hidden h-64 sm:h-72">
+          <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400" alt="Gallery 2" class="w-full h-full object-cover" loading="lazy" />
+        </div>
+
+        <!-- Gallery Item 3 -->
+        <div class="animate delay-3 image-hover rounded-xl overflow-hidden h-64 sm:h-72">
+          <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=400" alt="Gallery 3" class="w-full h-full object-cover" loading="lazy" />
+        </div>
+
+        <!-- Gallery Item 4 -->
+        <div class="animate delay-4 image-hover rounded-xl overflow-hidden h-64 sm:h-72">
+          <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1600" alt="Gallery 4" class="w-full h-full object-cover" loading="lazy" />
+        </div>
+
+        <!-- Gallery Item 5 -->
+        <div class="animate delay-5 image-hover rounded-xl overflow-hidden h-64 sm:h-72">
+          <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400" alt="Gallery 5" class="w-full h-full object-cover" loading="lazy" />
+        </div>
+
+        <!-- Gallery Item 6 -->
+        <div class="animate delay-6 image-hover rounded-xl overflow-hidden h-64 sm:h-72 lg:col-span-2">
+          <img src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=600" alt="Gallery 6" class="w-full h-full object-cover" loading="lazy" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section id="testimonials" class="bg-white py-16 md:py-24" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <p class="section-label">WHAT CUSTOMERS SAY</p>
+      <h2 class="font-heading text-3xl md:text-5xl font-bold mb-12">Testimonials</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Testimonial Card 1 -->
+        <div class="animate delay-1 bg-white border border-gray-200 rounded-xl p-8 card-hover">
+          <div class="flex items-center gap-4 mb-6">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=80" alt="Customer 1" class="w-12 h-12 rounded-full object-cover" loading="lazy" />
+            <div>
+              <h3 class="font-heading font-bold text-zinc-900">Sarah Johnson</h3>
+              <p class="text-xs text-zinc-600">Verified Customer</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="text-base text-zinc-700">"The food at APEX is absolutely incredible. Fresh ingredients, amazing flavors, and the service is top-notch. I've recommended them to all my friends!"</p>
+        </div>
+
+        <!-- Testimonial Card 2 -->
+        <div class="animate delay-2 bg-white border border-gray-200 rounded-xl p-8 card-hover">
+          <div class="flex items-center gap-4 mb-6">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=80" alt="Customer 2" class="w-12 h-12 rounded-full object-cover" loading="lazy" />
+            <div>
+              <h3 class="font-heading font-bold text-zinc-900">Michael Chen</h3>
+              <p class="text-xs text-zinc-600">Verified Customer</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="text-base text-zinc-700">"Best restaurant in the area! Fast delivery, hot food, and incredible taste. The healthy options are perfect for my diet. Keep up the great work!"</p>
+        </div>
+
+        <!-- Testimonial Card 3 -->
+        <div class="animate delay-3 bg-white border border-gray-200 rounded-xl p-8 card-hover">
+          <div class="flex items-center gap-4 mb-6">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=80" alt="Customer 3" class="w-12 h-12 rounded-full object-cover" loading="lazy" />
+            <div>
+              <h3 class="font-heading font-bold text-zinc-900">Emily Rodriguez</h3>
+              <p class="text-xs text-zinc-600">Verified Customer</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="text-base text-zinc-700">"APEX never disappoints! The chefs really know what they're doing. Each dish is a masterpiece. I'm a regular customer now and couldn't be happier."</p>
+        </div>
+
+        <!-- Testimonial Card 4 -->
+        <div class="animate delay-4 bg-white border border-gray-200 rounded-xl p-8 card-hover">
+          <div class="flex items-center gap-4 mb-6">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=80" alt="Customer 4" class="w-12 h-12 rounded-full object-cover" loading="lazy" />
+            <div>
+              <h3 class="font-heading font-bold text-zinc-900">David Thompson</h3>
+              <p class="text-xs text-zinc-600">Verified Customer</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="text-base text-zinc-700">"Finally found my favorite restaurant! The quality is consistent, prices are fair, and they always deliver on time. Highly recommended!"</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact & Reservation Section -->
+  <section id="contact" class="bg-zinc-900 topographic-pattern text-white py-16 md:py-24 relative overflow-hidden" data-reveal>
+    <!-- Food Doodles -->
+    <svg class="food-doodle" style="top: 10%; right: 10%; width: 150px; height: 150px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+      <path d="M50 20 L70 80 L30 80 Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+    </svg>
+
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 relative z-10">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <!-- Left: Info -->
+        <div class="animate-left">
+          <p class="section-label">GET IN TOUCH</p>
+          <h2 class="font-heading text-3xl md:text-5xl font-bold mb-8">Reserve Your Table</h2>
+          
+          <div class="space-y-8">
+            <div class="flex items-start gap-4">
+              <div class="feature-icon-bg bg-accent-orange flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </div>
+              <div>
+                <h3 class="font-heading font-bold mb-2">Phone</h3>
+                <p class="text-sm opacity-80">+1 (555) 123-4567</p>
+                <p class="text-xs opacity-60 mt-1">Open daily 10 AM - 10 PM</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+              <div class="feature-icon-bg bg-accent-green flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <h3 class="font-heading font-bold mb-2">Location</h3>
+                <p class="text-sm opacity-80">123 Culinary Lane</p>
+                <p class="text-xs opacity-60 mt-1">Downtown District</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+              <div class="feature-icon-bg bg-accent-yellow flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              </div>
+              <div>
+                <h3 class="font-heading font-bold mb-2">Email</h3>
+                <p class="text-sm opacity-80">hello@apex-food.com</p>
+                <p class="text-xs opacity-60 mt-1">Response within 2 hours</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Reservation Form -->
+        <div class="animate-right bg-white text-zinc-900 p-8 rounded-2xl">
+          <h3 class="font-heading text-2xl font-bold mb-6">Book a Table</h3>
+          <form class="space-y-4">
+            <input type="text" placeholder="Your Name" class="form-input" required />
+            <input type="email" placeholder="Your Email" class="form-input" required />
+            <input type="tel" placeholder="Your Phone" class="form-input" required />
+            
+            <div class="grid grid-cols-2 gap-4">
+              <input type="date" class="form-input" required />
+              <input type="time" class="form-input" required />
+            </div>
+            
+            <select class="form-input" required>
+              <option value="">Select Guests</option>
+              <option value="1">1 Guest</option>
+              <option value="2">2 Guests</option>
+              <option value="3">3 Guests</option>
+              <option value="4">4 Guests</option>
+              <option value="5">5+ Guests</option>
+            </select>
+
+            <textarea placeholder="Special Requests" rows="4" class="form-input resize-none"></textarea>
+
+            <button type="submit" class="cta-pill w-full justify-center">Book a Table</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter Section -->
+  <section class="bg-accent-green text-white py-16 md:py-20" data-reveal>
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <div class="max-w-2xl mx-auto text-center animate">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-4">
+          <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+        </svg>
+        <h2 class="font-heading text-3xl md:text-4xl font-bold mb-4">Subscribe to Our Newsletter</h2>
+        <p class="text-base opacity-90 mb-8">Get exclusive recipes, special offers, and restaurant updates delivered to your inbox.</p>
+        
+        <form class="flex flex-col sm:flex-row gap-3 justify-center">
+          <input type="email" placeholder="Enter your email" class="form-input flex-1 sm:max-w-xs bg-white text-zinc-900" required />
+          <button type="submit" class="bg-accent-orange text-white font-semibold px-8 py-3 rounded-full hover:bg-orange-600 transition-colors whitespace-nowrap">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-zinc-900 topographic-pattern text-white py-16 md:py-24 relative overflow-hidden" data-reveal>
+    <!-- Decorative Elements -->
+    <svg class="food-doodle" style="top: 5%; left: 5%; width: 140px; height: 140px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <rect x="25" y="20" width="50" height="60" rx="5" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+      <line x1="35" y1="20" x2="35" y2="80" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+      <line x1="65" y1="20" x2="65" y2="80" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+      <circle cx="50" cy="50" r="8" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+    </svg>
+
+    <svg class="food-doodle" style="bottom: 10%; right: 5%; width: 160px; height: 160px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+      <path d="M50 10 L65 40 L95 45 L70 65 L80 95 L50 75 L20 95 L30 65 L5 45 L35 40 Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+    </svg>
+
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 relative z-10">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+        <!-- Brand -->
+        <div class="col-span-2 md:col-span-1">
+          <div class="flex items-center gap-2 font-heading text-xl font-bold mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF5722" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
+            </svg>
+            APEX
+          </div>
+          <p class="text-sm opacity-70">Premium food delivery and restaurant services.</p>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h3 class="font-heading font-bold text-white mb-4">Pages</h3>
+          <ul class="space-y-2 text-sm opacity-70">
+            <li><a href="#home" class="hover:text-accent-orange transition-colors">Home</a></li>
+            <li><a href="#menu" class="hover:text-accent-orange transition-colors">Menu</a></li>
+            <li><a href="#about" class="hover:text-accent-orange transition-colors">About</a></li>
+            <li><a href="#contact" class="hover:text-accent-orange transition-colors">Contact</a></li>
+          </ul>
+        </div>
+
+        <!-- Legal -->
+        <div>
+          <h3 class="font-heading font-bold text-white mb-4">Legal</h3>
+          <ul class="space-y-2 text-sm opacity-70">
+            <li><a href="#" class="hover:text-accent-orange transition-colors">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-accent-orange transition-colors">Terms of Service</a></li>
+            <li><a href="#" class="hover:text-accent-orange transition-colors">Cookies</a></li>
+            <li><a href="#" class="hover:text-accent-orange transition-colors">Sitemap</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Info -->
+        <div>
+          <h3 class="font-heading font-bold text-white mb-4">Contact</h3>
+          <ul class="space-y-2 text-sm opacity-70">
+            <li>+1 (555) 123-4567</li>
+            <li>hello@apex-food.com</li>
+            <li>123 Culinary Lane</li>
+            <li>Downtown District</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="border-t border-white/10 pt-8">
+        <!-- Social Icons -->
+        <div class="flex items-center justify-center gap-4 mb-6">
+          <a href="#" class="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center hover:bg-accent-orange hover:border-accent-orange transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center hover:bg-accent-orange hover:border-accent-orange transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center hover:bg-accent-orange hover:border-accent-orange transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" fill="rgba(10,10,10,1)"/><circle cx="17.5" cy="6.5" r="1.5" fill="rgba(10,10,10,1)"/></svg>
+          </a>
+        </div>
+
+        <!-- Copyright -->
+        <p class="text-center text-sm opacity-60">
+          © 2024 APEX Restaurant. All rights reserved. Made with ❤️ for food lovers.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href === '#' || href === '#home') return;
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+          // Close mobile menu if open
+          const mobileMenu = document.getElementById('mobile-menu');
+          const menuOverlay = document.getElementById('menu-overlay');
+          if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+            menuOverlay.classList.remove('active');
+          }
+        }
+      });
+    });
+
+    // Form submission
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Thank you! We will get back to you shortly.');
+        this.reset();
+      });
+    });
+
+    // Button interactions
+    document.querySelectorAll('button:not([type="button"][onclick]), .cta-pill:not([type])').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        if (this.textContent.includes('Add') || this.textContent.includes('Order')) {
+          e.preventDefault();
+          alert('Item added to cart!');
+        } else if (this.textContent.includes('Book')) {
+          e.preventDefault();
+        }
+      });
+    });
+  </script>
+<!-- WEAVO_RUNTIME -->
+<script>/* runtime injected at generation time */</script>
+<!-- /WEAVO_RUNTIME -->
+</body>
+</html>
