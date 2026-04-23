@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsc --noEmit && node --test src/lib/export/__tests__/**/*.test.mjs"
+    "test": "tsc --noEmit && node --experimental-strip-types --no-warnings --test src/lib/export/__tests__/**/*.test.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.64",
@@ -21,10 +21,12 @@
     "ai": "^6.0.141",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "domutils": "^4.0.2",
     "file-saver": "^2.0.5",
     "framer-motion": "^12.38.0",
     "grapesjs": "^0.22.14",
     "grapesjs-preset-webpage": "^1.0.3",
+    "htmlparser2": "^12.0.0",
     "jszip": "^3.10.1",
     "lucide-react": "^1.7.0",
     "next": "16.2.1",
