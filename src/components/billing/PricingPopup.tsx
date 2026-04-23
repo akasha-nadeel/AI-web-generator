@@ -10,7 +10,14 @@ import { useCreditsStore } from "@/stores/creditsStore";
 import { cn } from "@/lib/utils";
 import { PaddleCheckoutModal } from "./PaddleCheckoutModal";
 
-const ACCENT = "#C8E600";
+const ACCENT = "#4F46E5"; // Default to indigo
+
+const PACK_COLORS: Record<string, string> = {
+  free: "#64748B", // Matches Haiku
+  starter: "#0284C7", // Matches Sonnet
+  popular: "#4F46E5", // Indigo 600
+  studio: "#1E1B4B", // Deep Navy
+};
 
 type CreditPack = (typeof CREDIT_PACKS)[number];
 
@@ -30,6 +37,7 @@ type PackCard = {
   ctaLabel: string;
   popular: boolean;
   features: string[];
+  color: string;
 };
 
 const FREE_CARD: PackCard = {
@@ -46,6 +54,7 @@ const FREE_CARD: PackCard = {
     "Unlock Sonnet & Opus with any pack",
     "Export as ZIP",
   ],
+  color: PACK_COLORS.free,
 };
 
 const PACK_FEATURES: Record<string, string[]> = {
@@ -118,7 +127,7 @@ export function PricingPopup({
   const [paddle, setPaddle] = useState<Paddle | null>(null);
   const [paddleError, setPaddleError] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
-  const [activeCheckout, setActiveCheckout] = useState<{ pack: CreditPack; priceId: string } | null>(null);
+  const [activeCheckout, setActiveCheckout] = useState<{ pack: CreditPack; priceId: string; color: string } | null>(null);
   const pollingRef = useRef(false);
 
   const startPolling = () => {
@@ -197,6 +206,7 @@ export function PricingPopup({
       ctaLabel: `Buy ${p.name}`,
       popular: p.popular,
       features: PACK_FEATURES[p.id] ?? [],
+      color: PACK_COLORS[p.id] ?? ACCENT,
     })),
   ];
 
@@ -218,7 +228,7 @@ export function PricingPopup({
     if (!pack) return;
 
     setLoadingId(packId);
-    setActiveCheckout({ pack, priceId });
+    setActiveCheckout({ pack, priceId, color: PACK_COLORS[packId] ?? ACCENT });
     setLoadingId(null);
   };
 
@@ -254,19 +264,21 @@ export function PricingPopup({
               <div
                 key={card.id}
                 className={cn(
-                  "relative flex flex-col rounded-2xl p-5 md:p-6 transition-all",
+                  "relative flex flex-col rounded-2xl p-5 md:p-6 transition-all border",
                   card.popular
                     ? "border-2 shadow-lg"
-                    : "border border-border bg-foreground/[0.03] hover:border-foreground/[0.1] hover:bg-foreground/[0.05]"
+                    : "border-border bg-foreground/[0.03] hover:border-foreground/[0.1] hover:bg-foreground/[0.05]"
                 )}
                 style={
                   card.popular
                     ? {
-                        borderColor: ACCENT,
-                        backgroundColor: `${ACCENT}0A`,
-                        boxShadow: `0 10px 30px -10px ${ACCENT}26`,
+                        borderColor: card.color,
+                        backgroundColor: `${card.color}0A`,
+                        boxShadow: `0 10px 30px -10px ${card.color}26`,
                       }
-                    : undefined
+                    : {
+                        borderColor: card.id === "free" ? "transparent" : undefined
+                      }
                 }
               >
                 <div className="flex items-center justify-between gap-2 mb-1">
@@ -275,9 +287,9 @@ export function PricingPopup({
                     <span
                       className="text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap border"
                       style={{
-                        color: ACCENT,
-                        borderColor: card.popular ? `${ACCENT}80` : `${ACCENT}4D`,
-                        backgroundColor: card.popular ? `${ACCENT}33` : `${ACCENT}1A`,
+                        color: card.color,
+                        borderColor: `${card.color}4D`,
+                        backgroundColor: `${card.color}1A`,
                       }}
                     >
                       {card.badge}
@@ -304,13 +316,10 @@ export function PricingPopup({
                     onClick={() => handleBuy(card.id)}
                     disabled={loadingId === card.id}
                     className={cn(
-                      "flex items-center justify-center w-full py-2.5 rounded-xl font-semibold text-sm mb-5 transition-all",
-                      card.popular
-                        ? "text-black shadow-sm hover:opacity-90"
-                        : "bg-foreground/[0.08] text-foreground/90 hover:bg-foreground/[0.14] border border-border",
+                      "flex items-center justify-center w-full py-2.5 rounded-xl font-semibold text-sm mb-5 transition-all text-white shadow-sm hover:opacity-90",
                       loadingId === card.id && "opacity-60 cursor-wait"
                     )}
-                    style={card.popular ? { backgroundColor: ACCENT } : undefined}
+                    style={{ backgroundColor: card.color }}
                   >
                     {loadingId === card.id ? "Loading…" : card.ctaLabel}
                   </button>
@@ -324,7 +333,7 @@ export function PricingPopup({
                         <Check
                           className="w-4 h-4 shrink-0 mt-[2px]"
                           strokeWidth={3}
-                          style={{ color: ACCENT }}
+                          style={{ color: card.color }}
                         />
                         <span className="text-muted-foreground leading-snug">
                           {numberMatch ? (
@@ -356,6 +365,7 @@ export function PricingPopup({
           customerEmail={clerkUser.primaryEmailAddress?.emailAddress ?? null}
           clerkId={clerkUser.id}
           onClose={() => setActiveCheckout(null)}
+          packColor={activeCheckout.color}
         />
       )}
     </>

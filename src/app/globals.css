@@ -101,6 +101,31 @@
   --sidebar-ring: oklch(0.55 0.25 290);
 }
 
+/* Global Dark Scrollbar for Light Mode */
+html {
+  scrollbar-color: #333333 #111111;
+  scrollbar-width: thin;
+}
+
+/* Webkit Specific Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111111;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border: 3px solid #111111;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444444;
+}
+
 .dark {
   --background: oklch(0.1 0.02 280);
   --foreground: oklch(0.95 0 0);

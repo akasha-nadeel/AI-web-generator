@@ -41,7 +41,7 @@ function extractSubdomain(host: string): string | null {
   return sub;
 }
 
-export function proxy(request: NextRequest, event: NextFetchEvent) {
+export default function middleware(request: NextRequest, event: NextFetchEvent) {
   const host = request.headers.get("host") || "";
 
   if (!isAppHost(host)) {

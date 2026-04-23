@@ -65,6 +65,8 @@ export default function SignUpPage() {
       >
         {mounted && (
           <SignUp
+            routing="path"
+            path="/sign-up"
             forceRedirectUrl="/dashboard"
             appearance={isDark ? {
               variables: {

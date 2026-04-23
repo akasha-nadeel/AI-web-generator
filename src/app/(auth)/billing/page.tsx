@@ -9,7 +9,7 @@ import { initializePaddle, type Paddle } from "@paddle/paddle-js";
 import { CreditCounter } from "@/components/ui/CreditCounter";
 import { useCreditsStore } from "@/stores/creditsStore";
 import { CREDIT_PACKS, MODEL_COSTS, type ModelKey } from "@/lib/constants";
-import { ArrowLeft, Check, Zap, Sparkles, Gem, Plus, X, Lock } from "lucide-react";
+import { ArrowLeft, Check, Zap, Sparkles, Gem, Plus, X, Lock, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PaddleCheckoutModal } from "@/components/billing/PaddleCheckoutModal";
 
@@ -21,7 +21,14 @@ const PADDLE_PRICE_IDS: Record<string, string | undefined> = {
   studio: process.env.NEXT_PUBLIC_PADDLE_PRICE_STUDIO,
 };
 
-const ACCENT = "#C8E600";
+const ACCENT = "#4F46E5"; // Default to indigo
+
+const PACK_COLORS: Record<string, string> = {
+  free: "#64748B", // Matches Haiku
+  starter: "#0284C7", // Matches Sonnet
+  popular: "#4F46E5", // Indigo 600
+  studio: "#1E1B4B", // Deep Navy
+};
 
 type PackCard = {
   id: string;
@@ -33,6 +40,7 @@ type PackCard = {
   ctaLabel: string;
   popular: boolean;
   features: string[];
+  color: string;
 };
 
 const FREE_CARD: PackCard = {
@@ -49,6 +57,7 @@ const FREE_CARD: PackCard = {
     "Unlock Sonnet & Opus with any pack",
     "Export as ZIP",
   ],
+  color: PACK_COLORS.free,
 };
 
 const PACK_FEATURES: Record<string, string[]> = {
@@ -119,7 +128,7 @@ export default function BillingPage() {
   const [paddle, setPaddle] = useState<Paddle | null>(null);
   const [paddleError, setPaddleError] = useState<string | null>(null);
   const [purchaseSuccess, setPurchaseSuccess] = useState<PurchaseSuccess | null>(null);
-  const [activeCheckout, setActiveCheckout] = useState<{ pack: CreditPack; priceId: string } | null>(null);
+  const [activeCheckout, setActiveCheckout] = useState<{ pack: CreditPack; priceId: string; color: string } | null>(null);
   const pollingRef = useRef(false);
   const lastPackIdRef = useRef<string | null>(null);
 
@@ -201,6 +210,7 @@ export default function BillingPage() {
       ctaLabel: `Buy ${p.name}`,
       popular: p.popular,
       features: PACK_FEATURES[p.id] ?? [],
+      color: PACK_COLORS[p.id] ?? ACCENT,
     })),
   ];
 
@@ -223,7 +233,7 @@ export default function BillingPage() {
 
     setLoadingId(packId);
     lastPackIdRef.current = packId;
-    setActiveCheckout({ pack, priceId });
+    setActiveCheckout({ pack, priceId, color: PACK_COLORS[packId] ?? ACCENT });
     setLoadingId(null);
   };
 
@@ -294,71 +304,44 @@ export default function BillingPage() {
               View packs
             </a>
           </div>
-        ) : (
-          <div className="mb-8 inline-flex items-start gap-2.5 px-4 py-2.5 rounded-full bg-foreground/[0.03] border border-border max-w-2xl">
-            <span
-              className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0 mt-[1px]"
-              style={{ color: ACCENT }}
-            >
-              Why credits
-            </span>
-            <span className="text-[12.5px] text-muted-foreground leading-snug text-left">
-              Each site costs us{" "}
-              <span className="text-foreground/85 font-semibold">$0.07–$1.05</span> in AI
-              compute. Packs cover that plus hosting and payment fees — no hidden
-              markup.
-            </span>
-          </div>
-        )}
+        ) : null}
 
         {/* Pricing cards */}
-        <div id="packs" className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div id="packs" className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {cards.map((card) => (
             <div
               key={card.id}
               className={cn(
-                "relative flex flex-col rounded-2xl p-6 md:p-7 backdrop-blur-xl transition-all",
-                card.popular
-                  ? "border-2 shadow-lg"
-                  : "border border-border bg-foreground/[0.03] hover:border-foreground/[0.1] hover:bg-foreground/[0.05]"
+                "relative flex flex-col rounded-[2rem] p-6 md:p-8 transition-all border-0 overflow-hidden",
+                "text-white shadow-xl hover:shadow-2xl hover:-translate-y-1 duration-300"
               )}
-              style={
-                card.popular
-                  ? {
-                      borderColor: ACCENT,
-                      backgroundColor: `${ACCENT}0A`,
-                      boxShadow: `0 10px 30px -10px ${ACCENT}26`,
-                    }
-                  : undefined
-              }
+              style={{ 
+                backgroundColor: card.color,
+                boxShadow: `0 20px 40px -15px ${card.color}66`
+              }}
             >
               {/* Name + badge */}
               <div className="flex items-center justify-between gap-2 mb-1">
-                <h3 className="text-lg font-bold text-foreground">{card.name}</h3>
+                <h3 className="text-lg font-bold">{card.name}</h3>
                 {card.badge && (
                   <span
-                    className="text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap border"
-                    style={{
-                      color: ACCENT,
-                      borderColor: card.popular ? `${ACCENT}80` : `${ACCENT}4D`,
-                      backgroundColor: card.popular ? `${ACCENT}33` : `${ACCENT}1A`,
-                    }}
+                    className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-white/20 text-white backdrop-blur-sm"
                   >
                     {card.badge}
                   </span>
                 )}
               </div>
-              <p className="text-[13px] text-muted-foreground mb-7 min-h-[20px]">
+              <p className="text-[13px] text-white/70 mb-7 min-h-[20px]">
                 {card.tagline}
               </p>
 
               {/* Price */}
               <div className="flex items-baseline gap-1.5 mb-6">
-                <span className="text-4xl md:text-[2.75rem] font-bold leading-none text-foreground tracking-tight">
+                <span className="text-4xl md:text-[2.75rem] font-bold leading-none tracking-tight">
                   {card.price}
                 </span>
                 {card.priceSuffix && (
-                  <span className="text-sm text-muted-foreground leading-tight">
+                  <span className="text-sm text-white/60 leading-tight">
                     /{card.priceSuffix}
                   </span>
                 )}
@@ -366,7 +349,7 @@ export default function BillingPage() {
 
               {/* CTA */}
               {card.id === "free" ? (
-                <div className="flex items-center justify-center w-full py-3 rounded-xl font-semibold text-sm mb-6 bg-foreground/[0.04] text-muted-foreground border border-border">
+                <div className="flex items-center justify-center w-full py-3.5 rounded-2xl font-bold text-sm mb-6 bg-white/10 text-white/80 border border-white/10 backdrop-blur-sm">
                   Current plan
                 </div>
               ) : (
@@ -374,33 +357,28 @@ export default function BillingPage() {
                   onClick={() => handleBuy(card.id)}
                   disabled={loadingId === card.id}
                   className={cn(
-                    "flex items-center justify-center w-full py-3 rounded-xl font-semibold text-sm mb-6 transition-all",
-                    card.popular
-                      ? "text-black shadow-sm hover:opacity-90"
-                      : "bg-foreground/[0.08] text-foreground/90 hover:bg-foreground/[0.14] border border-border",
+                    "flex items-center justify-center w-full py-3.5 rounded-2xl font-bold text-sm mb-6 transition-all bg-white shadow-lg hover:bg-white/90 active:scale-[0.98]",
                     loadingId === card.id && "opacity-60 cursor-wait"
                   )}
-                  style={card.popular ? { backgroundColor: ACCENT } : undefined}
+                  style={{ color: card.color }}
                 >
                   {loadingId === card.id ? "Loading…" : card.ctaLabel}
                 </button>
               )}
 
               {/* Features */}
-              <ul className="space-y-3 text-[13.5px]">
+              <ul className="space-y-4 text-[13.5px]">
                 {card.features.map((f) => {
                   const numberMatch = f.match(/^(\d+)(.*)/);
                   return (
-                    <li key={f} className="flex items-start gap-2.5">
-                      <Check
-                        className="w-4 h-4 shrink-0 mt-[2px]"
-                        strokeWidth={3}
-                        style={{ color: ACCENT }}
-                      />
-                      <span className="text-muted-foreground leading-snug">
+                    <li key={f} className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 mt-[1px]">
+                        <Check className="w-3 h-3 text-white" strokeWidth={4} />
+                      </div>
+                      <span className="text-white/80 leading-snug">
                         {numberMatch ? (
                           <>
-                            <span className="text-[20px] font-bold text-foreground mr-1 inline-block align-middle -mt-1">
+                            <span className="text-[22px] font-black text-white mr-1.5 inline-block align-middle -mt-1.5">
                               {numberMatch[1]}
                             </span>
                             {numberMatch[2]}
@@ -413,6 +391,12 @@ export default function BillingPage() {
                   );
                 })}
               </ul>
+
+              {/* AI Watermark Effect */}
+              <Sparkles 
+                className="absolute -right-8 -bottom-8 w-40 h-40 text-white opacity-10 -rotate-12 pointer-events-none" 
+                strokeWidth={1}
+              />
             </div>
           ))}
         </div>
@@ -429,6 +413,7 @@ export default function BillingPage() {
           customerEmail={clerkUser.primaryEmailAddress?.emailAddress ?? null}
           clerkId={clerkUser.id}
           onClose={() => setActiveCheckout(null)}
+          packColor={activeCheckout.color}
         />
       )}
 
@@ -533,115 +518,118 @@ const modelRows: Array<{
   key: ModelKey;
   icon: typeof Zap;
   blurb: string;
+  color: string;
+  badge?: string;
 }> = [
   {
     key: "haiku",
     icon: Zap,
     blurb: "Quick drafts and simple landing pages. Fast output.",
+    color: "#64748B",
+    badge: "Fast",
   },
   {
     key: "sonnet",
-    icon: Sparkles,
+    icon: Gem,
     blurb: "Full design library and patterns. Recommended default.",
+    color: "#0284C7",
+    badge: "Popular",
   },
   {
     key: "opus",
-    icon: Gem,
+    icon: Crown,
     blurb: "Maximum design intelligence. Premium quality.",
+    color: "#7C3AED",
+    badge: "Elite",
   },
 ];
 
 function ModelCostBreakdown() {
   return (
     <div className="mt-16 md:mt-20">
-      <div className="mb-6 md:mb-8">
-        <h3 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+      <div className="mb-8 md:mb-10 text-center md:text-left">
+        <h3 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
           What each model costs
         </h3>
-        <p className="text-sm text-muted-foreground mt-1.5 max-w-lg">
+        <p className="text-[15px] text-muted-foreground mt-2 max-w-lg mx-auto md:mx-0">
           All three available to every paid user. Lower credits for fast drafts,
           higher for premium quality.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-3 md:gap-4">
-        {modelRows.map(({ key, icon: Icon, blurb }) => {
+      <div className="grid md:grid-cols-3 gap-4 md:gap-6">
+        {modelRows.map(({ key, icon: Icon, blurb, color, badge }) => {
           const model = MODEL_COSTS[key];
-          const isPremium = key === "opus";
           return (
             <div
               key={key}
               className={cn(
-                "rounded-2xl p-6 md:p-7 backdrop-blur-xl transition-all",
-                isPremium
-                  ? "border-2 shadow-lg"
-                  : "border border-border bg-foreground/[0.03] hover:border-foreground/[0.1] hover:bg-foreground/[0.05]"
+                "group relative rounded-[2rem] p-7 md:p-8 transition-all border-0 overflow-hidden",
+                "text-white shadow-xl"
               )}
-              style={
-                isPremium
-                  ? {
-                      borderColor: ACCENT,
-                      backgroundColor: `${ACCENT}0A`,
-                      boxShadow: `0 10px 30px -10px ${ACCENT}26`,
-                    }
-                  : undefined
-              }
+              style={{ 
+                backgroundColor: color,
+                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.15), 0 40px 50px -10px rgba(0, 0, 0, 0.25)"
+              }}
             >
-              <div className="flex items-center gap-2 mb-5">
-                <div
-                  className={cn(
-                    "w-9 h-9 rounded-xl flex items-center justify-center",
-                    !isPremium && "bg-foreground/[0.06] text-foreground/80"
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <div 
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center bg-white/20 backdrop-blur-sm border border-white/30 text-white"
+                    style={{ 
+                      boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)" 
+                    }}
+                  >
+                    <Icon 
+                      className="w-6 h-6 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" 
+                      strokeWidth={1.5} 
+                    />
+                  </div>
+                  {badge && (
+                    <span 
+                      className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-white/20 text-white backdrop-blur-sm"
+                    >
+                      {badge}
+                    </span>
                   )}
-                  style={
-                    isPremium
-                      ? { backgroundColor: `${ACCENT}33`, color: ACCENT }
-                      : undefined
-                  }
-                >
-                  <Icon className="w-4 h-4" strokeWidth={2.5} />
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                  {model.label}
-                </span>
+
+                <h4 className="text-2xl font-bold tracking-tight mb-2">
+                  {model.name}
+                </h4>
+                <p className="text-[13px] text-white/70 leading-relaxed min-h-[40px]">
+                  {blurb}
+                </p>
+
+                <div className="mt-8 pt-6 border-t border-white/10 flex items-baseline gap-1.5">
+                  <span className="text-[32px] font-black leading-none tracking-tighter">
+                    {model.credits}
+                  </span>
+                  <span className="text-[11px] font-medium text-white/60 uppercase tracking-wider">
+                    credits / generation
+                  </span>
+                </div>
+
+                <div className="mt-4 flex items-center gap-2 text-[11px] font-bold">
+                  {model.requiresPayment ? (
+                    <div className="px-2.5 py-1 rounded-md bg-black/20 text-white/80 border border-white/10 flex items-center gap-1.5 backdrop-blur-sm">
+                      <Lock className="w-3 h-3" strokeWidth={2.5} />
+                      PACK REQUIRED
+                    </div>
+                  ) : (
+                    <div className="px-2.5 py-1 rounded-md bg-white/20 text-white border border-white/10 flex items-center gap-1.5 backdrop-blur-sm">
+                      <Check className="w-3 h-3" strokeWidth={3} />
+                      AVAILABLE ON FREE TIER
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div className="text-lg font-bold text-foreground leading-tight">
-                {model.name}
-              </div>
-              <div className="text-[13px] text-muted-foreground mt-1 leading-relaxed">
-                {blurb}
-              </div>
-
-              <div className="mt-6 pt-5 border-t border-border flex items-baseline gap-1.5">
-                <span
-                  className="text-3xl font-bold leading-none tracking-tight"
-                  style={isPremium ? { color: ACCENT } : { color: "currentColor" }}
-                >
-                  {model.credits}
-                </span>
-                <span className="text-sm text-muted-foreground">credits / generation</span>
-              </div>
-
-              <div
-                className={cn(
-                  "mt-3 flex items-center gap-1.5 text-[11px] font-semibold",
-                  model.requiresPayment && "text-muted-foreground"
-                )}
-                style={!model.requiresPayment ? { color: ACCENT } : undefined}
-              >
-                {model.requiresPayment ? (
-                  <>
-                    <Lock className="w-3 h-3" strokeWidth={2.5} />
-                    Pack required
-                  </>
-                ) : (
-                  <>
-                    <Check className="w-3 h-3" strokeWidth={3} />
-                    Available on free tier
-                  </>
-                )}
-              </div>
+              {/* AI Watermark Effect */}
+              <Sparkles 
+                className="absolute -right-8 -bottom-8 w-48 h-48 text-white opacity-[0.08] -rotate-12 pointer-events-none" 
+                strokeWidth={1}
+              />
             </div>
           );
         })}

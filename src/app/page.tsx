@@ -2,7 +2,7 @@ import { Navbar } from "@/components/landing/Navbar";
 import { AnnouncementBanner } from "@/components/shared/AnnouncementBanner";
 import { Hero } from "@/components/landing/Hero";
 import { TrustedBy } from "@/components/landing/TrustedBy";
-import { HowItWorks } from "@/components/landing/HowItWorks";
+import { VideoDemo } from "@/components/landing/VideoDemo";
 import { Features } from "@/components/landing/Features";
 import { PricingCards } from "@/components/landing/PricingCards";
 import { Testimonials } from "@/components/landing/Testimonials";
@@ -27,7 +27,7 @@ export default async function LandingPage() {
       <main>
         <Hero />
         <TrustedBy />
-        <HowItWorks />
+        <VideoDemo />
         <Features />
         <Testimonials />
         <PricingCards />

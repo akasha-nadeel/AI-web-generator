@@ -25,7 +25,6 @@ export function WizardShell({ children }: WizardShellProps) {
   const { step } = useWizardStore();
   const { user, isLoaded: userLoaded } = useUser();
   const router = useRouter();
-  const [stage, setStage] = useState<"splash" | "transition" | "ready">("splash");
 
   const leftPanelContent = {
     1: {
@@ -82,90 +81,9 @@ export function WizardShell({ children }: WizardShellProps) {
 
   const currentContent = leftPanelContent[step as keyof typeof leftPanelContent] || leftPanelContent[1];
 
-  // Orchestrate the entrance sequence — slowed down for cinematic impact
-  useEffect(() => {
-    if (userLoaded) {
-      // 1. Pause on initial greeting
-      const transitionTimer = setTimeout(() => {
-        setStage("transition");
-      }, 3200); // Increased from 2200
-
-      // 2. Complete transition and reveal UI
-      const readyTimer = setTimeout(() => {
-        setStage("ready");
-      }, 5000); // Increased from 3400 (allows 1.8s for the glide)
-
-      return () => {
-        clearTimeout(transitionTimer);
-        clearTimeout(readyTimer);
-      };
-    }
-  }, [userLoaded]);
-
   return (
     <main className="relative h-screen w-full bg-background overflow-hidden font-sans">
-      {/* Cinematic Splash Layer */}
-      <AnimatePresence>
-        {stage !== "ready" && (
-          <motion.div
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2, ease: "easeInOut" }}
-            className="fixed inset-0 z-[100] bg-[#0a0a0a] flex flex-col items-center justify-center pointer-events-none"
-          >
-            {/* Greeting — Refined positioning and scale */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ 
-                opacity: stage === "splash" ? 1 : 0, 
-                y: stage === "splash" ? 0 : -40 
-              }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[220px]"
-            >
-              <h2 className="text-2xl md:text-3xl text-white/30 font-medium tracking-tight mb-4">
-                Welcome back,
-              </h2>
-              <h1 className="text-6xl md:text-8xl font-black text-white tracking-tighter">
-                {user?.firstName || "Creator"}
-              </h1>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Hero Logo Transition — Weighted and fluid */}
-      <div className="fixed inset-0 z-[101] pointer-events-none flex items-center justify-center overflow-hidden">
-        <motion.div
-          animate={{
-            // Multi-stage pathing logic
-            top: stage === "splash" ? "56%" : "24px",
-            left: stage === "splash" ? "50%" : "32px",
-            x: stage === "splash" ? "-50%" : "0%",
-            y: stage === "splash" ? "-50%" : "0%",
-            scale: stage === "splash" ? 1.8 : 1, // Increased initial scale
-            width: stage === "splash" ? "min(50vw, 600px)" : "100px",
-          }}
-          transition={{
-            duration: 1.8, // Slower, more elegant glide
-            ease: [0.16, 1, 0.3, 1], 
-          }}
-          className="absolute origin-center flex items-center"
-        >
-          <img 
-            src="/images/logo.png" 
-            alt="Weavo" 
-            className="w-full h-auto object-contain opacity-100 brightness-0 invert" 
-          />
-        </motion.div>
-      </div>
-
-      {/* Workspace UI Reveal */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: stage === "ready" ? 1 : 0 }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        className="h-screen bg-background flex flex-col lg:flex-row overflow-hidden"
-      >
+      <div className="h-screen bg-background flex flex-col lg:flex-row overflow-hidden">
         {/* Left Panel */}
         <div className="lg:w-[42%] h-full relative overflow-hidden flex-col shrink-0 hidden lg:flex">
           {/* Background Image with Crossfade */}
@@ -191,9 +109,15 @@ export function WizardShell({ children }: WizardShellProps) {
           <div className="absolute inset-0 bg-black/20 z-10" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
 
-          {/* Logo Anchor Placeholder */}
+          {/* Logo */}
           <div className="absolute top-6 left-8 z-20">
-             <Link href="/dashboard" className="w-[100px] h-7 pointer-events-auto block" />
+             <Link href="/dashboard" className="block">
+                <img 
+                  src="/images/logo.png" 
+                  alt="Weavo" 
+                  className="h-5 w-auto object-contain brightness-0 invert" 
+                />
+             </Link>
           </div>
 
           <AnimatePresence mode="wait">
@@ -216,7 +140,27 @@ export function WizardShell({ children }: WizardShellProps) {
         </div>
 
         {/* Right Panel */}
-        <div className="flex-1 flex flex-col relative h-full overflow-y-auto w-full bg-background">
+        <div className="flex-1 flex flex-col relative h-full overflow-y-auto w-full bg-background custom-scrollbar">
+          <style jsx>{`
+            .custom-scrollbar {
+              scrollbar-width: thin;
+              scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+            }
+            .custom-scrollbar::-webkit-scrollbar {
+              width: 5px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+              background: rgba(0, 0, 0, 0.3);
+              border-radius: 20px;
+              transition: background 0.2s;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+              background: rgba(0, 0, 0, 0.45);
+            }
+          `}</style>
           <div className="w-full max-w-[700px] mx-auto px-6 py-5 md:py-7 flex-1 flex flex-col">
             
             {/* Step Indicators */}
@@ -260,7 +204,7 @@ export function WizardShell({ children }: WizardShellProps) {
             </AnimatePresence>
           </div>
         </div>
-      </motion.div>
+      </div>
     </main>
   );
 }

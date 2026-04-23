@@ -18,21 +18,23 @@ export function CTA() {
     offset: ["start end", "end start"]
   });
 
-  const scale = useTransform(scrollYProgress, [0, 0.4], [0.92, 1]);
+  const scale = useTransform(scrollYProgress, [0, 0.45], [0.75, 1]);
   const opacity = useTransform(scrollYProgress, [0, 0.3], [0.8, 1]);
+  const borderRadius = useTransform(scrollYProgress, [0, 0.45], ["6rem", "2.5rem"]);
+  const y = useTransform(scrollYProgress, [0, 0.45], [150, 0]);
 
   return (
-    <section ref={containerRef} className="py-2 md:py-4 px-2 md:px-4 bg-background">
-      <motion.div 
-        style={{ scale, opacity }}
-        className="max-w-7xl mx-auto relative h-[500px] md:h-[650px] rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden border border-border/50 shadow-xl"
+    <section ref={containerRef} className="pt-4 pb-20 md:pb-32 px-1.5 md:px-2 bg-background overflow-hidden">
+      <motion.div
+        style={{ scale, opacity, borderRadius, y }}
+        className="max-w-[1450px] mx-auto relative h-[600px] md:h-[800px] overflow-hidden border border-border/50 shadow-xl"
       >
         {/* Full background image */}
         <Image
           src="/images/banner-bg.png"
           alt=""
           fill
-          className="object-cover"
+          className="object-cover scale-110"
           priority
         />
         {/* Dark overlay for text readability */}

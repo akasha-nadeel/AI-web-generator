@@ -2,11 +2,10 @@
 
 import { useEffect } from "react";
 import { type Paddle } from "@paddle/paddle-js";
-import { Zap, X, ShieldCheck, Lock, Check } from "lucide-react";
+import { Zap, X, ShieldCheck, Lock, Check, ArrowLeft } from "lucide-react";
 import { CREDIT_PACKS } from "@/lib/constants";
 import { useTheme } from "next-themes";
-
-const ACCENT = "#C8E600";
+import Link from "next/link";
 
 type CreditPack = (typeof CREDIT_PACKS)[number];
 
@@ -17,6 +16,7 @@ export function PaddleCheckoutModal({
   customerEmail,
   clerkId,
   onClose,
+  packColor,
 }: {
   paddle: Paddle;
   pack: CreditPack;
@@ -24,6 +24,7 @@ export function PaddleCheckoutModal({
   customerEmail: string | null;
   clerkId: string;
   onClose: () => void;
+  packColor: string;
 }) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -71,7 +72,8 @@ export function PaddleCheckoutModal({
     <div className="fixed inset-0 z-50 flex flex-col bg-background animate-in fade-in duration-150 transition-colors duration-300">
       <header className="h-14 shrink-0 border-b border-border bg-background/80 backdrop-blur-xl flex items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-2.5">
-          <span className="text-sm font-semibold text-foreground">Weavo Checkout</span>
+          <img src="/images/logo.png" alt="Weavo Logo" className="h-5 w-auto object-contain opacity-95 dark:invert-0 invert" />
+          <span className="text-xs font-medium text-muted-foreground ml-2 px-2 py-0.5 rounded border border-border">Checkout</span>
         </div>
         <button
           onClick={onClose}
@@ -83,6 +85,17 @@ export function PaddleCheckoutModal({
         </button>
       </header>
 
+      {/* Back Button Row */}
+      <div className="bg-muted/30 px-4 md:px-6 py-3 border-b border-border flex items-center">
+        <button
+          onClick={onClose}
+          className="inline-flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors group"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+          Back to Billing
+        </button>
+      </div>
+
       <div className="flex-1 overflow-hidden grid lg:grid-cols-[440px_1fr]">
         <aside className="bg-card border-r border-border flex flex-col overflow-y-auto">
           <div className="flex-1 px-6 md:px-8 py-7">
@@ -91,19 +104,19 @@ export function PaddleCheckoutModal({
             </h2>
             <div
               className="inline-flex items-center gap-2 mb-7 text-[18px] font-bold"
-              style={{ color: ACCENT }}
+              style={{ color: packColor }}
             >
               <Zap className="w-5 h-5" strokeWidth={2.5} />
               <span>{pack.credits} credits</span>
             </div>
 
             <div className="flex items-start gap-3.5 pb-6 border-b border-border">
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-foreground/[0.04] border border-border">
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-muted border border-border overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/logo-infinity.png"
+                  src="/images/tot.png"
                   alt="Weavo"
-                  className="w-12 h-12 object-contain scale-[1.35] origin-center dark:invert-0 invert"
+                  className="w-full h-full object-cover invert dark:invert-0"
                 />
               </div>
               <div className="flex-1 min-w-0">
@@ -150,7 +163,7 @@ export function PaddleCheckoutModal({
             <span className="text-[15px] font-semibold text-foreground">Due today</span>
             <span
               className="text-[22px] font-bold tracking-tight"
-              style={{ color: ACCENT }}
+              style={{ color: packColor }}
             >
               ${subtotal}
             </span>

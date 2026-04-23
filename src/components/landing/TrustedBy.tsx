@@ -86,7 +86,7 @@ export function TrustedBy() {
       viewport={vp}
       variants={fadeUp}
       transition={ease.smooth}
-      className="py-10 md:py-14 px-4 md:px-6"
+      className="pt-10 md:pt-14 pb-4 md:pb-6 px-4 md:px-6"
     >
       <div className="max-w-7xl mx-auto">
         <p className="text-center text-sm text-muted-foreground/50 mb-8">

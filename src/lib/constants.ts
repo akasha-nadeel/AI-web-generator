@@ -67,7 +67,7 @@ export const MODEL_COSTS = {
   haiku: {
     id: "haiku",
     label: "Fast",
-    name: "Claude Haiku 4.5",
+    name: "Claude Haiku",
     apiModel: "claude-haiku-4-5-20251001",
     detail: "Quick drafts, simple layouts",
     credits: 5,
@@ -76,7 +76,7 @@ export const MODEL_COSTS = {
   sonnet: {
     id: "sonnet",
     label: "Balanced",
-    name: "Claude Sonnet 4.6",
+    name: "Claude Sonnet",
     apiModel: "claude-sonnet-4-6",
     detail: "Full design library, recommended default",
     credits: 15,
@@ -85,7 +85,7 @@ export const MODEL_COSTS = {
   opus: {
     id: "opus",
     label: "Premium",
-    name: "Claude Opus 4.7",
+    name: "Claude Opus",
     apiModel: "claude-opus-4-7",
     detail: "Maximum design intelligence",
     credits: 60,
