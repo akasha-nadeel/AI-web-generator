@@ -36,33 +36,33 @@ export function Contact() {
             <div className="relative z-10 flex flex-col justify-between h-full p-8 md:p-10">
               {/* Top */}
               <div>
-                <h2 className="text-3xl md:text-4xl font-light text-foreground mb-3">
+                <h2 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tighter">
                   Get in Touch
                 </h2>
-                <p className="text-foreground/50 text-sm max-w-sm leading-relaxed">
+                <p className="text-white/70 text-base max-w-sm leading-relaxed font-medium">
                   Have a question or want to work together? We&apos;d love to hear from you.
                 </p>
               </div>
 
               {/* Bottom — Contact info */}
               <div className="space-y-4 mt-8">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-foreground/10 flex items-center justify-center">
-                    <Mail className="w-4 h-4 text-foreground/70" />
+                <div className="flex items-center gap-4 group cursor-pointer">
+                  <div className="w-11 h-11 rounded-xl bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all group-hover:bg-white/25 group-hover:scale-105">
+                    <Mail className="w-5 h-5 text-white" strokeWidth={1.5} />
                   </div>
-                  <span className="text-sm text-foreground/60">support@weavo.com</span>
+                  <span className="text-sm text-white/80 font-semibold tracking-wide">support@weavo.com</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-foreground/10 flex items-center justify-center">
-                    <Phone className="w-4 h-4 text-foreground/70" />
+                <div className="flex items-center gap-4 group cursor-pointer">
+                  <div className="w-11 h-11 rounded-xl bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all group-hover:bg-white/25 group-hover:scale-105">
+                    <Phone className="w-5 h-5 text-white" strokeWidth={1.5} />
                   </div>
-                  <span className="text-sm text-foreground/60">+1 (555) 123-4567</span>
+                  <span className="text-sm text-white/80 font-semibold tracking-wide">+1 (555) 123-4567</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-foreground/10 flex items-center justify-center">
-                    <MapPin className="w-4 h-4 text-foreground/70" />
+                <div className="flex items-center gap-4 group cursor-pointer">
+                  <div className="w-11 h-11 rounded-xl bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all group-hover:bg-white/25 group-hover:scale-105">
+                    <MapPin className="w-5 h-5 text-white" strokeWidth={1.5} />
                   </div>
-                  <span className="text-sm text-foreground/60">San Francisco, CA</span>
+                  <span className="text-sm text-white/80 font-semibold tracking-wide">San Francisco, CA</span>
                 </div>
               </div>
             </div>
