@@ -55,16 +55,18 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-[1100px] w-full mx-auto px-4 md:px-8 py-6 md:py-8">
+      <main className="flex-1 max-w-[1100px] w-full mx-auto px-4 md:px-8 pb-6 md:pb-8">
         {/* Breadcrumb / Back button relocated below nav */}
-        <div className="mb-6">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors group"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
-            Back to Workspace
-          </Link>
+        <div className="mb-10 -mx-4 md:-mx-8 border-y border-border/60 bg-foreground/[0.01]">
+          <div className="px-4 md:px-8 py-3.5">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+              Back to Workspace
+            </Link>
+          </div>
         </div>
 
         {/* Page header */}
@@ -74,19 +76,6 @@ export default function SettingsPage() {
             <p className="text-sm text-muted-foreground mt-1">
               Manage your profile, account, and security preferences.
             </p>
-          </div>
-          <div className="inline-flex items-center gap-2.5 rounded-2xl border border-border bg-foreground/[0.04] px-4 py-2.5 transition-colors">
-            <div className="w-9 h-9 rounded-xl bg-orange-500/15 border border-orange-400/30 flex items-center justify-center">
-              <Zap className="w-4 h-4 fill-orange-500 text-orange-500" strokeWidth={2.5} />
-            </div>
-            <div>
-              <div className="text-base font-semibold text-foreground leading-tight transition-colors">
-                {balance ?? "…"} credits
-              </div>
-              <div className="text-[11px] text-muted-foreground capitalize leading-tight">
-                {plan} plan
-              </div>
-            </div>
           </div>
         </div>
 

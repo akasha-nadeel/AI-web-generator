@@ -1339,7 +1339,7 @@ function GeneratePageContent() {
                                         /* ===== TABLET — CSS iPad Pro frame ===== */
                                         <div className="flex-1 flex justify-center items-center">
                                             <div
-                                                className="relative bg-[#1d1d1f] dark:bg-[#111] shadow-2xl shadow-black/20 dark:shadow-black/60"
+                                                className="relative bg-[#1d1d1f] dark:bg-[#111] shadow-[0_40px_100px_-24px_rgba(0,0,0,0.25)] dark:shadow-black/60"
                                                 style={{ borderRadius: 24, padding: "18px 18px" }}
                                             >
                                                 {/* Camera dot */}
@@ -1364,7 +1364,7 @@ function GeneratePageContent() {
                                         /* ===== MOBILE — CSS iPhone 12 Pro frame ===== */
                                         <div className="flex-1 flex justify-center items-center">
                                             <div
-                                                className="relative shadow-2xl shadow-black/20 dark:shadow-black/60"
+                                                className="relative shadow-[0_40px_100px_-24px_rgba(0,0,0,0.3)] dark:shadow-black/60"
                                                 style={{ borderRadius: 32, padding: "10px 10px", background: "linear-gradient(145deg, #2c3e4a 0%, #1a2c35 50%, #1d2d36 100%)" }}
                                             >
                                                 {/* Notch — classic iPhone 12 style */}

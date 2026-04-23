@@ -251,16 +251,18 @@ export default function BillingPage() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-[1400px] w-full mx-auto px-4 md:px-8 py-6 md:py-8">
+      <main className="flex-1 max-w-[1400px] w-full mx-auto px-4 md:px-8 pb-6 md:pb-8">
         {/* Breadcrumb / Back button relocated below nav */}
-        <div className="mb-6">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors group"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
-            Back to Workspace
-          </Link>
+        <div className="mb-10 -mx-4 md:-mx-8 border-y border-border/60 bg-foreground/[0.01]">
+          <div className="px-4 md:px-8 py-3.5">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+              Back to Workspace
+            </Link>
+          </div>
         </div>
 
         {/* Header */}

@@ -175,7 +175,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
           {/* Edit with AI chat — flips to the /generate page */}
           <Link
             href={`/generate/${siteId}`}
-            className="flex items-center gap-1.5 h-8 px-2 md:px-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-xs font-medium transition-colors"
+            className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#e26300] hover:bg-[#c94d00] text-white text-xs font-bold transition-all shadow-md hover:shadow-lg active:scale-95"
             title="Refine with AI chat"
           >
             <Pencil className="w-3.5 h-3.5" />
@@ -185,7 +185,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
           {/* Export */}
           <button
             onClick={handleExport}
-            className="flex items-center gap-1.5 h-8 px-2 md:px-3 rounded-lg bg-foreground/[0.08] hover:bg-foreground/[0.14] text-foreground/90 hover:text-foreground text-xs font-medium transition-colors"
+            className="flex items-center gap-1.5 h-8 px-2 md:px-3 rounded-lg bg-[#0072bf] hover:bg-[#005fa0] text-white text-xs font-bold transition-all shadow-md hover:shadow-lg"
           >
             <Download className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Export</span>
@@ -195,7 +195,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
           <button
             onClick={() => setPublishOpen(true)}
             className={cn(
-              "flex items-center gap-1.5 h-8 px-2 md:px-3 rounded-lg text-xs font-medium transition-colors",
+              "flex items-center gap-1.5 h-8 px-2 md:px-3 rounded-lg text-xs font-bold transition-all shadow-md hover:shadow-lg",
               subdomain
                 ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 hover:bg-emerald-500/30"
                 : "bg-foreground text-background hover:bg-foreground/90"
@@ -239,7 +239,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
                 /* ===== TABLET — CSS iPad Pro frame ===== */
                 <div className="flex-1 flex justify-center items-center">
                   <div
-                    className="relative bg-[#1d1d1f] dark:bg-[#111] shadow-2xl shadow-black/20 dark:shadow-black/60"
+                    className="relative bg-[#1d1d1f] dark:bg-[#111] shadow-[0_40px_100px_-24px_rgba(0,0,0,0.25)] dark:shadow-black/60"
                     style={{ borderRadius: 24, padding: "18px 18px" }}
                   >
                     {/* Camera dot */}
@@ -264,7 +264,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
                 /* ===== MOBILE — CSS iPhone 12 Pro frame ===== */
                 <div className="flex-1 flex justify-center items-center">
                   <div
-                    className="relative shadow-2xl shadow-black/20 dark:shadow-black/60"
+                    className="relative shadow-[0_40px_100px_-24px_rgba(0,0,0,0.3)] dark:shadow-black/60"
                     style={{ borderRadius: 32, padding: "10px 10px", background: "linear-gradient(145deg, #2c3e4a 0%, #1a2c35 50%, #1d2d36 100%)" }}
                   >
                     {/* Notch — classic iPhone 12 style */}
