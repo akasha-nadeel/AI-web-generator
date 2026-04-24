@@ -12,6 +12,13 @@ import { htmlToJsx } from "./jsx.ts";
 import { convertImagesModeB } from "./images.ts";
 import { swapInlineSvgs } from "./icons.ts";
 import { detectHookNeeds, type HookNeeds } from "./runtime-detect.ts";
+import { packageJson } from "./templates/static/package.json.ts";
+import { tsconfigJson } from "./templates/static/tsconfig.json.ts";
+import { tailwindConfigTs } from "./templates/static/tailwind.config.ts.ts";
+import { nextConfigTs } from "./templates/static/next.config.ts.ts";
+import { globalsCss } from "./templates/static/globals.css.ts";
+import { readmeMd } from "./templates/static/readme.md.ts";
+import { gitignore } from "./templates/static/gitignore.ts";
 
 export interface TranslateOptions {
   bundleImages?: boolean;
@@ -38,15 +45,21 @@ export function translateHtmlToNextjs(rawHtml: string, opts: TranslateOptions = 
   const headInfo = extractHeadInfo(parsed);
   const sections = extractSections(parsed);
   const needs = detectHookNeeds(html);
+  const siteName = opts.siteName || headInfo.title || "My Site";
 
   const files: FileMap = {};
 
-  // Per-section component files.
+  // Per-section component files. We collect inline-style and lucide-usage
+  // signals on this single pass so we don't re-parse the same HTML later.
   const sectionMeta: Array<{ name: string; importPath: string }> = [];
+  const allInlineStyles: string[] = [...headInfo.inlineStyles];
+  let hasLucide = false;
   for (const section of sections) {
-    const { code, importPath } = renderSectionFile(section);
+    const { code, importPath, inlineStyles, importsLucide } = renderSectionFile(section);
     files[`components/${section.name}.tsx`] = code;
     sectionMeta.push({ name: section.name, importPath });
+    allInlineStyles.push(...inlineStyles);
+    if (importsLucide) hasLucide = true;
   }
 
   // Always-on client wrapper.
@@ -59,8 +72,16 @@ export function translateHtmlToNextjs(rawHtml: string, opts: TranslateOptions = 
 
   // App router files.
   files["app/page.tsx"] = renderPage(sectionMeta);
-  files["app/layout.tsx"] = renderLayout(headInfo, needs, opts.siteName);
-  files["app/globals.css"] = renderGlobalsCss(headInfo, sections);
+  files["app/layout.tsx"] = renderLayout(headInfo, needs, siteName);
+  files["app/globals.css"] = globalsCss({ fontLinks: headInfo.fontLinks, customCss: allInlineStyles });
+
+  // Project-root static templates.
+  files["package.json"] = packageJson({ siteName, hasLucide });
+  files["tsconfig.json"] = tsconfigJson();
+  files["tailwind.config.ts"] = tailwindConfigTs();
+  files["next.config.ts"] = nextConfigTs();
+  files["README.md"] = readmeMd({ siteName });
+  files[".gitignore"] = gitignore();
 
   return files;
 }
@@ -99,10 +120,12 @@ function extractHeadInfo(parsed: ReturnType<typeof parse>): HeadInfo {
 interface SectionFile {
   code: string;
   importPath: string;
+  inlineStyles: string[];
+  importsLucide: boolean;
 }
 
 function renderSectionFile(section: Section): SectionFile {
-  const { body: rawJsx } = htmlToJsx(section.html);
+  const { body: rawJsx, inlineStyles } = htmlToJsx(section.html);
   const imageStep = convertImagesModeB(rawJsx);
   const iconStep = swapInlineSvgs(imageStep.jsx);
 
@@ -120,7 +143,12 @@ function renderSectionFile(section: Section): SectionFile {
     `\n  );\n` +
     `}\n`;
 
-  return { code, importPath: `@/components/${section.name}` };
+  return {
+    code,
+    importPath: `@/components/${section.name}`,
+    inlineStyles,
+    importsLucide: iconStep.imports.size > 0,
+  };
 }
 
 function renderClientRuntime(needs: HookNeeds): string {
@@ -161,8 +189,8 @@ function renderPage(sections: Array<{ name: string; importPath: string }>): stri
   );
 }
 
-function renderLayout(head: HeadInfo, needs: HookNeeds, siteName?: string): string {
-  const title = head.title || siteName || "My Site";
+function renderLayout(head: HeadInfo, needs: HookNeeds, siteName: string): string {
+  const title = head.title || siteName;
   const description = head.description || "Built with Weavo.";
   const usesAnyHook = needs.scrollReveal || needs.smoothScroll || needs.mobileNav || needs.accordion;
   const runtimeMount = usesAnyHook ? "<ClientRuntime />\n        " : "";
@@ -184,24 +212,6 @@ function renderLayout(head: HeadInfo, needs: HookNeeds, siteName?: string): stri
     `  );\n` +
     `}\n`
   );
-}
-
-function renderGlobalsCss(head: HeadInfo, sections: Section[]): string {
-  // Tailwind v4 single import line. Custom CSS extracted from <style> blocks
-  // (in <head> and inside section bodies) is appended below so the cascade
-  // still favours later rules.
-  const inlineStyles = [...head.inlineStyles];
-  for (const section of sections) {
-    const { inlineStyles: more } = htmlToJsx(section.html);
-    inlineStyles.push(...more);
-  }
-  const fonts = head.fontLinks.length
-    ? `/* Google Fonts (loaded statically; consider migrating to next/font/google):\n${head.fontLinks
-        .map((f) => `   ${f}`)
-        .join("\n")}\n*/\n\n`
-    : "";
-  const custom = inlineStyles.length ? `/* Extracted custom CSS */\n${inlineStyles.join("\n\n")}\n` : "";
-  return `@import "tailwindcss";\n\n${fonts}${custom}`;
 }
 
 function indentBlock(text: string, spaces: number): string {

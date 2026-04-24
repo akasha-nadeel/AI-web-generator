@@ -64,9 +64,73 @@ const ATTR_RENAME: Record<string, string> = {
   "fill-opacity": "fillOpacity",
   "clip-rule": "clipRule",
   "clip-path": "clipPath",
+  "text-anchor": "textAnchor",
+  "stop-color": "stopColor",
+  "stop-opacity": "stopOpacity",
+  // SVG attrs the AI sometimes lowercases despite the spec's camelCase form.
+  viewbox: "viewBox",
+  preserveaspectratio: "preserveAspectRatio",
 };
 
 const SKIP_TAGS = new Set(["script"]);
+
+/**
+ * HTML attributes that React types strictly as `number`. When the source has
+ * a clean integer string (`rows="4"`), we lift it to a JSX expression
+ * (`rows={4}`) so the exported project type-checks. Anything non-integer
+ * (e.g. `min="2024-01-01"` on a date input) falls through unchanged.
+ */
+const NUMERIC_ATTRS = new Set([
+  "rows",
+  "cols",
+  "colspan",
+  "rowspan",
+  "tabindex",
+  "maxlength",
+  "minlength",
+  "size",
+  "span",
+  "start",
+]);
+
+/**
+ * HTML boolean attributes per spec. When the source has `name=""` (or the
+ * attribute appears bare) and the name is in this set, we emit just the bare
+ * name in JSX so React reads it as `={true}`. Non-boolean attrs with empty
+ * values (e.g. `<option value="">`) keep their `=""` since the empty string
+ * carries meaning.
+ */
+const BOOLEAN_ATTRS = new Set([
+  "allowfullscreen",
+  "async",
+  "autofocus",
+  "autoplay",
+  "checked",
+  "controls",
+  "default",
+  "defer",
+  "disabled",
+  "formnovalidate",
+  "hidden",
+  "inert",
+  "ismap",
+  "itemscope",
+  "loop",
+  "multiple",
+  "muted",
+  "nomodule",
+  "novalidate",
+  "open",
+  "playsinline",
+  "readonly",
+  "required",
+  "reversed",
+  "selected",
+  "typemustmatch",
+  // Weavo's data-* convention markers used by the runtime selectors.
+  "data-reveal",
+  "data-reveal-stagger",
+]);
 
 /** Inline event-handler attributes are stripped — the hook library handles
  *  smooth scroll, mobile nav, accordion, reveal. */
@@ -144,7 +208,16 @@ function renderAttrs(attribs: Record<string, string>): string {
       if (obj) parts.push(`style={${obj}}`);
       continue;
     }
-    parts.push(`${name}=${quoteAttr(rawValue)}`);
+    const lower = rawName.toLowerCase();
+    if (rawValue === "" && BOOLEAN_ATTRS.has(lower)) {
+      parts.push(name);
+      continue;
+    }
+    if (NUMERIC_ATTRS.has(lower) && /^\d+$/.test(rawValue)) {
+      parts.push(`${name}={${rawValue}}`);
+      continue;
+    }
+    parts.push(`${name}=${renderAttrValue(rawValue)}`);
   }
   return parts.length ? " " + parts.join(" ") : "";
 }
@@ -156,14 +229,10 @@ function renameAttr(name: string): string {
   return name;
 }
 
-function quoteAttr(value: string): string {
-  // Empty value = boolean attribute. JSX accepts bare presence.
-  if (value === "") return '""';
+function renderAttrValue(value: string): string {
   // If the value contains a double-quote, fall back to a JSX expression with
   // a JS string literal so we don't have to escape inside an attribute.
-  if (value.includes('"')) {
-    return "{" + JSON.stringify(value) + "}";
-  }
+  if (value.includes('"')) return "{" + JSON.stringify(value) + "}";
   return `"${value}"`;
 }
 

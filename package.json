@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsc --noEmit && node --experimental-strip-types --no-warnings --test src/lib/export/__tests__/**/*.test.mjs"
+    "test": "tsc --noEmit && node --experimental-strip-types --no-warnings --test src/lib/export/__tests__/hooks.test.mjs src/lib/export/__tests__/static-templates.test.mjs src/lib/export/__tests__/translate.test.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.64",

@@ -1,0 +1,40 @@
+// Standard Next.js .gitignore. Keep deliberately conservative — anything a
+// power user would expect after `npx create-next-app`.
+
+export function gitignore(): string {
+  return `# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# vercel
+.vercel
+`;
+}

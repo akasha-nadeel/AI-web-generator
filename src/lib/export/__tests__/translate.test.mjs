@@ -22,6 +22,7 @@ snapshot.setResolveSnapshotPath((testFile) => {
 });
 
 const { translateHtmlToNextjs } = await import('../translate.ts');
+const { buildZip } = await import('../zip.ts');
 
 const fixtures = readdirSync(FIXTURES_DIR).filter((n) => n.endsWith('.html'));
 assert.ok(fixtures.length >= 5, `expected ≥5 fixtures, got ${fixtures.length}`);
@@ -38,10 +39,24 @@ for (const fixture of fixtures) {
 
   test(`${name}: every emitted .ts/.tsx file parses cleanly`, () => {
     const files = translateHtmlToNextjs(html);
-    const required = ['app/page.tsx', 'app/layout.tsx', 'app/globals.css'];
+    const required = [
+      'app/page.tsx',
+      'app/layout.tsx',
+      'app/globals.css',
+      'package.json',
+      'tsconfig.json',
+      'tailwind.config.ts',
+      'next.config.ts',
+      'README.md',
+      '.gitignore',
+    ];
     for (const r of required) assert.ok(r in files, `missing required output: ${r}`);
     const sectionFiles = Object.keys(files).filter((p) => p.startsWith('components/') && p.endsWith('.tsx'));
     assert.ok(sectionFiles.length >= 1, `expected at least one section component, got ${sectionFiles.length}`);
+
+    // Static config files must remain JSON-parseable.
+    JSON.parse(files['package.json']);
+    JSON.parse(files['tsconfig.json']);
 
     const errors = [];
     for (const [path, source] of Object.entries(files)) {
@@ -55,6 +70,15 @@ for (const fixture of fixtures) {
       }
     }
     assert.equal(errors.length, 0, errors.join('\n\n'));
+  });
+
+  test(`${name}: buildZip produces a usable Buffer`, async () => {
+    const files = translateHtmlToNextjs(html);
+    const buf = await buildZip(files);
+    assert.ok(Buffer.isBuffer(buf), 'buildZip must return a Buffer');
+    assert.ok(buf.length > 1024, `expected ZIP > 1KB, got ${buf.length}`);
+    // ZIP local-file-header magic number = "PK\x03\x04".
+    assert.equal(buf.readUInt32LE(0), 0x04034b50, 'first 4 bytes must be the ZIP local-file-header signature');
   });
 }
 

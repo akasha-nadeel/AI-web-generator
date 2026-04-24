@@ -1,8 +1,18 @@
 exports[`agency: translator emits a stable file map 1`] = `
 {
+  ".gitignore": {
+    "bytes": 291,
+    "lines": 35,
+    "head": "# dependencies /node_modules /.pnp .pnp.* # testing /coverage # next.js /.next"
+  },
+  "README.md": {
+    "bytes": 796,
+    "lines": 30,
+    "head": "# Apex Studio® — Creative Agency Single-page Next.js 16 project exported from ["
+  },
   "app/globals.css": {
-    "bytes": 238,
-    "lines": 7,
+    "bytes": 237,
+    "lines": 6,
     "head": "@import \\"tailwindcss\\"; /* Google Fonts (loaded statically; consider migrating t"
   },
   "app/layout.tsx": {
@@ -16,17 +26,17 @@ exports[`agency: translator emits a stable file map 1`] = `
     "head": "import ApexStudio from \\"@/components/ApexStudio\\"; import About from \\"@/component"
   },
   "components/About.tsx": {
-    "bytes": 4288,
+    "bytes": 4285,
     "lines": 66,
     "head": "import Image from \\"next/image\\"; import { Minus } from \\"lucide-react\\"; export de"
   },
   "components/ApexStudio.tsx": {
-    "bytes": 3369,
+    "bytes": 3366,
     "lines": 58,
     "head": "import Image from \\"next/image\\"; import { Minus } from \\"lucide-react\\"; export de"
   },
   "components/Blog.tsx": {
-    "bytes": 4993,
+    "bytes": 4990,
     "lines": 65,
     "head": "import Image from \\"next/image\\"; export default function Blog() { return ( "
   },
@@ -36,42 +46,42 @@ exports[`agency: translator emits a stable file map 1`] = `
     "head": "'use client'; import { useScrollReveal } from \\"@/lib/useScrollReveal\\"; import { "
   },
   "components/Contact.tsx": {
-    "bytes": 9411,
+    "bytes": 10609,
     "lines": 118,
-    "head": "import { Facebook, Instagram, Linkedin, Minus, Phone, Twitter } from \\"lucide-rea"
+    "head": "import { Minus, Phone } from \\"lucide-react\\"; export default function Contact() "
   },
   "components/Faq.tsx": {
-    "bytes": 6192,
+    "bytes": 6189,
     "lines": 83,
     "head": "export default function Faq() { return ( <section id=\\"faq\\" className=\\"ligh"
   },
   "components/Footer.tsx": {
-    "bytes": 6214,
+    "bytes": 6211,
     "lines": 69,
     "head": "export default function Footer() { return ( <footer style={{ background: \\""
   },
   "components/Pricing.tsx": {
-    "bytes": 10229,
+    "bytes": 10226,
     "lines": 71,
     "head": "export default function Pricing() { return ( <section id=\\"pricing\\" style={"
   },
   "components/Projects.tsx": {
-    "bytes": 7407,
+    "bytes": 7404,
     "lines": 85,
     "head": "import Image from \\"next/image\\"; import { Minus } from \\"lucide-react\\"; export de"
   },
   "components/Services.tsx": {
-    "bytes": 5688,
+    "bytes": 5685,
     "lines": 62,
     "head": "export default function Services() { return ( <section id=\\"services\\" class"
   },
   "components/Team.tsx": {
-    "bytes": 4797,
+    "bytes": 4794,
     "lines": 57,
     "head": "import Image from \\"next/image\\"; export default function Team() { return ( "
   },
   "components/Testimonials.tsx": {
-    "bytes": 7281,
+    "bytes": 7278,
     "lines": 87,
     "head": "import Image from \\"next/image\\"; export default function Testimonials() { retu"
   },
@@ -94,15 +104,45 @@ exports[`agency: translator emits a stable file map 1`] = `
     "bytes": 1051,
     "lines": 32,
     "head": "'use client'; import { useEffect } from 'react'; export function useSmoothScrol"
+  },
+  "next.config.ts": {
+    "bytes": 265,
+    "lines": 13,
+    "head": "import type { NextConfig } from \\"next\\"; const config: NextConfig = { images: "
+  },
+  "package.json": {
+    "bytes": 526,
+    "lines": 26,
+    "head": "{ \\"name\\": \\"apex-studio-creative-agency\\", \\"version\\": \\"0.1.0\\", \\"private\\": tr"
+  },
+  "tailwind.config.ts": {
+    "bytes": 187,
+    "lines": 9,
+    "head": "import type { Config } from \\"tailwindcss\\"; const config: Config = { content: "
+  },
+  "tsconfig.json": {
+    "bytes": 667,
+    "lines": 41,
+    "head": "{ \\"compilerOptions\\": { \\"target\\": \\"ES2017\\", \\"lib\\": [ \\"dom\\", "
   }
 }
 `;
 
 exports[`ecommerce: translator emits a stable file map 1`] = `
 {
+  ".gitignore": {
+    "bytes": 291,
+    "lines": 35,
+    "head": "# dependencies /node_modules /.pnp .pnp.* # testing /coverage # next.js /.next"
+  },
+  "README.md": {
+    "bytes": 800,
+    "lines": 30,
+    "head": "# LIBRARY - Premium Book Marketplace Single-page Next.js 16 project exported fr"
+  },
   "app/globals.css": {
-    "bytes": 227,
-    "lines": 7,
+    "bytes": 226,
+    "lines": 6,
     "head": "@import \\"tailwindcss\\"; /* Google Fonts (loaded statically; consider migrating t"
   },
   "app/layout.tsx": {
@@ -121,57 +161,57 @@ exports[`ecommerce: translator emits a stable file map 1`] = `
     "head": "'use client'; import { useScrollReveal } from \\"@/lib/useScrollReveal\\"; import { "
   },
   "components/ExtensiveCatalog.tsx": {
-    "bytes": 4940,
+    "bytes": 4937,
     "lines": 97,
     "head": "import Image from \\"next/image\\"; export default function ExtensiveCatalog() { "
   },
   "components/Faq.tsx": {
-    "bytes": 4292,
+    "bytes": 4289,
     "lines": 66,
     "head": "import { ChevronDown } from \\"lucide-react\\"; export default function Faq() { r"
   },
   "components/Footer.tsx": {
-    "bytes": 5311,
-    "lines": 94,
-    "head": "import { Facebook, Instagram, Twitter } from \\"lucide-react\\"; export default fun"
+    "bytes": 6298,
+    "lines": 100,
+    "head": "export default function Footer() { return ( <footer className=\\"bg-black bo"
   },
   "components/Gallery.tsx": {
-    "bytes": 7345,
+    "bytes": 7342,
     "lines": 120,
     "head": "import Image from \\"next/image\\"; import { Minus } from \\"lucide-react\\"; export de"
   },
   "components/Home.tsx": {
-    "bytes": 4073,
+    "bytes": 4070,
     "lines": 77,
     "head": "import Image from \\"next/image\\"; export default function Home() { return ( "
   },
   "components/Programs.tsx": {
-    "bytes": 5006,
+    "bytes": 5003,
     "lines": 95,
     "head": "import Image from \\"next/image\\"; export default function Programs() { return ("
   },
   "components/ReadyToTransformYourReadingJourney.tsx": {
-    "bytes": 1202,
+    "bytes": 1199,
     "lines": 21,
     "head": "export default function ReadyToTransformYourReadingJourney() { return ( <s"
   },
   "components/Section.tsx": {
-    "bytes": 1355,
+    "bytes": 1352,
     "lines": 33,
     "head": "export default function Section() { return ( <section className=\\"bg-zinc-9"
   },
   "components/StayUpdated.tsx": {
-    "bytes": 1138,
+    "bytes": 1132,
     "lines": 18,
     "head": "export default function StayUpdated() { return ( <section className=\\"bg-zi"
   },
   "components/Testimonials.tsx": {
-    "bytes": 6827,
+    "bytes": 6824,
     "lines": 99,
     "head": "import Image from \\"next/image\\"; export default function Testimonials() { retu"
   },
   "components/Trainers.tsx": {
-    "bytes": 4167,
+    "bytes": 4164,
     "lines": 53,
     "head": "import Image from \\"next/image\\"; export default function Trainers() { return ("
   },
@@ -194,15 +234,45 @@ exports[`ecommerce: translator emits a stable file map 1`] = `
     "bytes": 1051,
     "lines": 32,
     "head": "'use client'; import { useEffect } from 'react'; export function useSmoothScrol"
+  },
+  "next.config.ts": {
+    "bytes": 265,
+    "lines": 13,
+    "head": "import type { NextConfig } from \\"next\\"; const config: NextConfig = { images: "
+  },
+  "package.json": {
+    "bytes": 533,
+    "lines": 26,
+    "head": "{ \\"name\\": \\"library---premium-book-marketplace\\", \\"version\\": \\"0.1.0\\", \\"priva"
+  },
+  "tailwind.config.ts": {
+    "bytes": 187,
+    "lines": 9,
+    "head": "import type { Config } from \\"tailwindcss\\"; const config: Config = { content: "
+  },
+  "tsconfig.json": {
+    "bytes": 667,
+    "lines": 41,
+    "head": "{ \\"compilerOptions\\": { \\"target\\": \\"ES2017\\", \\"lib\\": [ \\"dom\\", "
   }
 }
 `;
 
 exports[`fitness: translator emits a stable file map 1`] = `
 {
+  ".gitignore": {
+    "bytes": 291,
+    "lines": 35,
+    "head": "# dependencies /node_modules /.pnp .pnp.* # testing /coverage # next.js /.next"
+  },
+  "README.md": {
+    "bytes": 808,
+    "lines": 30,
+    "head": "# IRON - Premium Fitness & Strength Training Single-page Next.js 16 project exp"
+  },
   "app/globals.css": {
-    "bytes": 203,
-    "lines": 7,
+    "bytes": 202,
+    "lines": 6,
     "head": "@import \\"tailwindcss\\"; /* Google Fonts (loaded statically; consider migrating t"
   },
   "app/layout.tsx": {
@@ -216,12 +286,12 @@ exports[`fitness: translator emits a stable file map 1`] = `
     "head": "import Home from \\"@/components/Home\\"; import StrengthTraining from \\"@/components"
   },
   "components/About.tsx": {
-    "bytes": 3832,
+    "bytes": 3829,
     "lines": 67,
     "head": "import Image from \\"next/image\\"; export default function About() { return ( "
   },
   "components/ByTheNumbers.tsx": {
-    "bytes": 1564,
+    "bytes": 1561,
     "lines": 39,
     "head": "export default function ByTheNumbers() { return ( <section className=\\"bg-c"
   },
@@ -231,47 +301,47 @@ exports[`fitness: translator emits a stable file map 1`] = `
     "head": "'use client'; import { useScrollReveal } from \\"@/lib/useScrollReveal\\"; import { "
   },
   "components/Faq.tsx": {
-    "bytes": 5423,
+    "bytes": 5420,
     "lines": 97,
     "head": "import { ChevronDown } from \\"lucide-react\\"; export default function Faq() { r"
   },
   "components/Footer.tsx": {
-    "bytes": 3145,
+    "bytes": 3142,
     "lines": 69,
     "head": "export default function Footer() { return ( <footer className=\\"bg-dark bor"
   },
   "components/Home.tsx": {
-    "bytes": 2224,
+    "bytes": 2221,
     "lines": 49,
     "head": "import Image from \\"next/image\\"; export default function Home() { return ( "
   },
   "components/Pricing.tsx": {
-    "bytes": 6479,
+    "bytes": 6476,
     "lines": 123,
     "head": "export default function Pricing() { return ( <section id=\\"pricing\\" classNa"
   },
   "components/Programs.tsx": {
-    "bytes": 11132,
+    "bytes": 11129,
     "lines": 179,
     "head": "import Image from \\"next/image\\"; import { ChevronDown } from \\"lucide-react\\"; exp"
   },
   "components/ReadyToTransform.tsx": {
-    "bytes": 1188,
+    "bytes": 1185,
     "lines": 24,
     "head": "export default function ReadyToTransform() { return ( <section className=\\""
   },
   "components/Section.tsx": {
-    "bytes": 3533,
+    "bytes": 3530,
     "lines": 63,
     "head": "import Image from \\"next/image\\"; export default function Section() { return ( "
   },
   "components/StrengthTraining.tsx": {
-    "bytes": 6004,
+    "bytes": 6001,
     "lines": 97,
     "head": "export default function StrengthTraining() { return ( <section className=\\""
   },
   "components/Trainers.tsx": {
-    "bytes": 3768,
+    "bytes": 3765,
     "lines": 62,
     "head": "import Image from \\"next/image\\"; export default function Trainers() { return ("
   },
@@ -294,15 +364,45 @@ exports[`fitness: translator emits a stable file map 1`] = `
     "bytes": 1051,
     "lines": 32,
     "head": "'use client'; import { useEffect } from 'react'; export function useSmoothScrol"
+  },
+  "next.config.ts": {
+    "bytes": 265,
+    "lines": 13,
+    "head": "import type { NextConfig } from \\"next\\"; const config: NextConfig = { images: "
+  },
+  "package.json": {
+    "bytes": 539,
+    "lines": 26,
+    "head": "{ \\"name\\": \\"iron---premium-fitness-strength-training\\", \\"version\\": \\"0.1.0\\", "
+  },
+  "tailwind.config.ts": {
+    "bytes": 187,
+    "lines": 9,
+    "head": "import type { Config } from \\"tailwindcss\\"; const config: Config = { content: "
+  },
+  "tsconfig.json": {
+    "bytes": 667,
+    "lines": 41,
+    "head": "{ \\"compilerOptions\\": { \\"target\\": \\"ES2017\\", \\"lib\\": [ \\"dom\\", "
   }
 }
 `;
 
 exports[`photography: translator emits a stable file map 1`] = `
 {
+  ".gitignore": {
+    "bytes": 291,
+    "lines": 35,
+    "head": "# dependencies /node_modules /.pnp .pnp.* # testing /coverage # next.js /.next"
+  },
+  "README.md": {
+    "bytes": 803,
+    "lines": 30,
+    "head": "# Studio Hub - Professional Photography Single-page Next.js 16 project exported"
+  },
   "app/globals.css": {
-    "bytes": 231,
-    "lines": 7,
+    "bytes": 230,
+    "lines": 6,
     "head": "@import \\"tailwindcss\\"; /* Google Fonts (loaded statically; consider migrating t"
   },
   "app/layout.tsx": {
@@ -316,7 +416,7 @@ exports[`photography: translator emits a stable file map 1`] = `
     "head": "import Home from \\"@/components/Home\\"; import Gallery from \\"@/components/Gallery\\""
   },
   "components/About.tsx": {
-    "bytes": 2714,
+    "bytes": 2711,
     "lines": 49,
     "head": "import Image from \\"next/image\\"; export default function About() { return ( "
   },
@@ -326,32 +426,32 @@ exports[`photography: translator emits a stable file map 1`] = `
     "head": "'use client'; import { useScrollReveal } from \\"@/lib/useScrollReveal\\"; import { "
   },
   "components/Contact.tsx": {
-    "bytes": 5365,
+    "bytes": 5362,
     "lines": 98,
     "head": "import { Phone } from \\"lucide-react\\"; export default function Contact() { ret"
   },
   "components/Footer.tsx": {
-    "bytes": 3883,
-    "lines": 70,
-    "head": "import { Facebook, Instagram } from \\"lucide-react\\"; export default function Foo"
+    "bytes": 4534,
+    "lines": 74,
+    "head": "export default function Footer() { return ( <footer className=\\"bg-stone-50"
   },
   "components/Gallery.tsx": {
-    "bytes": 3210,
+    "bytes": 3207,
     "lines": 55,
     "head": "import Image from \\"next/image\\"; export default function Gallery() { return ( "
   },
   "components/Home.tsx": {
-    "bytes": 2287,
+    "bytes": 2284,
     "lines": 36,
     "head": "import Image from \\"next/image\\"; export default function Home() { return ( "
   },
   "components/OurServices.tsx": {
-    "bytes": 3774,
+    "bytes": 3771,
     "lines": 55,
     "head": "export default function OurServices() { return ( <section className=\\"py-24"
   },
   "components/Pricing.tsx": {
-    "bytes": 5905,
+    "bytes": 5902,
     "lines": 108,
     "head": "import { Check } from \\"lucide-react\\"; export default function Pricing() { ret"
   },
@@ -374,15 +474,45 @@ exports[`photography: translator emits a stable file map 1`] = `
     "bytes": 1051,
     "lines": 32,
     "head": "'use client'; import { useEffect } from 'react'; export function useSmoothScrol"
+  },
+  "next.config.ts": {
+    "bytes": 265,
+    "lines": 13,
+    "head": "import type { NextConfig } from \\"next\\"; const config: NextConfig = { images: "
+  },
+  "package.json": {
+    "bytes": 536,
+    "lines": 26,
+    "head": "{ \\"name\\": \\"studio-hub---professional-photography\\", \\"version\\": \\"0.1.0\\", \\"pr"
+  },
+  "tailwind.config.ts": {
+    "bytes": 187,
+    "lines": 9,
+    "head": "import type { Config } from \\"tailwindcss\\"; const config: Config = { content: "
+  },
+  "tsconfig.json": {
+    "bytes": 667,
+    "lines": 41,
+    "head": "{ \\"compilerOptions\\": { \\"target\\": \\"ES2017\\", \\"lib\\": [ \\"dom\\", "
   }
 }
 `;
 
 exports[`restaurant: translator emits a stable file map 1`] = `
 {
+  ".gitignore": {
+    "bytes": 291,
+    "lines": 35,
+    "head": "# dependencies /node_modules /.pnp .pnp.* # testing /coverage # next.js /.next"
+  },
+  "README.md": {
+    "bytes": 794,
+    "lines": 30,
+    "head": "# APEX - Premium Food Delivery Single-page Next.js 16 project exported from [We"
+  },
   "app/globals.css": {
-    "bytes": 227,
-    "lines": 7,
+    "bytes": 226,
+    "lines": 6,
     "head": "@import \\"tailwindcss\\"; /* Google Fonts (loaded statically; consider migrating t"
   },
   "app/layout.tsx": {
@@ -396,7 +526,7 @@ exports[`restaurant: translator emits a stable file map 1`] = `
     "head": "import Home from \\"@/components/Home\\"; import DiscountVoucher from \\"@/components/"
   },
   "components/About.tsx": {
-    "bytes": 3234,
+    "bytes": 3231,
     "lines": 54,
     "head": "import Image from \\"next/image\\"; export default function About() { return ( "
   },
@@ -406,57 +536,57 @@ exports[`restaurant: translator emits a stable file map 1`] = `
     "head": "'use client'; import { useScrollReveal } from \\"@/lib/useScrollReveal\\"; import { "
   },
   "components/Contact.tsx": {
-    "bytes": 4614,
+    "bytes": 4593,
     "lines": 87,
     "head": "import { Phone } from \\"lucide-react\\"; export default function Contact() { ret"
   },
   "components/DiscountVoucher.tsx": {
-    "bytes": 2519,
+    "bytes": 2516,
     "lines": 49,
     "head": "export default function DiscountVoucher() { return ( <section className=\\"b"
   },
   "components/ExcellenceInEveryBite.tsx": {
-    "bytes": 3912,
+    "bytes": 3909,
     "lines": 74,
     "head": "import Image from \\"next/image\\"; export default function ExcellenceInEveryBite()"
   },
   "components/Gallery.tsx": {
-    "bytes": 2676,
+    "bytes": 2673,
     "lines": 45,
     "head": "import Image from \\"next/image\\"; export default function Gallery() { return ( "
   },
   "components/Home.tsx": {
-    "bytes": 4212,
+    "bytes": 4209,
     "lines": 53,
     "head": "import Image from \\"next/image\\"; export default function Home() { return ( "
   },
   "components/LimitedTimeDeals.tsx": {
-    "bytes": 4972,
+    "bytes": 4969,
     "lines": 67,
     "head": "import Image from \\"next/image\\"; export default function LimitedTimeDeals() { "
   },
   "components/Menu.tsx": {
-    "bytes": 4484,
+    "bytes": 4481,
     "lines": 74,
     "head": "import Image from \\"next/image\\"; export default function Menu() { return ( "
   },
   "components/OurSignatureDishes.tsx": {
-    "bytes": 4821,
+    "bytes": 4818,
     "lines": 84,
     "head": "import Image from \\"next/image\\"; import { Minus } from \\"lucide-react\\"; export de"
   },
   "components/Pages.tsx": {
-    "bytes": 4909,
-    "lines": 90,
-    "head": "import { Facebook, Instagram, Twitter } from \\"lucide-react\\"; export default fun"
+    "bytes": 5563,
+    "lines": 88,
+    "head": "export default function Pages() { return ( <footer className=\\"bg-zinc-900 "
   },
   "components/SubscribeToOurNewsletter.tsx": {
-    "bytes": 1386,
+    "bytes": 1380,
     "lines": 21,
     "head": "export default function SubscribeToOurNewsletter() { return ( <section cla"
   },
   "components/Testimonials.tsx": {
-    "bytes": 9665,
+    "bytes": 9662,
     "lines": 91,
     "head": "import Image from \\"next/image\\"; export default function Testimonials() { retu"
   },
@@ -479,6 +609,26 @@ exports[`restaurant: translator emits a stable file map 1`] = `
     "bytes": 1051,
     "lines": 32,
     "head": "'use client'; import { useEffect } from 'react'; export function useSmoothScrol"
+  },
+  "next.config.ts": {
+    "bytes": 265,
+    "lines": 13,
+    "head": "import type { NextConfig } from \\"next\\"; const config: NextConfig = { images: "
+  },
+  "package.json": {
+    "bytes": 527,
+    "lines": 26,
+    "head": "{ \\"name\\": \\"apex---premium-food-delivery\\", \\"version\\": \\"0.1.0\\", \\"private\\": t"
+  },
+  "tailwind.config.ts": {
+    "bytes": 187,
+    "lines": 9,
+    "head": "import type { Config } from \\"tailwindcss\\"; const config: Config = { content: "
+  },
+  "tsconfig.json": {
+    "bytes": 667,
+    "lines": 41,
+    "head": "{ \\"compilerOptions\\": { \\"target\\": \\"ES2017\\", \\"lib\\": [ \\"dom\\", "
   }
 }
 `;

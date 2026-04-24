@@ -16,7 +16,15 @@ export interface ParsedHtml {
  * null for fragments. Caller decides how to handle missing structure.
  */
 export function parse(html: string): ParsedHtml {
-  const doc = parseDocument(html, { recognizeSelfClosing: true, lowerCaseTags: true });
+  // Tags are lowercased so the section walker can match `<SECTION>` and
+  // `<section>` interchangeably. Attribute names are preserved as written so
+  // SVG camelCase (`viewBox`, `strokeWidth`, `clipPath`) survives intact —
+  // JSX requires the camelCase form.
+  const doc = parseDocument(html, {
+    recognizeSelfClosing: true,
+    lowerCaseTags: true,
+    lowerCaseAttributeNames: false,
+  });
   const htmlEl = findElement(doc, "html");
   const root = htmlEl ?? doc;
   return {
