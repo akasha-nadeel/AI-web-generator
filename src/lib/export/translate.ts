@@ -7,10 +7,12 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { parse } from "./parser.ts";
-import { extractSections, type Section } from "./sections.ts";
+import { extractSections } from "./sections.ts";
 import { htmlToJsx } from "./jsx.ts";
 import { convertImagesModeB } from "./images.ts";
 import { swapInlineSvgs } from "./icons.ts";
+import { rewriteInternalLinks } from "./links.ts";
+import { detectSpaRoutes } from "./spa-routes.ts";
 import { detectHookNeeds, type HookNeeds } from "./runtime-detect.ts";
 import { packageJson } from "./templates/static/package.json.ts";
 import { tsconfigJson } from "./templates/static/tsconfig.json.ts";
@@ -19,9 +21,9 @@ import { nextConfigTs } from "./templates/static/next.config.ts.ts";
 import { globalsCss } from "./templates/static/globals.css.ts";
 import { readmeMd } from "./templates/static/readme.md.ts";
 import { gitignore } from "./templates/static/gitignore.ts";
+import { postcssConfigMjs } from "./templates/static/postcss.config.mjs.ts";
 
 export interface TranslateOptions {
-  bundleImages?: boolean;
   /** Project-display name. Used for <title> fallback and friendly comments. */
   siteName?: string;
 }
@@ -43,23 +45,56 @@ export function translateHtmlToNextjs(rawHtml: string, opts: TranslateOptions = 
   const html = rawHtml.replace(RUNTIME_BLOCK_RE, "");
   const parsed = parse(html);
   const headInfo = extractHeadInfo(parsed);
-  const sections = extractSections(parsed);
   const needs = detectHookNeeds(html);
   const siteName = opts.siteName || headInfo.title || "My Site";
+  const bodyClass = parsed.body?.attribs?.class ?? "";
 
   const files: FileMap = {};
-
-  // Per-section component files. We collect inline-style and lucide-usage
-  // signals on this single pass so we don't re-parse the same HTML later.
-  const sectionMeta: Array<{ name: string; importPath: string }> = [];
   const allInlineStyles: string[] = [...headInfo.inlineStyles];
   let hasLucide = false;
-  for (const section of sections) {
-    const { code, importPath, inlineStyles, importsLucide } = renderSectionFile(section);
-    files[`components/${section.name}.tsx`] = code;
-    sectionMeta.push({ name: section.name, importPath });
-    allInlineStyles.push(...inlineStyles);
-    if (importsLucide) hasLucide = true;
+
+  // Multi-page SPA detection. When non-null, every page-section div becomes
+  // its own route file and non-section body children (nav/footer/cart) become
+  // shared chrome rendered inside app/layout.tsx. Detection is conservative
+  // (see spa-routes.ts): when null we fall through to the single-page path
+  // and output is byte-identical to before this feature landed.
+  const plan = detectSpaRoutes(parsed, html);
+  const chromeRefs: ChromeRef[] = [];
+  if (plan) {
+    for (const route of plan.routes) {
+      const { code, inlineStyles, importsLucide } = renderSectionFile({
+        name: route.componentName,
+        html: route.html,
+      });
+      files[`components/${route.componentName}.tsx`] = code;
+      allInlineStyles.push(...inlineStyles);
+      if (importsLucide) hasLucide = true;
+
+      const routePath = route.isHome ? "app/page.tsx" : `app/${route.slug}/page.tsx`;
+      files[routePath] = renderRouteEntry(route.componentName);
+    }
+    for (const chrome of plan.chrome) {
+      const { code, inlineStyles, importsLucide } = renderSectionFile({
+        name: chrome.componentName,
+        html: chrome.html,
+      });
+      files[`components/${chrome.componentName}.tsx`] = code;
+      allInlineStyles.push(...inlineStyles);
+      if (importsLucide) hasLucide = true;
+      chromeRefs.push({ componentName: chrome.componentName, position: chrome.position });
+    }
+  } else {
+    // Single-page path — unchanged from before.
+    const sections = extractSections(parsed);
+    const sectionMeta: Array<{ name: string; importPath: string }> = [];
+    for (const section of sections) {
+      const { code, importPath, inlineStyles, importsLucide } = renderSectionFile(section);
+      files[`components/${section.name}.tsx`] = code;
+      sectionMeta.push({ name: section.name, importPath });
+      allInlineStyles.push(...inlineStyles);
+      if (importsLucide) hasLucide = true;
+    }
+    files["app/page.tsx"] = renderPage(sectionMeta);
   }
 
   // Always-on client wrapper.
@@ -70,20 +105,34 @@ export function translateHtmlToNextjs(rawHtml: string, opts: TranslateOptions = 
     files[`lib/${hook}.ts`] = readFileSync(join(HOOKS_DIR, `${hook}.ts`), "utf8");
   }
 
-  // App router files.
-  files["app/page.tsx"] = renderPage(sectionMeta);
-  files["app/layout.tsx"] = renderLayout(headInfo, needs, siteName);
+  // Layout + globals — shared by both paths.
+  files["app/layout.tsx"] = renderLayout(headInfo, needs, siteName, bodyClass, chromeRefs);
   files["app/globals.css"] = globalsCss({ fontLinks: headInfo.fontLinks, customCss: allInlineStyles });
 
   // Project-root static templates.
   files["package.json"] = packageJson({ siteName, hasLucide });
   files["tsconfig.json"] = tsconfigJson();
   files["tailwind.config.ts"] = tailwindConfigTs();
+  files["postcss.config.mjs"] = postcssConfigMjs();
   files["next.config.ts"] = nextConfigTs();
   files["README.md"] = readmeMd({ siteName });
   files[".gitignore"] = gitignore();
 
   return files;
+}
+
+interface ChromeRef {
+  componentName: string;
+  position: "before" | "after";
+}
+
+function renderRouteEntry(componentName: string): string {
+  return (
+    `import ${componentName} from "@/components/${componentName}";\n\n` +
+    `export default function Page() {\n` +
+    `  return <${componentName} />;\n` +
+    `}\n`
+  );
 }
 
 const HOOK_FILES = ["useScrollReveal", "useSmoothScroll", "useMobileNav", "useAccordion"] as const;
@@ -93,7 +142,10 @@ function extractHeadInfo(parsed: ReturnType<typeof parse>): HeadInfo {
   const info: HeadInfo = { title: null, description: null, fontLinks: [], inlineStyles: [] };
   if (!head) return info;
   for (const child of head.children) {
-    if (child.type !== "tag") continue;
+    // htmlparser2 tags <style> as type "style" and <script> as type "script",
+    // not the generic "tag". Accept all three so head styles don't get
+    // silently dropped.
+    if (child.type !== "tag" && child.type !== "style" && child.type !== "script") continue;
     const el = child;
     if (el.name === "title") {
       const text = el.children.map((c) => (c.type === "text" ? (c as unknown as { data: string }).data : "")).join("");
@@ -124,22 +176,24 @@ interface SectionFile {
   importsLucide: boolean;
 }
 
-function renderSectionFile(section: Section): SectionFile {
+function renderSectionFile(section: { name: string; html: string }): SectionFile {
   const { body: rawJsx, inlineStyles } = htmlToJsx(section.html);
   const imageStep = convertImagesModeB(rawJsx);
   const iconStep = swapInlineSvgs(imageStep.jsx);
+  const linkStep = rewriteInternalLinks(iconStep.jsx);
 
   const imports: string[] = [];
   if (imageStep.hasImages) imports.push(`import Image from "next/image";`);
   if (iconStep.imports.size > 0) {
     imports.push(`import { ${[...iconStep.imports].sort().join(", ")} } from "lucide-react";`);
   }
+  if (linkStep.hasLink) imports.push(`import Link from "next/link";`);
 
   const code =
     (imports.length ? imports.join("\n") + "\n\n" : "") +
     `export default function ${section.name}() {\n` +
     `  return (\n` +
-    indentBlock(iconStep.jsx, 4) +
+    indentBlock(linkStep.jsx, 4) +
     `\n  );\n` +
     `}\n`;
 
@@ -189,15 +243,42 @@ function renderPage(sections: Array<{ name: string; importPath: string }>): stri
   );
 }
 
-function renderLayout(head: HeadInfo, needs: HookNeeds, siteName: string): string {
+function renderLayout(
+  head: HeadInfo,
+  needs: HookNeeds,
+  siteName: string,
+  bodyClass: string,
+  chrome: ChromeRef[] = [],
+): string {
   const title = head.title || siteName;
   const description = head.description || "Built with Weavo.";
   const usesAnyHook = needs.scrollReveal || needs.smoothScroll || needs.mobileNav || needs.accordion;
   const runtimeMount = usesAnyHook ? "<ClientRuntime />\n        " : "";
+  const trimmed = bodyClass.trim();
+  const bodyAttr = trimmed ? ` className=${JSON.stringify(trimmed)}` : "";
+
+  // Imports: baseline 3, plus one per chrome component in original DOM order.
+  // When chrome is empty the joined string equals today's output exactly.
+  const importLines = [
+    `import type { Metadata } from "next";`,
+    `import "./globals.css";`,
+    `import ClientRuntime from "@/components/ClientRuntime";`,
+    ...chrome.map((c) => `import ${c.componentName} from "@/components/${c.componentName}";`),
+  ].join("\n");
+
+  const beforeTags = chrome
+    .filter((c) => c.position === "before")
+    .map((c) => `<${c.componentName} />`)
+    .join("\n        ");
+  const afterTags = chrome
+    .filter((c) => c.position === "after")
+    .map((c) => `<${c.componentName} />`)
+    .join("\n        ");
+  const beforeBlock = beforeTags ? `${beforeTags}\n        ` : "";
+  const afterBlock = afterTags ? `\n        ${afterTags}` : "";
+
   return (
-    `import type { Metadata } from "next";\n` +
-    `import "./globals.css";\n` +
-    `import ClientRuntime from "@/components/ClientRuntime";\n\n` +
+    `${importLines}\n\n` +
     `export const metadata: Metadata = {\n` +
     `  title: ${JSON.stringify(title)},\n` +
     `  description: ${JSON.stringify(description)},\n` +
@@ -205,8 +286,8 @@ function renderLayout(head: HeadInfo, needs: HookNeeds, siteName: string): strin
     `export default function RootLayout({ children }: { children: React.ReactNode }) {\n` +
     `  return (\n` +
     `    <html lang="en">\n` +
-    `      <body>\n` +
-    `        ${runtimeMount}{children}\n` +
+    `      <body${bodyAttr}>\n` +
+    `        ${runtimeMount}${beforeBlock}{children}${afterBlock}\n` +
     `      </body>\n` +
     `    </html>\n` +
     `  );\n` +

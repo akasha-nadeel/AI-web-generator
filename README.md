@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Weavo
 
-## Getting Started
+AI website generator. Describe your business, pick a style, and Weavo writes a full site — beautiful HTML + Tailwind + subtle scroll/interactivity — in about a minute. Preview, chat-edit, and publish on a `*.weavo.site` subdomain.
 
-First, run the development server:
+Built on Next.js 16 (Turbopack), React 19, Tailwind v4, Clerk, Supabase, Paddle.
+
+## Features
+
+- **AI generation** — Claude (Haiku/Sonnet/Opus) writes mobile-first HTML from a mood + industry prompt. Optional reference-image analysis extracts a design brief before generation.
+- **Design pattern library** — curated Supabase briefs injected at generation time based on industry + mood.
+- **Chat edits** — iterate on the generated site with natural language; intent router splits CHAT questions from HTML rewrites.
+- **Subdomain publishing** — one click to push to `yoursite.weavo.site` with bandwidth caps (10 GB free, 100 GB paid).
+- **Credits + Paddle** — pack-based pricing, atomic deduction, webhook-driven plan upgrades.
+- **HTML export** — single-file download for every user.
+- **Next.js export (Pro)** — exports any site generated after 2026-04-22 as a runnable Next.js 16 project ZIP (TypeScript, Tailwind v3 to match the generator's CDN, lucide-react, `next/image`, Google Fonts via `@import`, 4 hand-written React hooks for scroll reveal / smooth scroll / mobile nav / accordion). Multi-page SPAs are split into real Next.js routes. Optional image bundling downloads Unsplash assets to `public/images/` for offline builds. Deterministic translator — zero per-export AI cost.
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Environment variables (`.env.local`): Clerk keys, Supabase URL + service-role key, Paddle sandbox keys, at least one of `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `GEMINI_API_KEY`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Supabase migrations live at `supabase/migrations/*.sql` — run them in order via the Supabase SQL editor. Migration `006_exports_log.sql` backs the Pro Next.js export's audit log + rate limit.
 
-## Learn More
+## Tests
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm test
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Runs `tsc --noEmit` plus the Node test runner against the export module (snapshot + per-file parse checks on five industry fixtures, hook validity, static-template shape, API eligibility logic, image bundling, rate limit).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To smoke-test an exported project end-to-end (translate → ZIP → `npm install` → `next build` on a real fixture):
 
-## Deploy on Vercel
+```bash
+node --experimental-strip-types --no-warnings scripts/verify-export.mjs restaurant
+# or for the image-bundling path (mode C) with a stubbed fetch:
+node --experimental-strip-types --no-warnings scripts/verify-export.mjs agency --bundle
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Directory layout
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/app/` — Next.js routes. `(auth)/` is the signed-in area, `api/` is server routes.
+- `src/lib/ai/` — prompts, classifier, design library, image validator, runtime injector.
+- `src/lib/export/` — the Pro Next.js exporter: translator, mode-B/mode-C image handling, static templates, hooks library, rate limit.
+- `src/components/` — UI. `export/` hosts the Pro export button + dialogs.
+- `supabase/migrations/` — append-only schema.
+
+## Deployment
+
+Production runs on Vercel at https://ai-web-generator-dusky.vercel.app. Paddle sandbox webhook is verified; Clerk webhook URL registration is the one remaining wiring step.

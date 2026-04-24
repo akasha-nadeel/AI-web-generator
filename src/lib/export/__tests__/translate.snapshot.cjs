@@ -6,24 +6,24 @@ exports[`agency: translator emits a stable file map 1`] = `
     "head": "# dependencies /node_modules /.pnp .pnp.* # testing /coverage # next.js /.next"
   },
   "README.md": {
-    "bytes": 796,
-    "lines": 30,
+    "bytes": 1250,
+    "lines": 39,
     "head": "# Apex Studio® — Creative Agency Single-page Next.js 16 project exported from ["
   },
   "app/globals.css": {
-    "bytes": 237,
-    "lines": 6,
-    "head": "@import \\"tailwindcss\\"; /* Google Fonts (loaded statically; consider migrating t"
+    "bytes": 8709,
+    "lines": 314,
+    "head": "@import url(\\"https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,50"
   },
   "app/layout.tsx": {
-    "bytes": 443,
+    "bytes": 476,
     "lines": 20,
     "head": "import type { Metadata } from \\"next\\"; import \\"./globals.css\\"; import ClientRunti"
   },
   "app/page.tsx": {
-    "bytes": 740,
-    "lines": 30,
-    "head": "import ApexStudio from \\"@/components/ApexStudio\\"; import About from \\"@/component"
+    "bytes": 790,
+    "lines": 32,
+    "head": "import Nav from \\"@/components/Nav\\"; import ApexStudio from \\"@/components/ApexStu"
   },
   "components/About.tsx": {
     "bytes": 4285,
@@ -59,6 +59,11 @@ exports[`agency: translator emits a stable file map 1`] = `
     "bytes": 6211,
     "lines": 69,
     "head": "export default function Footer() { return ( <footer style={{ background: \\""
+  },
+  "components/Nav.tsx": {
+    "bytes": 4796,
+    "lines": 56,
+    "head": "import { Minus } from \\"lucide-react\\"; export default function Nav() { return "
   },
   "components/Pricing.tsx": {
     "bytes": 10226,
@@ -111,9 +116,14 @@ exports[`agency: translator emits a stable file map 1`] = `
     "head": "import type { NextConfig } from \\"next\\"; const config: NextConfig = { images: "
   },
   "package.json": {
-    "bytes": 526,
-    "lines": 26,
+    "bytes": 544,
+    "lines": 27,
     "head": "{ \\"name\\": \\"apex-studio-creative-agency\\", \\"version\\": \\"0.1.0\\", \\"private\\": tr"
+  },
+  "postcss.config.mjs": {
+    "bytes": 81,
+    "lines": 7,
+    "head": "export default { plugins: { tailwindcss: {}, autoprefixer: {}, }, };"
   },
   "tailwind.config.ts": {
     "bytes": 187,
@@ -136,24 +146,24 @@ exports[`ecommerce: translator emits a stable file map 1`] = `
     "head": "# dependencies /node_modules /.pnp .pnp.* # testing /coverage # next.js /.next"
   },
   "README.md": {
-    "bytes": 800,
-    "lines": 30,
+    "bytes": 1254,
+    "lines": 39,
     "head": "# LIBRARY - Premium Book Marketplace Single-page Next.js 16 project exported fr"
   },
   "app/globals.css": {
-    "bytes": 226,
-    "lines": 6,
-    "head": "@import \\"tailwindcss\\"; /* Google Fonts (loaded statically; consider migrating t"
+    "bytes": 2608,
+    "lines": 76,
+    "head": "@import url(\\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&fam"
   },
   "app/layout.tsx": {
-    "bytes": 447,
+    "bytes": 482,
     "lines": 20,
     "head": "import type { Metadata } from \\"next\\"; import \\"./globals.css\\"; import ClientRunti"
   },
   "app/page.tsx": {
-    "bytes": 866,
-    "lines": 30,
-    "head": "import Home from \\"@/components/Home\\"; import Section from \\"@/components/Section\\""
+    "bytes": 969,
+    "lines": 34,
+    "head": "import Nav from \\"@/components/Nav\\"; import Home from \\"@/components/Home\\"; import"
   },
   "components/ClientRuntime.tsx": {
     "bytes": 230,
@@ -184,6 +194,16 @@ exports[`ecommerce: translator emits a stable file map 1`] = `
     "bytes": 4070,
     "lines": 77,
     "head": "import Image from \\"next/image\\"; export default function Home() { return ( "
+  },
+  "components/Main.tsx": {
+    "bytes": 2641,
+    "lines": 42,
+    "head": "import { Phone } from \\"lucide-react\\"; export default function Main() { return"
+  },
+  "components/Nav.tsx": {
+    "bytes": 3276,
+    "lines": 54,
+    "head": "export default function Nav() { return ( <nav className=\\"fixed top-0 w-ful"
   },
   "components/Programs.tsx": {
     "bytes": 5003,
@@ -241,9 +261,14 @@ exports[`ecommerce: translator emits a stable file map 1`] = `
     "head": "import type { NextConfig } from \\"next\\"; const config: NextConfig = { images: "
   },
   "package.json": {
-    "bytes": 533,
-    "lines": 26,
+    "bytes": 551,
+    "lines": 27,
     "head": "{ \\"name\\": \\"library---premium-book-marketplace\\", \\"version\\": \\"0.1.0\\", \\"priva"
+  },
+  "postcss.config.mjs": {
+    "bytes": 81,
+    "lines": 7,
+    "head": "export default { plugins: { tailwindcss: {}, autoprefixer: {}, }, };"
   },
   "tailwind.config.ts": {
     "bytes": 187,
@@ -266,24 +291,24 @@ exports[`fitness: translator emits a stable file map 1`] = `
     "head": "# dependencies /node_modules /.pnp .pnp.* # testing /coverage # next.js /.next"
   },
   "README.md": {
-    "bytes": 808,
-    "lines": 30,
+    "bytes": 1262,
+    "lines": 39,
     "head": "# IRON - Premium Fitness & Strength Training Single-page Next.js 16 project exp"
   },
   "app/globals.css": {
-    "bytes": 202,
-    "lines": 6,
-    "head": "@import \\"tailwindcss\\"; /* Google Fonts (loaded statically; consider migrating t"
+    "bytes": 4603,
+    "lines": 192,
+    "head": "@import url(\\"https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wg"
   },
   "app/layout.tsx": {
-    "bytes": 455,
+    "bytes": 486,
     "lines": 20,
     "head": "import type { Metadata } from \\"next\\"; import \\"./globals.css\\"; import ClientRunti"
   },
   "app/page.tsx": {
-    "bytes": 794,
-    "lines": 30,
-    "head": "import Home from \\"@/components/Home\\"; import StrengthTraining from \\"@/components"
+    "bytes": 844,
+    "lines": 32,
+    "head": "import Nav from \\"@/components/Nav\\"; import Home from \\"@/components/Home\\"; import"
   },
   "components/About.tsx": {
     "bytes": 3829,
@@ -314,6 +339,11 @@ exports[`fitness: translator emits a stable file map 1`] = `
     "bytes": 2221,
     "lines": 49,
     "head": "import Image from \\"next/image\\"; export default function Home() { return ( "
+  },
+  "components/Nav.tsx": {
+    "bytes": 2774,
+    "lines": 63,
+    "head": "export default function Nav() { return ( <nav className=\\"fixed w-full top-"
   },
   "components/Pricing.tsx": {
     "bytes": 6476,
@@ -371,9 +401,14 @@ exports[`fitness: translator emits a stable file map 1`] = `
     "head": "import type { NextConfig } from \\"next\\"; const config: NextConfig = { images: "
   },
   "package.json": {
-    "bytes": 539,
-    "lines": 26,
+    "bytes": 557,
+    "lines": 27,
     "head": "{ \\"name\\": \\"iron---premium-fitness-strength-training\\", \\"version\\": \\"0.1.0\\", "
+  },
+  "postcss.config.mjs": {
+    "bytes": 81,
+    "lines": 7,
+    "head": "export default { plugins: { tailwindcss: {}, autoprefixer: {}, }, };"
   },
   "tailwind.config.ts": {
     "bytes": 187,
@@ -396,24 +431,24 @@ exports[`photography: translator emits a stable file map 1`] = `
     "head": "# dependencies /node_modules /.pnp .pnp.* # testing /coverage # next.js /.next"
   },
   "README.md": {
-    "bytes": 803,
-    "lines": 30,
+    "bytes": 1257,
+    "lines": 39,
     "head": "# Studio Hub - Professional Photography Single-page Next.js 16 project exported"
   },
   "app/globals.css": {
-    "bytes": 230,
-    "lines": 6,
-    "head": "@import \\"tailwindcss\\"; /* Google Fonts (loaded statically; consider migrating t"
+    "bytes": 1452,
+    "lines": 39,
+    "head": "@import url(\\"https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400"
   },
   "app/layout.tsx": {
-    "bytes": 450,
+    "bytes": 486,
     "lines": 20,
     "head": "import type { Metadata } from \\"next\\"; import \\"./globals.css\\"; import ClientRunti"
   },
   "app/page.tsx": {
-    "bytes": 495,
-    "lines": 22,
-    "head": "import Home from \\"@/components/Home\\"; import Gallery from \\"@/components/Gallery\\""
+    "bytes": 545,
+    "lines": 24,
+    "head": "import Nav from \\"@/components/Nav\\"; import Home from \\"@/components/Home\\"; import"
   },
   "components/About.tsx": {
     "bytes": 2711,
@@ -444,6 +479,11 @@ exports[`photography: translator emits a stable file map 1`] = `
     "bytes": 2284,
     "lines": 36,
     "head": "import Image from \\"next/image\\"; export default function Home() { return ( "
+  },
+  "components/Nav.tsx": {
+    "bytes": 3001,
+    "lines": 49,
+    "head": "export default function Nav() { return ( <nav className=\\"fixed top-0 left-"
   },
   "components/OurServices.tsx": {
     "bytes": 3771,
@@ -481,9 +521,14 @@ exports[`photography: translator emits a stable file map 1`] = `
     "head": "import type { NextConfig } from \\"next\\"; const config: NextConfig = { images: "
   },
   "package.json": {
-    "bytes": 536,
-    "lines": 26,
+    "bytes": 554,
+    "lines": 27,
     "head": "{ \\"name\\": \\"studio-hub---professional-photography\\", \\"version\\": \\"0.1.0\\", \\"pr"
+  },
+  "postcss.config.mjs": {
+    "bytes": 81,
+    "lines": 7,
+    "head": "export default { plugins: { tailwindcss: {}, autoprefixer: {}, }, };"
   },
   "tailwind.config.ts": {
     "bytes": 187,
@@ -506,24 +551,24 @@ exports[`restaurant: translator emits a stable file map 1`] = `
     "head": "# dependencies /node_modules /.pnp .pnp.* # testing /coverage # next.js /.next"
   },
   "README.md": {
-    "bytes": 794,
-    "lines": 30,
+    "bytes": 1248,
+    "lines": 39,
     "head": "# APEX - Premium Food Delivery Single-page Next.js 16 project exported from [We"
   },
   "app/globals.css": {
-    "bytes": 226,
-    "lines": 6,
-    "head": "@import \\"tailwindcss\\"; /* Google Fonts (loaded statically; consider migrating t"
+    "bytes": 6341,
+    "lines": 248,
+    "head": "@import url(\\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&fam"
   },
   "app/layout.tsx": {
-    "bytes": 441,
+    "bytes": 476,
     "lines": 20,
     "head": "import type { Metadata } from \\"next\\"; import \\"./globals.css\\"; import ClientRunti"
   },
   "app/page.tsx": {
-    "bytes": 973,
-    "lines": 32,
-    "head": "import Home from \\"@/components/Home\\"; import DiscountVoucher from \\"@/components/"
+    "bytes": 1023,
+    "lines": 34,
+    "head": "import Nav from \\"@/components/Nav\\"; import Home from \\"@/components/Home\\"; import"
   },
   "components/About.tsx": {
     "bytes": 3231,
@@ -569,6 +614,11 @@ exports[`restaurant: translator emits a stable file map 1`] = `
     "bytes": 4481,
     "lines": 74,
     "head": "import Image from \\"next/image\\"; export default function Menu() { return ( "
+  },
+  "components/Nav.tsx": {
+    "bytes": 3220,
+    "lines": 49,
+    "head": "export default function Nav() { return ( <nav className=\\"sticky top-0 z-50"
   },
   "components/OurSignatureDishes.tsx": {
     "bytes": 4818,
@@ -616,9 +666,254 @@ exports[`restaurant: translator emits a stable file map 1`] = `
     "head": "import type { NextConfig } from \\"next\\"; const config: NextConfig = { images: "
   },
   "package.json": {
-    "bytes": 527,
-    "lines": 26,
+    "bytes": 545,
+    "lines": 27,
     "head": "{ \\"name\\": \\"apex---premium-food-delivery\\", \\"version\\": \\"0.1.0\\", \\"private\\": t"
+  },
+  "postcss.config.mjs": {
+    "bytes": 81,
+    "lines": 7,
+    "head": "export default { plugins: { tailwindcss: {}, autoprefixer: {}, }, };"
+  },
+  "tailwind.config.ts": {
+    "bytes": 187,
+    "lines": 9,
+    "head": "import type { Config } from \\"tailwindcss\\"; const config: Config = { content: "
+  },
+  "tsconfig.json": {
+    "bytes": 667,
+    "lines": 41,
+    "head": "{ \\"compilerOptions\\": { \\"target\\": \\"ES2017\\", \\"lib\\": [ \\"dom\\", "
+  }
+}
+`;
+
+exports[`spa-dashboard: translator emits a stable file map 1`] = `
+{
+  ".gitignore": {
+    "bytes": 291,
+    "lines": 35,
+    "head": "# dependencies /node_modules /.pnp .pnp.* # testing /coverage # next.js /.next"
+  },
+  "README.md": {
+    "bytes": 1243,
+    "lines": 39,
+    "head": "# Dashboard — SPA fixture Single-page Next.js 16 project exported from [Weavo]("
+  },
+  "app/analytics/page.tsx": {
+    "bytes": 120,
+    "lines": 6,
+    "head": "import AnalyticsPage from \\"@/components/AnalyticsPage\\"; export default function"
+  },
+  "app/globals.css": {
+    "bytes": 161,
+    "lines": 7,
+    "head": "@tailwind base; @tailwind components; @tailwind utilities; /* Extracted custom "
+  },
+  "app/layout.tsx": {
+    "bytes": 614,
+    "lines": 25,
+    "head": "import type { Metadata } from \\"next\\"; import \\"./globals.css\\"; import ClientRunti"
+  },
+  "app/page.tsx": {
+    "bytes": 117,
+    "lines": 6,
+    "head": "import OverviewPage from \\"@/components/OverviewPage\\"; export default function P"
+  },
+  "app/settings/page.tsx": {
+    "bytes": 117,
+    "lines": 6,
+    "head": "import SettingsPage from \\"@/components/SettingsPage\\"; export default function P"
+  },
+  "components/AnalyticsPage.tsx": {
+    "bytes": 182,
+    "lines": 9,
+    "head": "export default function AnalyticsPage() { return ( <div className=\\"page-se"
+  },
+  "components/ClientRuntime.tsx": {
+    "bytes": 74,
+    "lines": 6,
+    "head": "'use client'; export default function ClientRuntime() { return null; } "
+  },
+  "components/Footer.tsx": {
+    "bytes": 143,
+    "lines": 8,
+    "head": "export default function Footer() { return ( <footer className=\\"p-4 border-"
+  },
+  "components/Header.tsx": {
+    "bytes": 363,
+    "lines": 15,
+    "head": "import Link from \\"next/link\\"; export default function Header() { return ( "
+  },
+  "components/Notifications.tsx": {
+    "bytes": 208,
+    "lines": 9,
+    "head": "export default function Notifications() { return ( <aside className=\\"fixed"
+  },
+  "components/OverviewPage.tsx": {
+    "bytes": 190,
+    "lines": 9,
+    "head": "export default function OverviewPage() { return ( <div className=\\"page-sec"
+  },
+  "components/SettingsPage.tsx": {
+    "bytes": 187,
+    "lines": 9,
+    "head": "export default function SettingsPage() { return ( <div className=\\"page-sec"
+  },
+  "lib/useAccordion.ts": {
+    "bytes": 989,
+    "lines": 26,
+    "head": "'use client'; import { useEffect } from 'react'; export function useAccordion()"
+  },
+  "lib/useMobileNav.ts": {
+    "bytes": 597,
+    "lines": 20,
+    "head": "'use client'; import { useEffect } from 'react'; export function useMobileNav()"
+  },
+  "lib/useScrollReveal.ts": {
+    "bytes": 1997,
+    "lines": 72,
+    "head": "'use client'; import { useEffect } from 'react'; const EASE = 'cubic-bezier(.22"
+  },
+  "lib/useSmoothScroll.ts": {
+    "bytes": 1051,
+    "lines": 32,
+    "head": "'use client'; import { useEffect } from 'react'; export function useSmoothScrol"
+  },
+  "next.config.ts": {
+    "bytes": 265,
+    "lines": 13,
+    "head": "import type { NextConfig } from \\"next\\"; const config: NextConfig = { images: "
+  },
+  "package.json": {
+    "bytes": 508,
+    "lines": 26,
+    "head": "{ \\"name\\": \\"dashboard-spa-fixture\\", \\"version\\": \\"0.1.0\\", \\"private\\": true, "
+  },
+  "postcss.config.mjs": {
+    "bytes": 81,
+    "lines": 7,
+    "head": "export default { plugins: { tailwindcss: {}, autoprefixer: {}, }, };"
+  },
+  "tailwind.config.ts": {
+    "bytes": 187,
+    "lines": 9,
+    "head": "import type { Config } from \\"tailwindcss\\"; const config: Config = { content: "
+  },
+  "tsconfig.json": {
+    "bytes": 667,
+    "lines": 41,
+    "head": "{ \\"compilerOptions\\": { \\"target\\": \\"ES2017\\", \\"lib\\": [ \\"dom\\", "
+  }
+}
+`;
+
+exports[`spa-notflix: translator emits a stable file map 1`] = `
+{
+  ".gitignore": {
+    "bytes": 291,
+    "lines": 35,
+    "head": "# dependencies /node_modules /.pnp .pnp.* # testing /coverage # next.js /.next"
+  },
+  "README.md": {
+    "bytes": 1241,
+    "lines": 39,
+    "head": "# NOTFLIX — SPA fixture Single-page Next.js 16 project exported from [Weavo](ht"
+  },
+  "app/gallery/page.tsx": {
+    "bytes": 114,
+    "lines": 6,
+    "head": "import GalleryPage from \\"@/components/GalleryPage\\"; export default function Pag"
+  },
+  "app/globals.css": {
+    "bytes": 173,
+    "lines": 10,
+    "head": "@tailwind base; @tailwind components; @tailwind utilities; /* Extracted custom "
+  },
+  "app/layout.tsx": {
+    "bytes": 617,
+    "lines": 25,
+    "head": "import type { Metadata } from \\"next\\"; import \\"./globals.css\\"; import ClientRunti"
+  },
+  "app/page.tsx": {
+    "bytes": 105,
+    "lines": 6,
+    "head": "import HomePage from \\"@/components/HomePage\\"; export default function Page() { "
+  },
+  "app/shop/page.tsx": {
+    "bytes": 105,
+    "lines": 6,
+    "head": "import ShopPage from \\"@/components/ShopPage\\"; export default function Page() { "
+  },
+  "components/ClientRuntime.tsx": {
+    "bytes": 74,
+    "lines": 6,
+    "head": "'use client'; export default function ClientRuntime() { return null; } "
+  },
+  "components/Footer.tsx": {
+    "bytes": 129,
+    "lines": 8,
+    "head": "export default function Footer() { return ( <footer className=\\"p-8\\"> "
+  },
+  "components/GalleryPage.tsx": {
+    "bytes": 204,
+    "lines": 9,
+    "head": "export default function GalleryPage() { return ( <div id=\\"galleryPage\\" cla"
+  },
+  "components/HomePage.tsx": {
+    "bytes": 205,
+    "lines": 9,
+    "head": "export default function HomePage() { return ( <div id=\\"homePage\\" className"
+  },
+  "components/MyCart.tsx": {
+    "bytes": 163,
+    "lines": 9,
+    "head": "export default function MyCart() { return ( <aside className=\\"cart-panel\\">"
+  },
+  "components/Nav.tsx": {
+    "bytes": 412,
+    "lines": 16,
+    "head": "import Link from \\"next/link\\"; export default function Nav() { return ( <n"
+  },
+  "components/ShopPage.tsx": {
+    "bytes": 204,
+    "lines": 9,
+    "head": "export default function ShopPage() { return ( <div id=\\"shopPage\\" className"
+  },
+  "lib/useAccordion.ts": {
+    "bytes": 989,
+    "lines": 26,
+    "head": "'use client'; import { useEffect } from 'react'; export function useAccordion()"
+  },
+  "lib/useMobileNav.ts": {
+    "bytes": 597,
+    "lines": 20,
+    "head": "'use client'; import { useEffect } from 'react'; export function useMobileNav()"
+  },
+  "lib/useScrollReveal.ts": {
+    "bytes": 1997,
+    "lines": 72,
+    "head": "'use client'; import { useEffect } from 'react'; const EASE = 'cubic-bezier(.22"
+  },
+  "lib/useSmoothScroll.ts": {
+    "bytes": 1051,
+    "lines": 32,
+    "head": "'use client'; import { useEffect } from 'react'; export function useSmoothScrol"
+  },
+  "next.config.ts": {
+    "bytes": 265,
+    "lines": 13,
+    "head": "import type { NextConfig } from \\"next\\"; const config: NextConfig = { images: "
+  },
+  "package.json": {
+    "bytes": 506,
+    "lines": 26,
+    "head": "{ \\"name\\": \\"notflix-spa-fixture\\", \\"version\\": \\"0.1.0\\", \\"private\\": true, \\"s"
+  },
+  "postcss.config.mjs": {
+    "bytes": 81,
+    "lines": 7,
+    "head": "export default { plugins: { tailwindcss: {}, autoprefixer: {}, }, };"
   },
   "tailwind.config.ts": {
     "bytes": 187,

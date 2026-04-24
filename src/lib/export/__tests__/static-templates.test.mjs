@@ -11,6 +11,7 @@ const { nextConfigTs } = await import('../templates/static/next.config.ts.ts');
 const { globalsCss } = await import('../templates/static/globals.css.ts');
 const { readmeMd } = await import('../templates/static/readme.md.ts');
 const { gitignore } = await import('../templates/static/gitignore.ts');
+const { postcssConfigMjs } = await import('../templates/static/postcss.config.mjs.ts');
 
 test('package.json parses as JSON and slug-ifies the site name', () => {
   const out = packageJson({ siteName: 'My Awesome Site!', hasLucide: true });
@@ -36,9 +37,10 @@ test('tsconfig.json parses as JSON and points @/* at the project root', () => {
   assert.equal(parsed.compilerOptions.jsx, 'react-jsx');
 });
 
-test('tailwind.config.ts contains the v4 typed export shape', () => {
+test('tailwind.config.ts contains the typed export shape with content globs', () => {
   const out = tailwindConfigTs();
   assert.match(out, /import type \{ Config \} from "tailwindcss"/);
+  assert.match(out, /content:\s*\[/);
   assert.match(out, /export default config/);
 });
 
@@ -49,9 +51,11 @@ test('next.config.ts whitelists Unsplash hostnames', () => {
   assert.match(out, /export default config/);
 });
 
-test('globals.css always begins with the Tailwind import', () => {
+test('globals.css always includes the Tailwind v3 layer directives', () => {
   const out = globalsCss({ fontLinks: [], customCss: [] });
-  assert.match(out, /^@import "tailwindcss";/);
+  assert.match(out, /@tailwind base;/);
+  assert.match(out, /@tailwind components;/);
+  assert.match(out, /@tailwind utilities;/);
 });
 
 test('globals.css splices in font links and custom CSS when present', () => {
@@ -61,6 +65,20 @@ test('globals.css splices in font links and custom CSS when present', () => {
   });
   assert.match(out, /Inter/);
   assert.match(out, /\.foo \{ color: red \}/);
+});
+
+test('globals.css emits fonts as @import url(...) so they actually load', () => {
+  // Regression: fonts used to be written as a comment only, so exported sites
+  // fell back to the browser default — rendering heavier and shifting line
+  // heights. Must be real @import rules, AND must come before the Tailwind
+  // layer directives (CSS requires all @import at the top of the file).
+  const href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap';
+  const out = globalsCss({ fontLinks: [href], customCss: [] });
+  assert.match(out, new RegExp(`@import url\\("${href.replace(/[.?*+^$()|[\\\]{}]/g, '\\$&')}"\\);`));
+  const fontIdx = out.indexOf('@import url(');
+  const tailwindIdx = out.indexOf('@tailwind base');
+  assert.ok(fontIdx >= 0 && tailwindIdx >= 0 && fontIdx < tailwindIdx,
+    'font @import must precede @tailwind directives');
 });
 
 test('README.md mentions the install + dev commands', () => {
@@ -74,4 +92,24 @@ test('.gitignore covers node_modules and the .next build output', () => {
   const out = gitignore();
   assert.match(out, /\/node_modules/);
   assert.match(out, /\/\.next\//);
+});
+
+test('postcss.config.mjs wires Tailwind + autoprefixer', () => {
+  const out = postcssConfigMjs();
+  assert.match(out, /tailwindcss:\s*\{\}/);
+  assert.match(out, /autoprefixer:\s*\{\}/);
+  assert.match(out, /export default/);
+});
+
+test('package.json pins Tailwind v3 to match the preview CDN', () => {
+  // The generated HTML is authored against the Tailwind v3 Play CDN; v4 has
+  // different default line-heights/spacing that cause visible drift between
+  // preview and exported site. Keep these in sync.
+  const out = packageJson({ siteName: 'site', hasLucide: false });
+  const parsed = JSON.parse(out);
+  assert.match(parsed.devDependencies.tailwindcss, /^\^3\./);
+  assert.ok(parsed.devDependencies.postcss, 'postcss present');
+  assert.ok(parsed.devDependencies.autoprefixer, 'autoprefixer present');
+  assert.equal(parsed.devDependencies['@tailwindcss/postcss'], undefined,
+    'v4 PostCSS plugin should no longer be declared');
 });

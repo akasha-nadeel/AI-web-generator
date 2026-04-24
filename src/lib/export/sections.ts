@@ -2,7 +2,7 @@ import type { Element } from "domhandler";
 import { getOuterHTML, textContent } from "domutils";
 import type { ParsedHtml } from "./parser.ts";
 
-const SECTION_TAGS = new Set(["header", "section", "footer", "main", "aside"]);
+const SECTION_TAGS = new Set(["header", "nav", "section", "footer", "main", "aside"]);
 
 export interface Section {
   /** DOM id attribute when present, else derived from heading or fallback. */
@@ -28,28 +28,61 @@ export function extractSections(parsed: ParsedHtml): Section[] {
   const usedNames = new Set<string>();
   const sections: Section[] = [];
   let fallbackCounter = 1;
+  let mainCounter = 1;
+
+  // Buffer of consecutive non-sectioning children. Flushed into a single
+  // synthetic "Main"/"Content" component whenever a real section tag appears
+  // or we finish walking. This preserves top-level <nav> + semantic sections
+  // while still capturing the AI's div-wrapped content that would otherwise
+  // be dropped on the floor.
+  let buffer: Element[] = [];
+  const flushBuffer = (): void => {
+    if (buffer.length === 0) return;
+    const html = buffer.map((el) => getOuterHTML(el)).join("");
+    const textLen = html.replace(/<[^>]+>/g, "").trim().length;
+    if (textLen > 0) {
+      const baseName = mainCounter === 1 ? "Main" : `Main${mainCounter}`;
+      const name = uniquify(baseName, usedNames);
+      sections.push({
+        id: mainCounter === 1 ? "main" : `main-${mainCounter}`,
+        name,
+        tag: "main",
+        html: `<main>${html}</main>`,
+      });
+      mainCounter++;
+    }
+    buffer = [];
+  };
 
   for (const child of body.children) {
     if (child.type !== "tag") continue;
     const el = child as Element;
-    if (!SECTION_TAGS.has(el.name)) continue;
+    // <script> and <style> are inert at this layer — the translator strips
+    // them. Skip so they neither get their own component nor pad a Main.
+    if (el.name === "script" || el.name === "style") continue;
 
-    const id = el.attribs.id ?? "";
-    const heading = firstHeadingText(el);
-    const baseName = pascalCase(id || heading || el.name) || `Section${fallbackCounter++}`;
-    const name = uniquify(baseName, usedNames);
-    sections.push({
-      id: id || slugify(baseName),
-      name,
-      tag: el.name,
-      html: getOuterHTML(el),
-    });
+    if (SECTION_TAGS.has(el.name)) {
+      flushBuffer();
+      const id = el.attribs.id ?? "";
+      const heading = firstHeadingText(el);
+      const baseName = pascalCase(id || heading || el.name) || `Section${fallbackCounter++}`;
+      const name = uniquify(baseName, usedNames);
+      sections.push({
+        id: id || slugify(baseName),
+        name,
+        tag: el.name,
+        html: getOuterHTML(el),
+      });
+    } else {
+      buffer.push(el);
+    }
   }
+  flushBuffer();
 
   return sections;
 }
 
-function firstHeadingText(el: Element): string | null {
+export function firstHeadingText(el: Element): string | null {
   for (const tag of walkTags(el)) {
     if (tag.name === "h1" || tag.name === "h2" || tag.name === "h3") {
       const t = textContent(tag).trim();
@@ -66,7 +99,7 @@ function* walkTags(el: Element): Generator<Element> {
   }
 }
 
-function pascalCase(input: string): string {
+export function pascalCase(input: string): string {
   return input
     .replace(/[^a-zA-Z0-9]+/g, " ")
     .trim()
@@ -77,7 +110,7 @@ function pascalCase(input: string): string {
     .slice(0, 40);
 }
 
-function slugify(input: string): string {
+export function slugify(input: string): string {
   return input
     .replace(/([a-z])([A-Z])/g, "$1-$2")
     .toLowerCase()
@@ -86,7 +119,7 @@ function slugify(input: string): string {
     .slice(0, 40);
 }
 
-function uniquify(name: string, used: Set<string>): string {
+export function uniquify(name: string, used: Set<string>): string {
   if (!used.has(name)) {
     used.add(name);
     return name;

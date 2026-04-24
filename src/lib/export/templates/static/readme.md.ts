@@ -35,5 +35,14 @@ This is a vanilla Next.js project. Push to a Git repo and import it on
 - Tailwind v4 reads tokens from \`@theme\` blocks in \`app/globals.css\`
 - Edit any section freely in \`components/\`
 - Image domains are whitelisted in \`next.config.ts\` (Unsplash CDN by default)
+
+## Interactivity notes
+
+The export preserves structure and styling but strips inline JavaScript
+(\`onclick\`, \`onmouseover\`, etc.) — React doesn't allow handler attributes
+as strings. Navigation-style \`onclick="showPage('x')"\` calls are converted
+to real Next.js \`<Link href="/x">\` elements so page switching still works.
+Other handlers (cart open/close, modals, carousels) render inert and need
+to be re-wired as client components if you want them back.
 `;
 }

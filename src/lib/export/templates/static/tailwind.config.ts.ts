@@ -1,6 +1,5 @@
-// Tailwind v4 defaults to CSS-first configuration via @theme blocks in
-// globals.css, so this file is mostly a marker for editors and tooling that
-// look for it. Customize freely.
+// Tailwind v3 config. The `content` globs drive JIT class extraction, so
+// they must cover every file that can reference utility classes.
 
 export function tailwindConfigTs(): string {
   return `import type { Config } from "tailwindcss";

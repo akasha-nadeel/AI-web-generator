@@ -31,8 +31,13 @@ export function packageJson({ siteName, hasLucide }: Options): string {
       "@types/node": "^20",
       "@types/react": "^19",
       "@types/react-dom": "^19",
-      tailwindcss: "^4",
-      "@tailwindcss/postcss": "^4",
+      // Tailwind v3 — the generated HTML was authored against the v3 Play
+      // CDN (cdn.tailwindcss.com), and v4 has different default values for
+      // line-heights, spacing, and shadows that cause visible drift between
+      // the in-app preview and the exported site.
+      tailwindcss: "^3.4.0",
+      postcss: "^8",
+      autoprefixer: "^10",
     },
   };
   return JSON.stringify(pkg, null, 2) + "\n";

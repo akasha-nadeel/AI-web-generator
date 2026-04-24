@@ -3,20 +3,23 @@
 // <style> blocks.
 
 interface Options {
-  /** Google Fonts hrefs collected from the original <head>. Recorded as a
-   *  comment so the user can migrate to next/font/google later. */
+  /** Google Fonts hrefs collected from the original <head>. Re-emitted as
+   *  `@import url(…)` at the top of the stylesheet so the fonts actually
+   *  load — otherwise the exported site falls back to the browser default,
+   *  which renders heavier and shifts line heights. */
   fontLinks: string[];
   /** CSS pulled out of inline <style> blocks, in document order. */
   customCss: string[];
 }
 
 export function globalsCss({ fontLinks, customCss }: Options): string {
-  const parts: string[] = [`@import "tailwindcss";`];
-
-  if (fontLinks.length > 0) {
-    const lines = fontLinks.map((href) => `   ${href}`).join("\n");
-    parts.push(`/* Google Fonts (loaded statically; consider migrating to next/font/google):\n${lines}\n*/`);
-  }
+  // `@import url(...)` rules must precede any other at-rules, so emit font
+  // imports first, then the Tailwind v3 layer directives.
+  const fontImports = fontLinks.map((href) => `@import url("${href}");`);
+  const parts: string[] = [
+    ...fontImports,
+    `@tailwind base;\n@tailwind components;\n@tailwind utilities;`,
+  ];
 
   if (customCss.length > 0) {
     parts.push(`/* Extracted custom CSS */\n${customCss.join("\n\n")}`);

@@ -46,6 +46,7 @@ for (const fixture of fixtures) {
       'package.json',
       'tsconfig.json',
       'tailwind.config.ts',
+      'postcss.config.mjs',
       'next.config.ts',
       'README.md',
       '.gitignore',
@@ -81,6 +82,60 @@ for (const fixture of fixtures) {
     assert.equal(buf.readUInt32LE(0), 0x04034b50, 'first 4 bytes must be the ZIP local-file-header signature');
   });
 }
+
+// --- Multi-page SPA assertions ---------------------------------------------
+// When the detector fires on an spa-* fixture, we expect real Next.js routes
+// (one app/ page per slug) plus a layout that imports the shared chrome. These
+// assertions are in addition to the per-fixture suite above.
+
+test('spa-notflix: emits per-route app/*/page.tsx files + shared chrome in layout', () => {
+  const html = readFileSync(join(FIXTURES_DIR, 'spa-notflix.html'), 'utf8');
+  const files = translateHtmlToNextjs(html);
+
+  // Home stays at app/page.tsx; non-home routes live at app/{slug}/page.tsx.
+  assert.ok('app/page.tsx' in files, 'home route missing');
+  assert.ok('app/shop/page.tsx' in files, 'shop route missing');
+  assert.ok('app/gallery/page.tsx' in files, 'gallery route missing');
+
+  // Each route file renders a distinct component.
+  assert.match(files['app/page.tsx'], /<HomePage \/>/);
+  assert.match(files['app/shop/page.tsx'], /<ShopPage \/>/);
+  assert.match(files['app/gallery/page.tsx'], /<GalleryPage \/>/);
+
+  // Layout imports and renders the chrome — nav before children, cart + footer after.
+  const layout = files['app/layout.tsx'];
+  assert.match(layout, /import Nav from "@\/components\/Nav"/);
+  assert.match(layout, /import Footer from "@\/components\/Footer"/);
+  assert.match(layout, /<Nav \/>[\s\S]*\{children\}/, 'Nav must render before children');
+  assert.match(layout, /\{children\}[\s\S]*<Footer \/>/, 'Footer must render after children');
+
+  // Nav component has real Next.js Links, not onclick handlers.
+  const nav = files['components/Nav.tsx'];
+  assert.match(nav, /import Link from "next\/link"/);
+  assert.match(nav, /<Link [^>]*href="\/"[^>]*>Home<\/Link>/);
+  assert.match(nav, /<Link [^>]*href="\/shop"[^>]*>Shop<\/Link>/);
+  assert.match(nav, /<Link [^>]*href="\/gallery"[^>]*>Gallery<\/Link>/);
+  assert.doesNotMatch(nav, /showPage\(/);
+  assert.doesNotMatch(nav, /onclick=/);
+});
+
+test('spa-dashboard: heading-derived slugs with cart sidebar hoisted to layout-after', () => {
+  const html = readFileSync(join(FIXTURES_DIR, 'spa-dashboard.html'), 'utf8');
+  const files = translateHtmlToNextjs(html);
+
+  assert.ok('app/page.tsx' in files);
+  assert.ok('app/analytics/page.tsx' in files);
+  assert.ok('app/settings/page.tsx' in files);
+
+  // Header is in layout, cart sidebar and footer too — and the cart sidebar,
+  // which appeared between page-sections in the source, renders after
+  // {children} (i.e. hoisted to the "after" group).
+  const layout = files['app/layout.tsx'];
+  assert.match(layout, /import Header from "@\/components\/Header"/);
+  assert.match(layout, /<Header \/>[\s\S]*\{children\}/);
+  // The aside component's name is derived from its first heading.
+  assert.ok(Object.keys(files).some((p) => p === 'components/Notifications.tsx'));
+});
 
 /** A compact, snapshot-friendly view of the file map: paths + sizes + a short
  *  content fingerprint per file. We deliberately don't snapshot full sources —

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NOTFLIX — SPA fixture</title>
+  <style>
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+  </style>
+</head>
+<body class="bg-zinc-950 text-white">
+  <nav class="flex items-center justify-between p-4">
+    <div class="font-bold">NOTFLIX</div>
+    <div class="flex gap-4">
+      <button onclick="showPage('home')">Home</button>
+      <button onclick="showPage('shop')">Shop</button>
+      <button onclick="showPage('gallery')">Gallery</button>
+      <button onclick="openCart()">Cart</button>
+    </div>
+  </nav>
+
+  <div id="homePage" class="page-section active">
+    <h1>Welcome Home</h1>
+    <p>Featured drops and trending pieces.</p>
+  </div>
+
+  <div id="shopPage" class="page-section">
+    <h1>Shop All</h1>
+    <p>Full catalog of cinema-inspired merch.</p>
+  </div>
+
+  <div id="galleryPage" class="page-section">
+    <h1>Visual Gallery</h1>
+    <p>Behind-the-scenes imagery.</p>
+  </div>
+
+  <aside class="cart-panel">
+    <h2>My Cart</h2>
+    <p>Your cart is empty.</p>
+  </aside>
+
+  <footer class="p-8">
+    <p>&copy; 2026 NOTFLIX.</p>
+  </footer>
+</body>
+</html>
