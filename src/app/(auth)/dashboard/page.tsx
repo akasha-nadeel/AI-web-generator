@@ -1547,7 +1547,9 @@ function TrashedGridCard({
     return () => observer.disconnect();
   }, []);
 
-  const iframeRenderWidth = 1440;
+  // 1920 matches typical desktop viewport so Tailwind 2xl: breakpoints engage
+  // (mirrors SiteGridCard above).
+  const iframeRenderWidth = 1920;
   const scale = containerWidth > 0 ? containerWidth / iframeRenderWidth : 0;
   const thumbHeight = 180;
   const iframeHeight = scale > 0 ? Math.ceil(thumbHeight / scale) : 900;
@@ -1775,11 +1777,12 @@ function SiteGridCard({
     return () => observer.disconnect();
   }, []);
 
-  // Render the iframe at a width of 1440 and set the viewport height equal
-  // to the visible crop area (thumbHeight / scale). Combined with the
-  // isolation script that forces the hero to min-h-100vh, the hero fills
-  // the iframe exactly — no leakage from sections below.
-  const iframeRenderWidth = 1440;
+  // Render the iframe at a typical desktop viewport width (1920px) so
+  // Tailwind's xl: and 2xl: breakpoints engage exactly the same way they
+  // do when the user views the live site. Rendering smaller (e.g. 1440px)
+  // would skip 2xl: rules and produce a thumbnail whose proportions don't
+  // match what the user actually sees in production.
+  const iframeRenderWidth = 1920;
   const scale = containerWidth > 0 ? containerWidth / iframeRenderWidth : 0;
   const thumbHeight = 180;
   const iframeHeight = scale > 0 ? Math.ceil(thumbHeight / scale) : 900;
@@ -1922,9 +1925,11 @@ function SiteListRow({
             className="border-0 pointer-events-none select-none block"
             scrolling="no"
             style={{
-              width: "1440px",
-              height: "990px",
-              transform: "scale(0.0444)",
+              // 1920 matches desktop viewport so 2xl: breakpoints engage.
+              // The list-row thumbnail is 64x44 → scale = 64/1920 ≈ 0.0333.
+              width: "1920px",
+              height: "1080px",
+              transform: "scale(0.0333)",
               transformOrigin: "top left",
               overflow: "hidden",
             }}
