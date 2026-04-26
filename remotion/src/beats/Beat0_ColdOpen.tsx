@@ -3,6 +3,7 @@ import { loadFont } from "@remotion/google-fonts/InstrumentSerif";
 import { COLORS } from "../lib/colors";
 import { BEATS, msToFrames, secondsToFrames } from "../lib/timing";
 import { softEaseOut } from "../lib/easing";
+import { useBeatMotion } from "../lib/beat-motion";
 
 const { fontFamily } = loadFont();
 
@@ -12,8 +13,13 @@ const SECOND_TEXT = "in a sentence.";
 export const Beat0_ColdOpen: React.FC = () => {
   const frame = useCurrentFrame();
   const { startFrame, endFrame } = BEATS.coldOpen;
+  const motion = useBeatMotion(startFrame, endFrame, {
+    scaleStart: 1.02,
+    scaleEnd: 1.06,
+    scaleExit: 1.1,
+  });
 
-  if (frame < startFrame || frame > endFrame) return null;
+  if (!motion.visible) return null;
 
   const localFrame = frame - startFrame;
 
@@ -82,6 +88,9 @@ export const Beat0_ColdOpen: React.FC = () => {
         backgroundColor: COLORS.videoBg,
         justifyContent: "center",
         alignItems: "center",
+        opacity: motion.opacity,
+        transform: `scale(${motion.scale})`,
+        transformOrigin: "center center",
       }}
     >
       <div style={{ position: "relative", width: 1600, height: 240 }}>

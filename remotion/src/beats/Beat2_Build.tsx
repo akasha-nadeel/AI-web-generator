@@ -6,13 +6,15 @@ import { KINO_HTML_SNIPPET } from "../data/kino-html-snippet";
 import { COLORS } from "../lib/colors";
 import { BEATS, CAPTIONS, secondsToFrames } from "../lib/timing";
 import { softEaseOut } from "../lib/easing";
+import { useBeatMotion } from "../lib/beat-motion";
 import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../lib/video-constants";
 
 export const Beat2_Build: React.FC = () => {
   const frame = useCurrentFrame();
   const { startFrame, endFrame } = BEATS.build;
+  const motion = useBeatMotion(startFrame, endFrame);
 
-  if (frame < startFrame || frame > endFrame) return null;
+  if (!motion.visible) return null;
 
   const localFrame = frame - startFrame;
   const t = (sec: number) => secondsToFrames(sec);
@@ -82,7 +84,12 @@ export const Beat2_Build: React.FC = () => {
 
   return (
     <AbsoluteFill
-      style={{ backgroundColor: COLORS.videoBg, opacity: fadeInOpacity }}
+      style={{
+        backgroundColor: COLORS.videoBg,
+        opacity: fadeInOpacity * motion.opacity,
+        transform: `scale(${motion.scale})`,
+        transformOrigin: "center center",
+      }}
     >
       {/* Status bar at top */}
       <div

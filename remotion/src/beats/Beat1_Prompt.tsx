@@ -6,7 +6,8 @@ import { Caption } from "../primitives/Caption";
 import { WeavoDashboard } from "../components/WeavoDashboard";
 import { COLORS } from "../lib/colors";
 import { BEATS, CAPTIONS, secondsToFrames } from "../lib/timing";
-import { softEaseOut } from "../lib/easing";
+import { softEaseOut, softEaseInOut } from "../lib/easing";
+import { useBeatMotion } from "../lib/beat-motion";
 import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../lib/video-constants";
 
 const PROMPT_TEXT =
@@ -15,8 +16,9 @@ const PROMPT_TEXT =
 export const Beat1_Prompt: React.FC = () => {
   const frame = useCurrentFrame();
   const { startFrame, endFrame } = BEATS.prompt;
+  const motion = useBeatMotion(startFrame, endFrame);
 
-  if (frame < startFrame || frame > endFrame) return null;
+  if (!motion.visible) return null;
 
   const localFrame = frame - startFrame;
   const t = (sec: number) => secondsToFrames(sec);
@@ -80,8 +82,50 @@ export const Beat1_Prompt: React.FC = () => {
     { frame: t(14), x: sendX, y: sendY },
   ];
 
+  // Punch-in zoom on the chat input as typing begins, holds through typing,
+  // shifts to the Send button right before the click, then exits.
+  const inputOriginX = inputCenterX / VIDEO_WIDTH;
+  const inputOriginY = inputCenterY / VIDEO_HEIGHT;
+  const sendOriginX = sendX / VIDEO_WIDTH;
+  const sendOriginY = sendY / VIDEO_HEIGHT;
+
+  const punchInScale = interpolate(
+    localFrame,
+    [t(3.6), t(4.2), t(11.5), t(12.4), t(13.4), t(14)],
+    [1.0, 1.12, 1.12, 1.18, 1.18, 1.0],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: softEaseInOut,
+    }
+  );
+
+  // Crossfade transform-origin from input to send between t(11) and t(12.5)
+  const originBlend = interpolate(
+    localFrame,
+    [t(11.0), t(12.5)],
+    [0, 1],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: softEaseInOut,
+    }
+  );
+  const punchOriginX = inputOriginX + (sendOriginX - inputOriginX) * originBlend;
+  const punchOriginY = inputOriginY + (sendOriginY - inputOriginY) * originBlend;
+
+  // Compose motion: outer breath × inner punch-in
+  const totalScale = motion.scale * punchInScale;
+
   return (
-    <AbsoluteFill style={{ backgroundColor: COLORS.videoBg }}>
+    <AbsoluteFill
+      style={{
+        backgroundColor: COLORS.videoBg,
+        opacity: motion.opacity,
+        transform: `scale(${totalScale})`,
+        transformOrigin: `${punchOriginX * 100}% ${punchOriginY * 100}%`,
+      }}
+    >
       {/* Browser frame with dashboard inside */}
       <div
         style={{

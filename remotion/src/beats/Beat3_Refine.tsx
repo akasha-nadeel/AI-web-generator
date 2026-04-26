@@ -7,7 +7,8 @@ import { WeavoEditor } from "../components/WeavoEditor";
 import { KinoSiteMock } from "../components/KinoSiteMock";
 import { COLORS } from "../lib/colors";
 import { BEATS, CAPTIONS, secondsToFrames } from "../lib/timing";
-import { softEaseOut } from "../lib/easing";
+import { softEaseOut, softEaseInOut } from "../lib/easing";
+import { useBeatMotion } from "../lib/beat-motion";
 import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../lib/video-constants";
 
 const REFINE_PROMPT =
@@ -16,8 +17,9 @@ const REFINE_PROMPT =
 export const Beat3_Refine: React.FC = () => {
   const frame = useCurrentFrame();
   const { startFrame, endFrame } = BEATS.refine;
+  const motion = useBeatMotion(startFrame, endFrame);
 
-  if (frame < startFrame || frame > endFrame) return null;
+  if (!motion.visible) return null;
 
   const localFrame = frame - startFrame;
   const t = (sec: number) => secondsToFrames(sec);
@@ -91,9 +93,29 @@ export const Beat3_Refine: React.FC = () => {
   // Build messages: empty until typing starts; show 1 user message after typing completes
   const showFinalMessage = localFrame >= TYPING_START + t(TYPING_DURATION_SEC);
 
+  // Punch-in zoom on the new "Watch Trailer" button after the crossfade completes
+  const punchInScale = interpolate(
+    localFrame,
+    [t(11.0), t(12.0), t(14.0), t(15.0)],
+    [1.0, 1.16, 1.16, 1.0],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: softEaseInOut,
+    }
+  );
+  const punchOriginX = buttonX / VIDEO_WIDTH;
+  const punchOriginY = buttonY / VIDEO_HEIGHT;
+  const totalScale = motion.scale * punchInScale;
+
   return (
     <AbsoluteFill
-      style={{ backgroundColor: COLORS.videoBg, opacity: fadeInOpacity }}
+      style={{
+        backgroundColor: COLORS.videoBg,
+        opacity: fadeInOpacity * motion.opacity,
+        transform: `scale(${totalScale})`,
+        transformOrigin: `${punchOriginX * 100}% ${punchOriginY * 100}%`,
+      }}
     >
       <div
         style={{

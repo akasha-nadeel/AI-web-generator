@@ -8,14 +8,16 @@ import { KinoSiteMock } from "../components/KinoSiteMock";
 import { PublishModal } from "../components/PublishModal";
 import { COLORS } from "../lib/colors";
 import { BEATS, CAPTIONS, secondsToFrames } from "../lib/timing";
-import { softEaseOut } from "../lib/easing";
+import { softEaseOut, softEaseInOut } from "../lib/easing";
+import { useBeatMotion } from "../lib/beat-motion";
 import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../lib/video-constants";
 
 export const Beat4_Publish: React.FC = () => {
   const frame = useCurrentFrame();
   const { startFrame, endFrame } = BEATS.publish;
+  const motion = useBeatMotion(startFrame, endFrame);
 
-  if (frame < startFrame || frame > endFrame) return null;
+  if (!motion.visible) return null;
 
   const localFrame = frame - startFrame;
   const t = (sec: number) => secondsToFrames(sec);
@@ -120,9 +122,39 @@ export const Beat4_Publish: React.FC = () => {
   const showSuccess = localFrame >= SUCCESS_START;
   const showModal = localFrame >= MODAL_OPEN_START;
 
+  // Punch-in zoom — first on Publish button before click, then on the success URL
+  const punchInScale = interpolate(
+    localFrame,
+    [t(1.5), t(2.0), t(2.5), t(7.5), t(8.5), t(10.0)],
+    [1.0, 1.14, 1.0, 1.0, 1.18, 1.18],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: softEaseInOut,
+    }
+  );
+  // Origin shifts: Publish button -> modal center
+  const originBlend = interpolate(localFrame, [t(2.2), t(7.5)], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const originX =
+    publishX / VIDEO_WIDTH +
+    ((VIDEO_WIDTH * 0.5) / VIDEO_WIDTH - publishX / VIDEO_WIDTH) * originBlend;
+  const originY =
+    publishY / VIDEO_HEIGHT +
+    ((VIDEO_HEIGHT * 0.55) / VIDEO_HEIGHT - publishY / VIDEO_HEIGHT) *
+      originBlend;
+  const totalScale = motion.scale * punchInScale;
+
   return (
     <AbsoluteFill
-      style={{ backgroundColor: COLORS.videoBg, opacity: fadeInOpacity }}
+      style={{
+        backgroundColor: COLORS.videoBg,
+        opacity: fadeInOpacity * motion.opacity,
+        transform: `scale(${totalScale})`,
+        transformOrigin: `${originX * 100}% ${originY * 100}%`,
+      }}
     >
       <div
         style={{

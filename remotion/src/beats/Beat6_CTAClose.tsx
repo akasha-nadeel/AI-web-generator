@@ -4,6 +4,7 @@ import { loadFont as loadInter } from "@remotion/google-fonts/Inter";
 import { COLORS } from "../lib/colors";
 import { BEATS, secondsToFrames } from "../lib/timing";
 import { softEaseOut } from "../lib/easing";
+import { useBeatMotion } from "../lib/beat-motion";
 
 const { fontFamily: serifFamily } = loadSerif();
 const { fontFamily: interFamily } = loadInter();
@@ -12,8 +13,13 @@ export const Beat6_CTAClose: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const { startFrame, endFrame } = BEATS.ctaClose;
+  const motion = useBeatMotion(startFrame, endFrame, {
+    scaleStart: 1.06,
+    scaleEnd: 1.0,
+    scaleExit: 1.0,
+  });
 
-  if (frame < startFrame || frame > endFrame) return null;
+  if (!motion.visible) return null;
 
   const localFrame = frame - startFrame;
   const t = (sec: number) => secondsToFrames(sec);
@@ -85,6 +91,9 @@ export const Beat6_CTAClose: React.FC = () => {
         justifyContent: "center",
         alignItems: "center",
         gap: 32,
+        opacity: motion.opacity,
+        transform: `scale(${motion.scale})`,
+        transformOrigin: "center center",
       }}
     >
       <div

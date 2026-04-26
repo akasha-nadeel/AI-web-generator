@@ -5,6 +5,7 @@ import { KinoSiteMock } from "../components/KinoSiteMock";
 import { COLORS } from "../lib/colors";
 import { BEATS, secondsToFrames } from "../lib/timing";
 import { softEaseOut } from "../lib/easing";
+import { useBeatMotion } from "../lib/beat-motion";
 import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../lib/video-constants";
 
 const TYPED_URL = "kino.weavostudio.com";
@@ -12,8 +13,14 @@ const TYPED_URL = "kino.weavostudio.com";
 export const Beat5_Payoff: React.FC = () => {
   const frame = useCurrentFrame();
   const { startFrame, endFrame } = BEATS.payoff;
+  // Subtle breath only — scroll provides the dominant motion
+  const motion = useBeatMotion(startFrame, endFrame, {
+    scaleStart: 0.98,
+    scaleEnd: 1.02,
+    scaleExit: 1.04,
+  });
 
-  if (frame < startFrame || frame > endFrame) return null;
+  if (!motion.visible) return null;
 
   const localFrame = frame - startFrame;
   const t = (sec: number) => secondsToFrames(sec);
@@ -104,7 +111,14 @@ export const Beat5_Payoff: React.FC = () => {
   })();
 
   return (
-    <AbsoluteFill style={{ backgroundColor: COLORS.videoBg }}>
+    <AbsoluteFill
+      style={{
+        backgroundColor: COLORS.videoBg,
+        opacity: motion.opacity,
+        transform: `scale(${motion.scale})`,
+        transformOrigin: "center center",
+      }}
+    >
       <div
         style={{
           position: "absolute",
