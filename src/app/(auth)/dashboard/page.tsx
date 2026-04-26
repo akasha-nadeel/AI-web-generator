@@ -755,8 +755,9 @@ export default function DashboardPage() {
 // was brittle: it broke for sites whose first body-child was a position:fixed
 // nav (which the script misidentified as the hero). The CSS-only approach
 // is deterministic and works for every layout structure the AI emits.
-function buildHeroSrcDoc(html: string): string {
+function buildHeroSrcDoc(html: string, siteId = ""): string {
   if (!html) return "";
+  const safeSiteId = JSON.stringify(siteId);
   const injection = `<style id="__weavo_thumb_style__">
     /* Reset margins and disable scrolling — the iframe already crops via overflow:hidden */
     html, body { margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: transparent !important; }
@@ -847,6 +848,10 @@ function buildHeroSrcDoc(html: string): string {
       return null;
     }
 
+    var SITE_ID = ${safeSiteId};
+    function send(height) {
+      try { parent.postMessage({ type: 'weavo:thumb-height', siteId: SITE_ID, height: height }, '*'); } catch (e) {}
+    }
     function measure() {
       try {
         var body = document.body;
@@ -855,7 +860,7 @@ function buildHeroSrcDoc(html: string): string {
         if (!hero) {
           /* Fallback: report viewport height so the thumbnail at least shows
              something reasonable rather than a sliver. */
-          parent.postMessage({ type: 'weavo:thumb-height', height: window.innerHeight || 800 }, '*');
+          send(window.innerHeight || 800);
           return;
         }
         var rect = hero.getBoundingClientRect();
@@ -863,7 +868,7 @@ function buildHeroSrcDoc(html: string): string {
            never scrolled inside the iframe). Add a small breathing-room
            buffer so we don't crop a hairline at the very bottom edge. */
         var bottom = Math.max(rect.bottom, hero.offsetTop + hero.offsetHeight);
-        parent.postMessage({ type: 'weavo:thumb-height', height: bottom }, '*');
+        send(bottom);
       } catch (e) { /* DOM gone — silently no-op */ }
     }
 
@@ -1611,8 +1616,8 @@ function TrashedGridCard({
 
   const siteHtml = site.site_json?.html || "";
   const heroSrcDoc = useMemo(
-    () => (inView ? buildHeroSrcDoc(siteHtml) : ""),
-    [siteHtml, inView]
+    () => (inView ? buildHeroSrcDoc(siteHtml, site.id) : ""),
+    [siteHtml, inView, site.id]
   );
 
   const formattedDate = new Date(site.updated_at).toLocaleDateString("en-US", {
@@ -1632,17 +1637,17 @@ function TrashedGridCard({
 
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
-      if (e.source !== iframeRef.current?.contentWindow) return;
       const data = e.data;
       if (!data || typeof data !== "object") return;
-      if (data.type === "weavo:thumb-height" && typeof data.height === "number") {
-        const clamped = Math.max(400, Math.min(2000, Math.round(data.height)));
-        setMeasuredHeroHeight((prev) => (prev === clamped ? prev : clamped));
-      }
+      if (data.type !== "weavo:thumb-height") return;
+      if (data.siteId !== site.id) return;
+      if (typeof data.height !== "number") return;
+      const clamped = Math.max(400, Math.min(2000, Math.round(data.height)));
+      setMeasuredHeroHeight((prev) => (prev === clamped ? prev : clamped));
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, []);
+  }, [site.id]);
 
   // Locked 1920x1080 viewport (mirrors SiteGridCard — see comment there).
   const iframeRenderWidth = 1920;
@@ -1864,8 +1869,8 @@ function SiteGridCard({
   const siteHtml = site.site_json?.html || "";
   // Defer the (expensive) HTML transform until the card is actually visible.
   const heroSrcDoc = useMemo(
-    () => (inView ? buildHeroSrcDoc(siteHtml) : ""),
-    [siteHtml, inView]
+    () => (inView ? buildHeroSrcDoc(siteHtml, site.id) : ""),
+    [siteHtml, inView, site.id]
   );
 
   const formattedDate = new Date(site.updated_at).toLocaleDateString("en-US", {
@@ -1883,22 +1888,22 @@ function SiteGridCard({
     return () => observer.disconnect();
   }, []);
 
-  // Listen for the iframe's posted hero height. Each card scopes by source
-  // window so it only reacts to its own iframe's messages.
+  // Listen for the iframe's posted hero height. Filter by siteId rather than
+  // contentWindow identity — contentWindow can change as srcDoc reloads,
+  // making source comparison race-prone.
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
-      if (e.source !== iframeRef.current?.contentWindow) return;
       const data = e.data;
       if (!data || typeof data !== "object") return;
-      if (data.type === "weavo:thumb-height" && typeof data.height === "number") {
-        // Clamp to a sensible range so a malformed payload can't blow up the layout
-        const clamped = Math.max(400, Math.min(2000, Math.round(data.height)));
-        setMeasuredHeroHeight((prev) => (prev === clamped ? prev : clamped));
-      }
+      if (data.type !== "weavo:thumb-height") return;
+      if (data.siteId !== site.id) return;
+      if (typeof data.height !== "number") return;
+      const clamped = Math.max(400, Math.min(2000, Math.round(data.height)));
+      setMeasuredHeroHeight((prev) => (prev === clamped ? prev : clamped));
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, []);
+  }, [site.id]);
 
   // Render the iframe at exactly 1920×1080 — the user's actual desktop
   // viewport — so Tailwind's 2xl: breakpoint engages and min-h-screen
