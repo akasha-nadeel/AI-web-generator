@@ -799,7 +799,52 @@ function buildHeroSrcDoc(html: string): string {
 
     /* Disable smooth scroll which can cause layout flicker on iframe load */
     html { scroll-behavior: auto !important; }
-  </style>`;
+  </style>
+  <script id="__weavo_measure__">
+  (function () {
+    /* Measure the hero section's actual rendered height and post it to the
+       parent so the thumbnail container can crop precisely. We pick the first
+       body-level block tall enough (>=400px) to be the hero — that skips
+       nav bars, announcement banners, and marquees but reliably picks the
+       hero across every layout the AI emits. */
+    function measure() {
+      try {
+        var body = document.body;
+        if (!body) return;
+        var kids = body.children;
+        var heroBottom = 0;
+        for (var i = 0; i < kids.length; i++) {
+          var el = kids[i];
+          var tag = el.tagName.toLowerCase();
+          if (tag === 'script' || tag === 'style' || tag === 'link' || tag === 'noscript') continue;
+          var rect = el.getBoundingClientRect();
+          /* Track running bottom so navs/banners are included up to the hero */
+          if (rect.height < 400) {
+            heroBottom = Math.max(heroBottom, rect.bottom);
+            continue;
+          }
+          heroBottom = rect.bottom;
+          break;
+        }
+        if (heroBottom > 0) {
+          parent.postMessage({ type: 'weavo:thumb-height', height: heroBottom }, '*');
+        }
+      } catch (e) { /* same-origin denied or DOM gone — silently fall back */ }
+    }
+    /* Re-measure after images/fonts settle since they affect heights */
+    function schedule() {
+      requestAnimationFrame(measure);
+      setTimeout(measure, 250);
+      setTimeout(measure, 800);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', schedule);
+    } else {
+      schedule();
+    }
+    window.addEventListener('load', schedule);
+  })();
+  </script>`;
   if (/<\/head>/i.test(html)) return html.replace(/<\/head>/i, `${injection}</head>`);
   if (/<body[^>]*>/i.test(html)) return html.replace(/<body[^>]*>/i, (m) => `${m}${injection}`);
   return injection + html;
@@ -1523,7 +1568,9 @@ function TrashedGridCard({
   onPermanentDelete: (id: string) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [measuredHeroHeight, setMeasuredHeroHeight] = useState<number | null>(null);
   const inView = useInViewport(containerRef);
 
   const siteHtml = site.site_json?.html || "";
@@ -1547,11 +1594,31 @@ function TrashedGridCard({
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.source !== iframeRef.current?.contentWindow) return;
+      const data = e.data;
+      if (!data || typeof data !== "object") return;
+      if (data.type === "weavo:thumb-height" && typeof data.height === "number") {
+        const clamped = Math.max(400, Math.min(2000, Math.round(data.height)));
+        setMeasuredHeroHeight((prev) => (prev === clamped ? prev : clamped));
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
+
   // Locked 1920x1080 viewport (mirrors SiteGridCard — see comment there).
   const iframeRenderWidth = 1920;
   const iframeHeight = 1080;
   const scale = containerWidth > 0 ? containerWidth / iframeRenderWidth : 0;
-  const thumbHeight = containerWidth > 0 ? Math.round(containerWidth * 9 / 16) : 180;
+  const thumbHeight = (() => {
+    const fallback16x9 = containerWidth > 0 ? Math.round(containerWidth * 9 / 16) : 180;
+    if (measuredHeroHeight && scale > 0) {
+      return Math.round(measuredHeroHeight * scale);
+    }
+    return fallback16x9;
+  })();
 
   return (
     <div className="group rounded-lg overflow-hidden border border-border bg-card hover:border-border transition-colors duration-200">
@@ -1562,6 +1629,7 @@ function TrashedGridCard({
       >
         {heroSrcDoc && scale > 0 ? (
           <iframe
+            ref={iframeRef}
             srcDoc={heroSrcDoc}
             title={site.name}
             className="border-0 pointer-events-none select-none block grayscale opacity-60 group-hover:opacity-80 transition-opacity"
@@ -1750,8 +1818,11 @@ function SiteGridCard({
   plan: "free" | "pro" | "business";
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [renameOpen, setRenameOpen] = useState(false);
+  // Hero height measured inside the iframe via postMessage (null until ready).
+  const [measuredHeroHeight, setMeasuredHeroHeight] = useState<number | null>(null);
   const inView = useInViewport(containerRef);
 
   const siteHtml = site.site_json?.html || "";
@@ -1776,21 +1847,39 @@ function SiteGridCard({
     return () => observer.disconnect();
   }, []);
 
+  // Listen for the iframe's posted hero height. Each card scopes by source
+  // window so it only reacts to its own iframe's messages.
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.source !== iframeRef.current?.contentWindow) return;
+      const data = e.data;
+      if (!data || typeof data !== "object") return;
+      if (data.type === "weavo:thumb-height" && typeof data.height === "number") {
+        // Clamp to a sensible range so a malformed payload can't blow up the layout
+        const clamped = Math.max(400, Math.min(2000, Math.round(data.height)));
+        setMeasuredHeroHeight((prev) => (prev === clamped ? prev : clamped));
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
+
   // Render the iframe at exactly 1920×1080 — the user's actual desktop
-  // viewport. This is critical for correctness:
-  //  • Width 1920 engages Tailwind's xl: + 2xl: breakpoints the same way
-  //    they engage on the live site.
-  //  • Height 1080 makes min-h-screen render the hero at the same height
-  //    the user sees in their browser. Letting iframeHeight float (set to
-  //    thumbHeight/scale) caused min-h-screen to compute against a smaller
-  //    viewport, squishing the hero and exposing the section below it.
-  // The thumbnail container then crops to its 16:9 aspect ratio, showing
-  // the entire hero with the same proportions as the live site.
+  // viewport — so Tailwind's 2xl: breakpoint engages and min-h-screen
+  // matches what the user sees in their own browser.
   const iframeRenderWidth = 1920;
   const iframeHeight = 1080;
   const scale = containerWidth > 0 ? containerWidth / iframeRenderWidth : 0;
-  // 16:9 aspect ratio matches the iframe so we get a 1:1 letterbox-free fit.
-  const thumbHeight = containerWidth > 0 ? Math.round(containerWidth * 9 / 16) : 180;
+  // The thumbnail container crops to the actual hero height (measured inside
+  // the iframe and posted back). Until measurement arrives, we use a 16:9
+  // placeholder so cards don't visually thrash on first load.
+  const thumbHeight = (() => {
+    const fallback16x9 = containerWidth > 0 ? Math.round(containerWidth * 9 / 16) : 180;
+    if (measuredHeroHeight && scale > 0) {
+      return Math.round(measuredHeroHeight * scale);
+    }
+    return fallback16x9;
+  })();
 
   return (
     <div className="group rounded-lg overflow-hidden border border-border bg-card hover:border-border transition-colors duration-200">
@@ -1803,6 +1892,7 @@ function SiteGridCard({
         >
           {heroSrcDoc && scale > 0 ? (
             <iframe
+              ref={iframeRef}
               srcDoc={heroSrcDoc}
               title={site.name}
               className="border-0 pointer-events-none select-none block"
