@@ -50,6 +50,9 @@ import { CreditCounter } from "@/components/ui/CreditCounter";
 import { AnnouncementBanner } from "@/components/shared/AnnouncementBanner";
 import { useCreditsStore } from "@/stores/creditsStore";
 import { useTheme } from "next-themes";
+import { AIChatSection } from "@/components/dashboard/AIChatSection";
+import { ExportButton } from "@/components/export/ExportButton";
+import { useInViewport } from "@/hooks/useInViewport";
 
 /* ===== TYPES ===== */
 
@@ -64,7 +67,7 @@ interface Site {
 }
 
 type ViewMode = "grid" | "list";
-type NavView = "Recents" | "All Projects" | "Templates" | "Trash";
+type NavView = "Chat" | "Recents" | "All Projects" | "Templates" | "Trash";
 type SortMode = "updated" | "created" | "name";
 
 /* ===== INDUSTRY ICON MAP ===== */
@@ -95,7 +98,7 @@ export default function DashboardPage() {
   const [plan, setPlan] = useState<"free" | "pro" | "business">("free");
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [activeNav, setActiveNav] = useState<NavView>("Recents");
+  const [activeNav, setActiveNav] = useState<NavView>("Chat");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortMode, setSortMode] = useState<SortMode>("updated");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -155,8 +158,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function loadData() {
-      await Promise.all([fetchSites(), fetchTrashed()]);
+      // Active sites block the loading flag — they're what's visible on
+      // first paint. Trash fetches in the background and updates the
+      // tab count once it returns; the user won't perceive a delay.
+      await fetchSites();
       setLoading(false);
+      fetchTrashed();
     }
     loadData();
   }, [fetchSites, fetchTrashed]);
@@ -243,6 +250,7 @@ export default function DashboardPage() {
   const creditPercentage = (credits / totalCredits) * 100;
 
   const sidebarNavItems: { label: NavView; icon: typeof Clock }[] = [
+    { label: "Chat", icon: Sparkles },
     { label: "Recents", icon: Clock },
     { label: "All Projects", icon: FolderOpen },
     { label: "Templates", icon: FileText },
@@ -256,7 +264,7 @@ export default function DashboardPage() {
     <>
       {/* Brand header */}
       <div className="p-4 flex items-center justify-between">
-        <Link href="/dashboard" onClick={() => { setActiveNav("Recents"); setMobileMenuOpen(false); }}>
+        <Link href="/dashboard" onClick={() => { setActiveNav("Chat"); setMobileMenuOpen(false); }}>
           <span className="flex items-center gap-1 text-xl font-bold text-foreground">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/logo.png" alt="Weavo Logo" className="h-5 w-auto object-contain opacity-95 dark:invert-0 invert" />
@@ -637,27 +645,29 @@ export default function DashboardPage() {
             <span className="text-muted-foreground">Workspace</span>
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40" />
             <span className="text-foreground font-medium">{activeNav}</span>
-            {activeNav !== "Templates" && (
+            {activeNav !== "Templates" && activeNav !== "Chat" && (
               <span className="ml-1 text-[11px] text-muted-foreground bg-foreground/[0.05] border border-border rounded-full px-2 py-0.5 tabular-nums">
                 {activeNav === "Trash" ? displayTrashed.length : displaySites.length}
               </span>
             )}
           </div>
 
-          {/* Search bar moved to left (next to breadcrumbs) */}
-          <div className="hidden md:block flex-1 max-w-sm ml-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder="Search projects..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-9 pl-9 pr-3 text-xs bg-foreground/[0.04] border border-border rounded-full text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/40 focus:bg-foreground/[0.06] transition-all"
-              />
+          {/* Search bar — hidden on Chat view (nothing to search) */}
+          {activeNav !== "Chat" && (
+            <div className="hidden md:block flex-1 max-w-sm ml-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search projects..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-9 pl-9 pr-3 text-xs bg-foreground/[0.04] border border-border rounded-full text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/40 focus:bg-foreground/[0.06] transition-all"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="flex-1 md:hidden" />
 
@@ -675,7 +685,9 @@ export default function DashboardPage() {
         {/* Content area */}
         <main className="flex-1 overflow-y-auto scrollbar-thin">
           <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-6">
-              {activeNav === "Templates" ? (
+              {activeNav === "Chat" ? (
+                <AIChatSection />
+              ) : activeNav === "Templates" ? (
                 <TemplatesGallery selectedIndustry={selectedTemplateId} onSelectIndustry={setSelectedTemplateId} />
               ) : activeNav === "Trash" ? (
                 <TrashView
@@ -700,6 +712,7 @@ export default function DashboardPage() {
                   setActiveNav={setActiveNav}
                   searchQuery={searchQuery}
                   onDelete={handleMoveToTrash}
+                  plan={plan}
                 />
               )}
             </div>
@@ -784,6 +797,7 @@ function SitesView({
   setActiveNav,
   searchQuery,
   onDelete,
+  plan,
 }: {
   sites: Site[];
   loading: boolean;
@@ -795,6 +809,7 @@ function SitesView({
   setActiveNav: (v: NavView) => void;
   searchQuery: string;
   onDelete: (id: string) => void;
+  plan: "free" | "pro" | "business";
 }) {
   const [showRecommended, setShowRecommended] = useState(true);
 
@@ -912,13 +927,13 @@ function SitesView({
       ) : viewMode === "grid" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {sites.map((site) => (
-            <SiteGridCard key={site.id} site={site} onDelete={onDelete} />
+            <SiteGridCard key={site.id} site={site} onDelete={onDelete} plan={plan} />
           ))}
         </div>
       ) : (
         <div className="flex flex-col gap-1.5">
           {sites.map((site) => (
-            <SiteListRow key={site.id} site={site} onDelete={onDelete} />
+            <SiteListRow key={site.id} site={site} onDelete={onDelete} plan={plan} />
           ))}
         </div>
       )}
@@ -1474,9 +1489,13 @@ function TrashedGridCard({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  const inView = useInViewport(containerRef);
 
   const siteHtml = site.site_json?.html || "";
-  const heroSrcDoc = useMemo(() => buildHeroSrcDoc(siteHtml), [siteHtml]);
+  const heroSrcDoc = useMemo(
+    () => (inView ? buildHeroSrcDoc(siteHtml) : ""),
+    [siteHtml, inView]
+  );
 
   const formattedDate = new Date(site.updated_at).toLocaleDateString("en-US", {
     month: "short",
@@ -1603,12 +1622,17 @@ function TrashedListRow({
 
 /* ===== SITE GRID CARD ===== */
 
-function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) => void }) {
+function SiteGridCard({ site, onDelete, plan }: { site: Site; onDelete: (id: string) => void; plan: "free" | "pro" | "business" }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  const inView = useInViewport(containerRef);
 
   const siteHtml = site.site_json?.html || "";
-  const heroSrcDoc = useMemo(() => buildHeroSrcDoc(siteHtml), [siteHtml]);
+  // Defer the (expensive) HTML transform until the card is actually visible.
+  const heroSrcDoc = useMemo(
+    () => (inView ? buildHeroSrcDoc(siteHtml) : ""),
+    [siteHtml, inView]
+  );
 
   const formattedDate = new Date(site.updated_at).toLocaleDateString("en-US", {
     month: "short",
@@ -1681,26 +1705,38 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
           </p>
         </Link>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger className="p-1 rounded-md hover:bg-foreground/[0.08] transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100 shrink-0 focus:outline-none">
-            <MoreVertical className="w-4 h-4 text-muted-foreground" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40 bg-popover backdrop-blur-xl border-border">
-            <DropdownMenuItem asChild>
-              <Link href={`/editor/${site.id}`} className="flex items-center gap-2 text-xs">
-                <Edit className="w-3.5 h-3.5" /> Edit
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href={`/editor/${site.id}?export=true`} className="flex items-center gap-2 text-xs">
-                <Download className="w-3.5 h-3.5" /> Export
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDelete(site.id)} className="text-destructive focus:text-destructive text-xs">
-              <Trash2 className="w-3.5 h-3.5 mr-2" /> Move to Trash
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-1 shrink-0">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+            <ExportButton
+              projectId={site.id}
+              userPlan={plan}
+              siteCreatedAt={site.created_at}
+              siteName={site.name}
+              compact
+            />
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger className="p-1 rounded-md hover:bg-foreground/[0.08] transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100 shrink-0 focus:outline-none">
+              <MoreVertical className="w-4 h-4 text-muted-foreground" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40 bg-popover backdrop-blur-xl border-border">
+              <DropdownMenuItem asChild>
+                <Link href={`/editor/${site.id}`} className="flex items-center gap-2 text-xs">
+                  <Edit className="w-3.5 h-3.5" /> Edit
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={`/editor/${site.id}?export=true`} className="flex items-center gap-2 text-xs">
+                  <Download className="w-3.5 h-3.5" /> Export HTML
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDelete(site.id)} className="text-destructive focus:text-destructive text-xs">
+                <Trash2 className="w-3.5 h-3.5 mr-2" /> Move to Trash
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </div>
   );
@@ -1708,9 +1744,14 @@ function SiteGridCard({ site, onDelete }: { site: Site; onDelete: (id: string) =
 
 /* ===== SITE LIST ROW ===== */
 
-function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) => void }) {
+function SiteListRow({ site, onDelete, plan }: { site: Site; onDelete: (id: string) => void; plan: "free" | "pro" | "business" }) {
+  const thumbRef = useRef<HTMLAnchorElement>(null);
+  const inView = useInViewport(thumbRef);
   const siteHtml = site.site_json?.html || "";
-  const heroSrcDoc = useMemo(() => buildHeroSrcDoc(siteHtml), [siteHtml]);
+  const heroSrcDoc = useMemo(
+    () => (inView ? buildHeroSrcDoc(siteHtml) : ""),
+    [siteHtml, inView]
+  );
   const formattedDate = new Date(site.updated_at).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -1720,6 +1761,7 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
   return (
     <div className="group flex items-center gap-4 px-3 py-2.5 rounded-lg hover:bg-foreground/[0.03] transition-colors">
       <Link
+        ref={thumbRef}
         href={`/editor/${site.id}`}
         className="w-16 h-11 rounded-md border border-border overflow-hidden shrink-0 relative"
       >
@@ -1761,6 +1803,16 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
 
       <span className="text-xs text-muted-foreground w-24 text-right">{formattedDate}</span>
 
+      <div className="md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+        <ExportButton
+          projectId={site.id}
+          userPlan={plan}
+          siteCreatedAt={site.created_at}
+          siteName={site.name}
+          compact
+        />
+      </div>
+
       <DropdownMenu>
         <DropdownMenuTrigger className="p-1 rounded-md hover:bg-foreground/[0.08] transition-colors md:opacity-0 md:group-hover:opacity-100 data-[state=open]:opacity-100 focus:outline-none">
           <MoreVertical className="w-4 h-4 text-muted-foreground" />
@@ -1773,7 +1825,7 @@ function SiteListRow({ site, onDelete }: { site: Site; onDelete: (id: string) =>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href={`/editor/${site.id}?export=true`} className="flex items-center gap-2 text-xs">
-              <Download className="w-3.5 h-3.5" /> Export
+              <Download className="w-3.5 h-3.5" /> Export HTML
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => onDelete(site.id)} className="text-destructive focus:text-destructive text-xs">
