@@ -5,7 +5,7 @@ import { PreviewPane } from "../components/PreviewPane";
 import { KINO_HTML_SNIPPET } from "../data/kino-html-snippet";
 import { COLORS } from "../lib/colors";
 import { BEATS, CAPTIONS, secondsToFrames } from "../lib/timing";
-import { softEaseOut } from "../lib/easing";
+import { softEaseOut, softEaseInOut } from "../lib/easing";
 import { useBeatMotion } from "../lib/beat-motion";
 import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../lib/video-constants";
 
@@ -82,13 +82,30 @@ export const Beat2_Build: React.FC = () => {
   const codeWidth = FRAME_W * codeWidthRatio - GUTTER / 2;
   const previewWidth = FRAME_W * previewWidthRatio - GUTTER / 2;
 
+  // Punch-in zoom — start neutral, push in toward the preview pane during the
+  // hero/trending reveal, then ease back out as code dims and preview expands.
+  const punchInScale = interpolate(
+    localFrame,
+    [t(5.5), t(7.0), t(13.0), t(15.0), t(17.0)],
+    [1.0, 1.18, 1.18, 1.0, 1.0],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: softEaseInOut,
+    }
+  );
+  // Origin: right side, center vertically — pushes toward the preview pane
+  const punchOriginX = 0.72;
+  const punchOriginY = 0.5;
+  const totalScale = motion.scale * punchInScale;
+
   return (
     <AbsoluteFill
       style={{
         backgroundColor: COLORS.videoBg,
         opacity: fadeInOpacity * motion.opacity,
-        transform: `scale(${motion.scale})`,
-        transformOrigin: "center center",
+        transform: `scale(${totalScale})`,
+        transformOrigin: `${punchOriginX * 100}% ${punchOriginY * 100}%`,
       }}
     >
       {/* Status bar at top */}

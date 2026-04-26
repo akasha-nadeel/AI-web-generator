@@ -33,9 +33,9 @@ export function useBeatMotion(
   const frame = useCurrentFrame();
   const fadeIn = options.fadeInFrames ?? DEFAULT_FADE_IN;
   const fadeOut = options.fadeOutFrames ?? DEFAULT_FADE_OUT;
-  const scaleStart = options.scaleStart ?? 0.96;
-  const scaleEnd = options.scaleEnd ?? 1.04;
-  const scaleExit = options.scaleExit ?? 1.08;
+  const scaleStart = options.scaleStart ?? 0.94;
+  const scaleEnd = options.scaleEnd ?? 1.08;
+  const scaleExit = options.scaleExit ?? 1.14;
 
   const visibleStart = startFrame - fadeIn;
   const visibleEnd = endFrame + fadeOut;

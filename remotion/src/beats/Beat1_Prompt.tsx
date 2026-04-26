@@ -91,8 +91,8 @@ export const Beat1_Prompt: React.FC = () => {
 
   const punchInScale = interpolate(
     localFrame,
-    [t(3.6), t(4.2), t(11.5), t(12.4), t(13.4), t(14)],
-    [1.0, 1.12, 1.12, 1.18, 1.18, 1.0],
+    [t(3.6), t(4.6), t(11.5), t(12.4), t(13.4), t(14)],
+    [1.0, 1.32, 1.32, 1.5, 1.5, 1.05],
     {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",

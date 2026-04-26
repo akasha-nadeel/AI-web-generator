@@ -96,8 +96,8 @@ export const Beat3_Refine: React.FC = () => {
   // Punch-in zoom on the new "Watch Trailer" button after the crossfade completes
   const punchInScale = interpolate(
     localFrame,
-    [t(11.0), t(12.0), t(14.0), t(15.0)],
-    [1.0, 1.16, 1.16, 1.0],
+    [t(11.0), t(12.5), t(14.0), t(15.0)],
+    [1.0, 1.45, 1.45, 1.05],
     {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",

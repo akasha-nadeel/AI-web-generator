@@ -126,7 +126,7 @@ export const Beat4_Publish: React.FC = () => {
   const punchInScale = interpolate(
     localFrame,
     [t(1.5), t(2.0), t(2.5), t(7.5), t(8.5), t(10.0)],
-    [1.0, 1.14, 1.0, 1.0, 1.18, 1.18],
+    [1.0, 1.4, 1.0, 1.0, 1.45, 1.45],
     {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
