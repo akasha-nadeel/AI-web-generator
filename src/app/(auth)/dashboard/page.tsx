@@ -1547,12 +1547,11 @@ function TrashedGridCard({
     return () => observer.disconnect();
   }, []);
 
-  // 1920 matches typical desktop viewport so Tailwind 2xl: breakpoints engage
-  // (mirrors SiteGridCard above).
+  // Locked 1920x1080 viewport (mirrors SiteGridCard — see comment there).
   const iframeRenderWidth = 1920;
+  const iframeHeight = 1080;
   const scale = containerWidth > 0 ? containerWidth / iframeRenderWidth : 0;
-  const thumbHeight = 180;
-  const iframeHeight = scale > 0 ? Math.ceil(thumbHeight / scale) : 900;
+  const thumbHeight = containerWidth > 0 ? Math.round(containerWidth * 9 / 16) : 180;
 
   return (
     <div className="group rounded-lg overflow-hidden border border-border bg-card hover:border-border transition-colors duration-200">
@@ -1777,15 +1776,21 @@ function SiteGridCard({
     return () => observer.disconnect();
   }, []);
 
-  // Render the iframe at a typical desktop viewport width (1920px) so
-  // Tailwind's xl: and 2xl: breakpoints engage exactly the same way they
-  // do when the user views the live site. Rendering smaller (e.g. 1440px)
-  // would skip 2xl: rules and produce a thumbnail whose proportions don't
-  // match what the user actually sees in production.
+  // Render the iframe at exactly 1920×1080 — the user's actual desktop
+  // viewport. This is critical for correctness:
+  //  • Width 1920 engages Tailwind's xl: + 2xl: breakpoints the same way
+  //    they engage on the live site.
+  //  • Height 1080 makes min-h-screen render the hero at the same height
+  //    the user sees in their browser. Letting iframeHeight float (set to
+  //    thumbHeight/scale) caused min-h-screen to compute against a smaller
+  //    viewport, squishing the hero and exposing the section below it.
+  // The thumbnail container then crops to its 16:9 aspect ratio, showing
+  // the entire hero with the same proportions as the live site.
   const iframeRenderWidth = 1920;
+  const iframeHeight = 1080;
   const scale = containerWidth > 0 ? containerWidth / iframeRenderWidth : 0;
-  const thumbHeight = 180;
-  const iframeHeight = scale > 0 ? Math.ceil(thumbHeight / scale) : 900;
+  // 16:9 aspect ratio matches the iframe so we get a 1:1 letterbox-free fit.
+  const thumbHeight = containerWidth > 0 ? Math.round(containerWidth * 9 / 16) : 180;
 
   return (
     <div className="group rounded-lg overflow-hidden border border-border bg-card hover:border-border transition-colors duration-200">
