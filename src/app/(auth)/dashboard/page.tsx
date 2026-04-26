@@ -761,27 +761,28 @@ function buildHeroSrcDoc(html: string): string {
     /* Reset margins and disable scrolling — the iframe already crops via overflow:hidden */
     html, body { margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: transparent !important; }
 
-    /* Force fixed / sticky / absolute navs and headers into normal flow so they
-       sit above the hero (in document order) instead of overlapping it. Without
-       this, sites whose navs use position:fixed render as a thin floating bar
-       in the thumbnail with empty space below. */
-    nav, header,
-    [class*="fixed"], [class*="sticky"], [class*="absolute"] {
+    /* SURGICAL nav/header positioning fix.
+       Only force NAV/HEADER elements out of fixed/sticky positioning so they
+       sit in normal document flow above the hero. Crucially, this does NOT
+       touch general .absolute / .fixed / .sticky on other elements — heroes
+       routinely use <div class="absolute inset-0"> for background-image
+       layering and <div class="absolute …"> for text overlays; stripping
+       those would break the hero's layered composition entirely. */
+    nav[class*="fixed"], header[class*="fixed"],
+    nav[class*="sticky"], header[class*="sticky"],
+    nav.fixed, header.fixed,
+    nav.sticky, header.sticky {
       position: static !important;
+      top: auto !important;
+      bottom: auto !important;
     }
-
-    /* Re-apply the most common in-flow layouts after the position reset above
-       (which is intentionally aggressive). Anything that needs to stay
-       absolutely positioned should add the position via inline style or via
-       a more specific selector — generated sites don't do that. */
 
     /* Neutralize entrance animations / scroll-reveal hidden states. The
        weavo-runtime sets inline style="opacity:0; transform:translateY(28px)"
        on [data-reveal] elements that start below the viewport — that includes
        most of the hero in a small iframe. Force everything visible. */
     [data-reveal], [data-reveal-stagger] > *,
-    .animate, .animate-fade, .animate-scale,
-    [class*="opacity-0"] {
+    .animate, .animate-fade, .animate-scale {
       opacity: 1 !important;
       transform: none !important;
       animation: none !important;
@@ -789,7 +790,9 @@ function buildHeroSrcDoc(html: string): string {
     }
 
     /* Belt-and-suspenders: any element with inline opacity:0 should become
-       visible. Inline styles without !important lose to this CSS !important. */
+       visible. Inline styles without !important lose to this CSS !important.
+       Scoped to inline-style attribute only — does NOT match utility classes
+       like .opacity-0 which often legitimately hide things in dropdowns etc. */
     [style*="opacity: 0"], [style*="opacity:0"] {
       opacity: 1 !important;
     }
