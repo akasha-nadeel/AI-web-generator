@@ -455,8 +455,10 @@ ${userPrompt}`;
     // Store the generated HTML in site_json as { html: "..." }
     const siteData = { html: generatedHtml };
 
-    // Extract a site name from the prompt
-    const siteName = extractSiteName(prompt);
+    // Prefer the brand name baked into the generated HTML (e.g. <title>Kino — …</title>)
+    // and fall back to a prompt-derived name only if the HTML doesn't expose one.
+    const siteName =
+      extractBrandFromHtml(generatedHtml) || extractSiteName(prompt);
 
     const site = await createSite(
       user.id,
@@ -556,4 +558,46 @@ function extractSiteName(prompt: string): string {
   const lastSpace = truncated.lastIndexOf(" ");
   const name = lastSpace > 20 ? truncated.slice(0, lastSpace) : truncated;
   return name || "My Website";
+}
+
+/**
+ * Pull the brand name out of the AI-generated HTML's <title> tag.
+ *
+ * The system prompt asks the model to invent a real brand and put it in
+ * <title>. Typical formats: "Kino — Stream Cinema", "NOTFLIX | Streaming",
+ * "Iron Gym - Train Hard". We keep only the part before the first
+ * separator and reject obvious junk values.
+ *
+ * Returns null when nothing usable is found so the caller can fall back to
+ * the prompt-based extractor.
+ */
+function extractBrandFromHtml(html: string): string | null {
+  const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  if (!titleMatch) return null;
+
+  // Decode the few HTML entities the AI tends to emit
+  let title = titleMatch[1]
+    .replace(/&amp;/g, "&")
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  // Keep only the brand portion before the first separator
+  const split = title.split(/\s+[—–|·\-:]\s+/);
+  if (split.length > 0) title = split[0].trim();
+
+  // Strip surrounding quotes / parentheses
+  title = title.replace(/^["'(]+|["')]+$/g, "").trim();
+
+  // Reject obvious non-names
+  if (!title) return null;
+  if (title.length > 60) return null;
+  if (/^(untitled|website|home|welcome|index|document|page|my\s+site)$/i.test(title)) {
+    return null;
+  }
+
+  return title;
 }
