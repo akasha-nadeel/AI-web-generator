@@ -52,7 +52,7 @@ import { useCreditsStore } from "@/stores/creditsStore";
 import { useTheme } from "next-themes";
 import { AIChatSection } from "@/components/dashboard/AIChatSection";
 import { ExportButton } from "@/components/export/ExportButton";
-import { StaticThumbnail } from "@/components/dashboard/StaticThumbnail";
+import { useInViewport } from "@/hooks/useInViewport";
 
 /* ===== TYPES ===== */
 
@@ -721,6 +721,67 @@ export default function DashboardPage() {
     </div>
     </div>
   );
+}
+
+/* ===== THUMBNAIL HELPERS ===== */
+
+// Injects CSS + a tiny script into stored site HTML so that the iframe
+// thumbnail shows only the hero section instead of the full page. We can't
+// reliably identify the hero via CSS selectors alone because the hero isn't
+// always the first <section> (some pages put an announcement bar or nav
+// as a <section>), so we use JS to pick the first "tall" top-level block
+// after the document loads.
+function buildHeroSrcDoc(html: string): string {
+  if (!html) return "";
+  const injection = `<style id="__pixora_thumb_style__">
+    html, body { margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: transparent !important; }
+    /* Kill entrance animations so the hero is visible the instant it mounts */
+    .animate, .animate-fade, .animate-scale { opacity: 1 !important; animation: none !important; transform: none !important; }
+  </style>
+  <script id="__pixora_thumb_script__">
+  (function () {
+    function isolateHero() {
+      try {
+        var root = document.querySelector('main') || document.body;
+        if (!root) return;
+        var kids = Array.prototype.filter.call(root.children, function (el) {
+          var tag = el.tagName.toLowerCase();
+          return tag !== 'script' && tag !== 'style' && tag !== 'link' && tag !== 'noscript';
+        });
+        // The hero is the first top-level block tall enough to be "main content".
+        // 240px threshold skips announcement bars, sticky navs, and marquees.
+        var heroIdx = -1;
+        for (var i = 0; i < kids.length; i++) {
+          if (kids[i].offsetHeight >= 240) { heroIdx = i; break; }
+        }
+        if (heroIdx === -1) return;
+        var hero = kids[heroIdx];
+        // Hide siblings after the hero
+        for (var j = heroIdx + 1; j < kids.length; j++) {
+          kids[j].style.display = 'none';
+        }
+        // If hero lives inside <main>, hide <main>'s siblings too
+        if (root !== document.body) {
+          var bodyKids = document.body.children;
+          var rootIdx = Array.prototype.indexOf.call(bodyKids, root);
+          for (var k = rootIdx + 1; k < bodyKids.length; k++) {
+            bodyKids[k].style.display = 'none';
+          }
+        }
+        // Force hero to fill the iframe viewport so no white gap below
+        hero.style.minHeight = '100vh';
+      } catch (e) {}
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () { requestAnimationFrame(isolateHero); });
+    } else {
+      requestAnimationFrame(isolateHero);
+    }
+  })();
+  </script>`;
+  if (/<\/head>/i.test(html)) return html.replace(/<\/head>/i, `${injection}</head>`);
+  if (/<body[^>]*>/i.test(html)) return html.replace(/<body[^>]*>/i, (m) => `${m}${injection}`);
+  return injection + html;
 }
 
 /* ===== SITES VIEW (Recents / All Projects) ===== */
@@ -1426,20 +1487,65 @@ function TrashedGridCard({
   onRestore: (id: string) => void;
   onPermanentDelete: (id: string) => void;
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const inView = useInViewport(containerRef);
+
+  const siteHtml = site.site_json?.html || "";
+  const heroSrcDoc = useMemo(
+    () => (inView ? buildHeroSrcDoc(siteHtml) : ""),
+    [siteHtml, inView]
+  );
+
   const formattedDate = new Date(site.updated_at).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
   });
 
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setContainerWidth(entry.contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const iframeRenderWidth = 1440;
+  const scale = containerWidth > 0 ? containerWidth / iframeRenderWidth : 0;
   const thumbHeight = 180;
+  const iframeHeight = scale > 0 ? Math.ceil(thumbHeight / scale) : 900;
 
   return (
     <div className="group rounded-lg overflow-hidden border border-border bg-card hover:border-border transition-colors duration-200">
       <div
-        className="relative overflow-hidden grayscale opacity-60 group-hover:opacity-80 transition-opacity"
+        ref={containerRef}
+        className="relative overflow-hidden bg-muted/30"
         style={{ height: thumbHeight }}
       >
-        <StaticThumbnail site={site} variant="card" />
+        {heroSrcDoc && scale > 0 ? (
+          <iframe
+            srcDoc={heroSrcDoc}
+            title={site.name}
+            className="border-0 pointer-events-none select-none block grayscale opacity-60 group-hover:opacity-80 transition-opacity"
+            scrolling="no"
+            style={{
+              width: `${iframeRenderWidth}px`,
+              height: `${iframeHeight}px`,
+              transform: `scale(${scale})`,
+              transformOrigin: "top left",
+              overflow: "hidden",
+            }}
+            tabIndex={-1}
+            loading="lazy"
+            sandbox="allow-scripts"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-muted/30 to-card flex items-center justify-center">
+            <Globe className="w-8 h-8 text-foreground/10" />
+          </div>
+        )}
       </div>
 
       <div className="px-3 py-2.5 flex items-center justify-between gap-2">
@@ -1517,19 +1623,72 @@ function TrashedListRow({
 /* ===== SITE GRID CARD ===== */
 
 function SiteGridCard({ site, onDelete, plan }: { site: Site; onDelete: (id: string) => void; plan: "free" | "pro" | "business" }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const inView = useInViewport(containerRef);
+
+  const siteHtml = site.site_json?.html || "";
+  // Defer the (expensive) HTML transform until the card is actually visible.
+  const heroSrcDoc = useMemo(
+    () => (inView ? buildHeroSrcDoc(siteHtml) : ""),
+    [siteHtml, inView]
+  );
+
   const formattedDate = new Date(site.updated_at).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
   });
 
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setContainerWidth(entry.contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Render the iframe at a width of 1440 and set the viewport height equal
+  // to the visible crop area (thumbHeight / scale). Combined with the
+  // isolation script that forces the hero to min-h-100vh, the hero fills
+  // the iframe exactly — no leakage from sections below.
+  const iframeRenderWidth = 1440;
+  const scale = containerWidth > 0 ? containerWidth / iframeRenderWidth : 0;
   const thumbHeight = 180;
+  const iframeHeight = scale > 0 ? Math.ceil(thumbHeight / scale) : 900;
 
   return (
     <div className="group rounded-lg overflow-hidden border border-border bg-card hover:border-border transition-colors duration-200">
-      {/* Thumbnail — static gradient + site name overlay (no live iframe) */}
+      {/* Thumbnail */}
       <Link href={`/editor/${site.id}`} className="block">
-        <div className="relative overflow-hidden" style={{ height: thumbHeight }}>
-          <StaticThumbnail site={site} variant="card" />
+        <div
+          ref={containerRef}
+          className="relative overflow-hidden bg-muted/30"
+          style={{ height: thumbHeight }}
+        >
+          {heroSrcDoc && scale > 0 ? (
+            <iframe
+              srcDoc={heroSrcDoc}
+              title={site.name}
+              className="border-0 pointer-events-none select-none block"
+              scrolling="no"
+              style={{
+                width: `${iframeRenderWidth}px`,
+                height: `${iframeHeight}px`,
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+                overflow: "hidden",
+              }}
+              tabIndex={-1}
+              loading="lazy"
+              sandbox="allow-scripts"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-muted/30 to-card flex items-center justify-center">
+              <Globe className="w-8 h-8 text-foreground/10" />
+            </div>
+          )}
           {/* Hover overlay */}
           <div className="absolute inset-0 bg-background/0 group-hover:bg-foreground/5 transition-colors duration-200" />
         </div>
@@ -1586,6 +1745,13 @@ function SiteGridCard({ site, onDelete, plan }: { site: Site; onDelete: (id: str
 /* ===== SITE LIST ROW ===== */
 
 function SiteListRow({ site, onDelete, plan }: { site: Site; onDelete: (id: string) => void; plan: "free" | "pro" | "business" }) {
+  const thumbRef = useRef<HTMLAnchorElement>(null);
+  const inView = useInViewport(thumbRef);
+  const siteHtml = site.site_json?.html || "";
+  const heroSrcDoc = useMemo(
+    () => (inView ? buildHeroSrcDoc(siteHtml) : ""),
+    [siteHtml, inView]
+  );
   const formattedDate = new Date(site.updated_at).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -1595,10 +1761,32 @@ function SiteListRow({ site, onDelete, plan }: { site: Site; onDelete: (id: stri
   return (
     <div className="group flex items-center gap-4 px-3 py-2.5 rounded-lg hover:bg-foreground/[0.03] transition-colors">
       <Link
+        ref={thumbRef}
         href={`/editor/${site.id}`}
         className="w-16 h-11 rounded-md border border-border overflow-hidden shrink-0 relative"
       >
-        <StaticThumbnail site={site} variant="row" />
+        {heroSrcDoc ? (
+          <iframe
+            srcDoc={heroSrcDoc}
+            title={site.name}
+            className="border-0 pointer-events-none select-none block"
+            scrolling="no"
+            style={{
+              width: "1440px",
+              height: "990px",
+              transform: "scale(0.0444)",
+              transformOrigin: "top left",
+              overflow: "hidden",
+            }}
+            tabIndex={-1}
+            loading="lazy"
+            sandbox="allow-scripts"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-purple-900/25 via-blue-900/15 to-cyan-900/10 flex items-center justify-center">
+            <Globe className="w-4 h-4 text-foreground/15" />
+          </div>
+        )}
       </Link>
 
       <Link href={`/editor/${site.id}`} className="flex-1 min-w-0">
