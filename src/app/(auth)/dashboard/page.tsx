@@ -196,6 +196,29 @@ export default function DashboardPage() {
     }
   };
 
+  // Rename a site
+  const handleRename = useCallback(async (id: string, newName: string) => {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    // Optimistic update
+    setSites((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, name: trimmed } : s))
+    );
+    try {
+      const res = await fetch("/api/sites", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, action: "rename", name: trimmed }),
+      });
+      if (!res.ok) {
+        // Roll back on failure
+        await fetchSites();
+      }
+    } catch {
+      await fetchSites();
+    }
+  }, [fetchSites]);
+
   // Permanent delete
   const handlePermanentDelete = async (id: string) => {
     if (!confirm("This will permanently delete this site. Are you sure?")) return;
@@ -712,6 +735,7 @@ export default function DashboardPage() {
                   setActiveNav={setActiveNav}
                   searchQuery={searchQuery}
                   onDelete={handleMoveToTrash}
+                  onRename={handleRename}
                   plan={plan}
                 />
               )}
@@ -797,6 +821,7 @@ function SitesView({
   setActiveNav,
   searchQuery,
   onDelete,
+  onRename,
   plan,
 }: {
   sites: Site[];
@@ -809,6 +834,7 @@ function SitesView({
   setActiveNav: (v: NavView) => void;
   searchQuery: string;
   onDelete: (id: string) => void;
+  onRename: (id: string, newName: string) => void;
   plan: "free" | "pro" | "business";
 }) {
   const [showRecommended, setShowRecommended] = useState(true);
@@ -927,13 +953,25 @@ function SitesView({
       ) : viewMode === "grid" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {sites.map((site) => (
-            <SiteGridCard key={site.id} site={site} onDelete={onDelete} plan={plan} />
+            <SiteGridCard
+              key={site.id}
+              site={site}
+              onDelete={onDelete}
+              onRename={onRename}
+              plan={plan}
+            />
           ))}
         </div>
       ) : (
         <div className="flex flex-col gap-1.5">
           {sites.map((site) => (
-            <SiteListRow key={site.id} site={site} onDelete={onDelete} plan={plan} />
+            <SiteListRow
+              key={site.id}
+              site={site}
+              onDelete={onDelete}
+              onRename={onRename}
+              plan={plan}
+            />
           ))}
         </div>
       )}
@@ -1620,11 +1658,102 @@ function TrashedListRow({
   );
 }
 
+/* ===== RENAME DIALOG ===== */
+
+function RenameDialog({
+  open,
+  initialName,
+  onClose,
+  onConfirm,
+}: {
+  open: boolean;
+  initialName: string;
+  onClose: () => void;
+  onConfirm: (newName: string) => void;
+}) {
+  const [value, setValue] = useState(initialName);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      setValue(initialName);
+      requestAnimationFrame(() => {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      });
+    }
+  }, [open, initialName]);
+
+  if (!open) return null;
+
+  const submit = () => {
+    const trimmed = value.trim();
+    if (trimmed && trimmed !== initialName) {
+      onConfirm(trimmed);
+    }
+    onClose();
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-sm rounded-2xl border border-border bg-popover p-5 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="text-base font-semibold text-foreground">Rename site</h3>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Pick a short, memorable name. This is what shows up on your dashboard.
+        </p>
+        <input
+          ref={inputRef}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") submit();
+            if (e.key === "Escape") onClose();
+          }}
+          maxLength={100}
+          className="mt-4 w-full h-10 px-3 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/25"
+        />
+        <div className="mt-4 flex items-center justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="h-8 px-3 rounded-md text-xs text-muted-foreground hover:bg-foreground/[0.05] transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={submit}
+            disabled={!value.trim() || value.trim() === initialName}
+            className="h-8 px-3 rounded-md text-xs font-medium bg-foreground text-background hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ===== SITE GRID CARD ===== */
 
-function SiteGridCard({ site, onDelete, plan }: { site: Site; onDelete: (id: string) => void; plan: "free" | "pro" | "business" }) {
+function SiteGridCard({
+  site,
+  onDelete,
+  onRename,
+  plan,
+}: {
+  site: Site;
+  onDelete: (id: string) => void;
+  onRename: (id: string, newName: string) => void;
+  plan: "free" | "pro" | "business";
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [renameOpen, setRenameOpen] = useState(false);
   const inView = useInViewport(containerRef);
 
   const siteHtml = site.site_json?.html || "";
@@ -1726,6 +1855,12 @@ function SiteGridCard({ site, onDelete, plan }: { site: Site; onDelete: (id: str
                   <Edit className="w-3.5 h-3.5" /> Edit
                 </Link>
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setRenameOpen(true)}
+                className="flex items-center gap-2 text-xs"
+              >
+                <FileText className="w-3.5 h-3.5" /> Rename
+              </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href={`/editor/${site.id}?export=true`} className="flex items-center gap-2 text-xs">
                   <Download className="w-3.5 h-3.5" /> Export HTML
@@ -1738,15 +1873,33 @@ function SiteGridCard({ site, onDelete, plan }: { site: Site; onDelete: (id: str
           </DropdownMenu>
         </div>
       </div>
+
+      <RenameDialog
+        open={renameOpen}
+        initialName={site.name}
+        onClose={() => setRenameOpen(false)}
+        onConfirm={(newName) => onRename(site.id, newName)}
+      />
     </div>
   );
 }
 
 /* ===== SITE LIST ROW ===== */
 
-function SiteListRow({ site, onDelete, plan }: { site: Site; onDelete: (id: string) => void; plan: "free" | "pro" | "business" }) {
+function SiteListRow({
+  site,
+  onDelete,
+  onRename,
+  plan,
+}: {
+  site: Site;
+  onDelete: (id: string) => void;
+  onRename: (id: string, newName: string) => void;
+  plan: "free" | "pro" | "business";
+}) {
   const thumbRef = useRef<HTMLAnchorElement>(null);
   const inView = useInViewport(thumbRef);
+  const [renameOpen, setRenameOpen] = useState(false);
   const siteHtml = site.site_json?.html || "";
   const heroSrcDoc = useMemo(
     () => (inView ? buildHeroSrcDoc(siteHtml) : ""),
@@ -1823,6 +1976,12 @@ function SiteListRow({ site, onDelete, plan }: { site: Site; onDelete: (id: stri
               <Edit className="w-3.5 h-3.5" /> Edit
             </Link>
           </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => setRenameOpen(true)}
+            className="flex items-center gap-2 text-xs"
+          >
+            <FileText className="w-3.5 h-3.5" /> Rename
+          </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href={`/editor/${site.id}?export=true`} className="flex items-center gap-2 text-xs">
               <Download className="w-3.5 h-3.5" /> Export HTML
@@ -1833,6 +1992,13 @@ function SiteListRow({ site, onDelete, plan }: { site: Site; onDelete: (id: stri
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <RenameDialog
+        open={renameOpen}
+        initialName={site.name}
+        onClose={() => setRenameOpen(false)}
+        onConfirm={(newName) => onRename(site.id, newName)}
+      />
     </div>
   );
 }

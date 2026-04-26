@@ -64,7 +64,7 @@ export async function PATCH(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const body = await req.json();
-    const { id, site_json, siteJson, action, source, summary } = body;
+    const { id, site_json, siteJson, action, source, summary, name } = body;
     if (!id) return NextResponse.json({ error: "Missing site ID" }, { status: 400 });
 
     // Verify ownership + fetch current site_json for snapshotting
@@ -76,6 +76,22 @@ export async function PATCH(req: NextRequest) {
 
     if (!site || site.user_id !== user.id) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    // Rename
+    if (action === "rename") {
+      const trimmed = typeof name === "string" ? name.trim() : "";
+      if (!trimmed) {
+        return NextResponse.json({ error: "Name cannot be empty" }, { status: 400 });
+      }
+      if (trimmed.length > 100) {
+        return NextResponse.json({ error: "Name too long" }, { status: 400 });
+      }
+      await supabase
+        .from("sites")
+        .update({ name: trimmed, updated_at: new Date().toISOString() })
+        .eq("id", id);
+      return NextResponse.json({ success: true, name: trimmed });
     }
 
     // Restore from trash
