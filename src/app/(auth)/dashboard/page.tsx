@@ -749,60 +749,54 @@ export default function DashboardPage() {
 
 /* ===== THUMBNAIL HELPERS ===== */
 
-// Injects CSS + a tiny script into stored site HTML so that the iframe
-// thumbnail shows only the hero section instead of the full page. We can't
-// reliably identify the hero via CSS selectors alone because the hero isn't
-// always the first <section> (some pages put an announcement bar or nav
-// as a <section>), so we use JS to pick the first "tall" top-level block
-// after the document loads.
+// Injects CSS into stored site HTML so the iframe naturally shows the top
+// portion of the page (nav + hero) clipped to the thumbnail height — without
+// any JS-based "find the hero" heuristic. The previous JS-driven approach
+// was brittle: it broke for sites whose first body-child was a position:fixed
+// nav (which the script misidentified as the hero). The CSS-only approach
+// is deterministic and works for every layout structure the AI emits.
 function buildHeroSrcDoc(html: string): string {
   if (!html) return "";
-  const injection = `<style id="__pixora_thumb_style__">
+  const injection = `<style id="__weavo_thumb_style__">
+    /* Reset margins and disable scrolling — the iframe already crops via overflow:hidden */
     html, body { margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: transparent !important; }
-    /* Kill entrance animations so the hero is visible the instant it mounts */
-    .animate, .animate-fade, .animate-scale { opacity: 1 !important; animation: none !important; transform: none !important; }
-  </style>
-  <script id="__pixora_thumb_script__">
-  (function () {
-    function isolateHero() {
-      try {
-        var root = document.querySelector('main') || document.body;
-        if (!root) return;
-        var kids = Array.prototype.filter.call(root.children, function (el) {
-          var tag = el.tagName.toLowerCase();
-          return tag !== 'script' && tag !== 'style' && tag !== 'link' && tag !== 'noscript';
-        });
-        // The hero is the first top-level block tall enough to be "main content".
-        // 240px threshold skips announcement bars, sticky navs, and marquees.
-        var heroIdx = -1;
-        for (var i = 0; i < kids.length; i++) {
-          if (kids[i].offsetHeight >= 240) { heroIdx = i; break; }
-        }
-        if (heroIdx === -1) return;
-        var hero = kids[heroIdx];
-        // Hide siblings after the hero
-        for (var j = heroIdx + 1; j < kids.length; j++) {
-          kids[j].style.display = 'none';
-        }
-        // If hero lives inside <main>, hide <main>'s siblings too
-        if (root !== document.body) {
-          var bodyKids = document.body.children;
-          var rootIdx = Array.prototype.indexOf.call(bodyKids, root);
-          for (var k = rootIdx + 1; k < bodyKids.length; k++) {
-            bodyKids[k].style.display = 'none';
-          }
-        }
-        // Force hero to fill the iframe viewport so no white gap below
-        hero.style.minHeight = '100vh';
-      } catch (e) {}
+
+    /* Force fixed / sticky / absolute navs and headers into normal flow so they
+       sit above the hero (in document order) instead of overlapping it. Without
+       this, sites whose navs use position:fixed render as a thin floating bar
+       in the thumbnail with empty space below. */
+    nav, header,
+    [class*="fixed"], [class*="sticky"], [class*="absolute"] {
+      position: static !important;
     }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function () { requestAnimationFrame(isolateHero); });
-    } else {
-      requestAnimationFrame(isolateHero);
+
+    /* Re-apply the most common in-flow layouts after the position reset above
+       (which is intentionally aggressive). Anything that needs to stay
+       absolutely positioned should add the position via inline style or via
+       a more specific selector — generated sites don't do that. */
+
+    /* Neutralize entrance animations / scroll-reveal hidden states. The
+       weavo-runtime sets inline style="opacity:0; transform:translateY(28px)"
+       on [data-reveal] elements that start below the viewport — that includes
+       most of the hero in a small iframe. Force everything visible. */
+    [data-reveal], [data-reveal-stagger] > *,
+    .animate, .animate-fade, .animate-scale,
+    [class*="opacity-0"] {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: none !important;
+      transition: none !important;
     }
-  })();
-  </script>`;
+
+    /* Belt-and-suspenders: any element with inline opacity:0 should become
+       visible. Inline styles without !important lose to this CSS !important. */
+    [style*="opacity: 0"], [style*="opacity:0"] {
+      opacity: 1 !important;
+    }
+
+    /* Disable smooth scroll which can cause layout flicker on iframe load */
+    html { scroll-behavior: auto !important; }
+  </style>`;
   if (/<\/head>/i.test(html)) return html.replace(/<\/head>/i, `${injection}</head>`);
   if (/<body[^>]*>/i.test(html)) return html.replace(/<body[^>]*>/i, (m) => `${m}${injection}`);
   return injection + html;
