@@ -802,35 +802,71 @@ function buildHeroSrcDoc(html: string): string {
   </style>
   <script id="__weavo_measure__">
   (function () {
-    /* Measure the hero section's actual rendered height and post it to the
-       parent so the thumbnail container can crop precisely. We pick the first
-       body-level block tall enough (>=400px) to be the hero — that skips
-       nav bars, announcement banners, and marquees but reliably picks the
-       hero across every layout the AI emits. */
+    /* Find the hero section's bottom Y and post it to the parent so the
+       thumbnail container crops precisely at the hero/next-section boundary.
+       Strategy: walk the DOM looking for the first element whose offsetHeight
+       falls in the typical hero range (400-1500px) — that's the hero. If we
+       hit a "wrapper" element (>1500px tall — common in SPA-style sites
+       where every page is wrapped in one big div like #page-home), we
+       descend into its children rather than reporting the wrapper's bottom.
+       This handles both flat structures (nav + section.hero + ...) and
+       nested ones (nav + div#page-home > section.hero + ...). */
+
+    var HERO_MIN = 400;
+    var HERO_MAX = 1500;
+    var SKIP_TAGS = { script: 1, style: 1, link: 1, noscript: 1, nav: 1, header: 1 };
+
+    function isHeroSized(el) {
+      if (!el || !el.tagName) return false;
+      var tag = el.tagName.toLowerCase();
+      if (SKIP_TAGS[tag]) return false;
+      var h = el.offsetHeight;
+      return h >= HERO_MIN && h <= HERO_MAX;
+    }
+
+    /* Recursive walk: at each level, scan children left-to-right. First
+       hero-sized element wins. If a child is too tall (wrapper), descend
+       into it. If too short (banner / nav / divider), skip. */
+    function findHero(parent, depth) {
+      if (!parent || !parent.children || depth > 5) return null;
+      var kids = parent.children;
+      for (var i = 0; i < kids.length; i++) {
+        var el = kids[i];
+        var tag = el.tagName ? el.tagName.toLowerCase() : '';
+        if (SKIP_TAGS[tag]) continue;
+        var h = el.offsetHeight;
+        if (h <= 0) continue; /* hidden — display:none, etc. */
+        if (h >= HERO_MIN && h <= HERO_MAX) return el;
+        if (h > HERO_MAX) {
+          /* Looks like a wrapper. Descend. */
+          var found = findHero(el, depth + 1);
+          if (found) return found;
+        }
+        /* Too short — banner / announcement. Continue to next sibling. */
+      }
+      return null;
+    }
+
     function measure() {
       try {
         var body = document.body;
         if (!body) return;
-        var kids = body.children;
-        var heroBottom = 0;
-        for (var i = 0; i < kids.length; i++) {
-          var el = kids[i];
-          var tag = el.tagName.toLowerCase();
-          if (tag === 'script' || tag === 'style' || tag === 'link' || tag === 'noscript') continue;
-          var rect = el.getBoundingClientRect();
-          /* Track running bottom so navs/banners are included up to the hero */
-          if (rect.height < 400) {
-            heroBottom = Math.max(heroBottom, rect.bottom);
-            continue;
-          }
-          heroBottom = rect.bottom;
-          break;
+        var hero = findHero(body, 0);
+        if (!hero) {
+          /* Fallback: report viewport height so the thumbnail at least shows
+             something reasonable rather than a sliver. */
+          parent.postMessage({ type: 'weavo:thumb-height', height: window.innerHeight || 800 }, '*');
+          return;
         }
-        if (heroBottom > 0) {
-          parent.postMessage({ type: 'weavo:thumb-height', height: heroBottom }, '*');
-        }
-      } catch (e) { /* same-origin denied or DOM gone — silently fall back */ }
+        var rect = hero.getBoundingClientRect();
+        /* rect.bottom is hero's bottom Y from the document top (since we're
+           never scrolled inside the iframe). Add a small breathing-room
+           buffer so we don't crop a hairline at the very bottom edge. */
+        var bottom = Math.max(rect.bottom, hero.offsetTop + hero.offsetHeight);
+        parent.postMessage({ type: 'weavo:thumb-height', height: bottom }, '*');
+      } catch (e) { /* DOM gone — silently no-op */ }
     }
+
     /* Re-measure after images/fonts settle since they affect heights */
     function schedule() {
       requestAnimationFrame(measure);
