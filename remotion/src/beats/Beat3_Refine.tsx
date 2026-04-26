@@ -8,7 +8,7 @@ import { KinoSiteMock } from "../components/KinoSiteMock";
 import { COLORS } from "../lib/colors";
 import { BEATS, CAPTIONS, secondsToFrames } from "../lib/timing";
 import { softEaseOut } from "../lib/easing";
-import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../Root";
+import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../lib/video-constants";
 
 const REFINE_PROMPT =
   "Make the hero title bigger and add a 'Watch Trailer' button.";

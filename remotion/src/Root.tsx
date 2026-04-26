@@ -1,11 +1,18 @@
 import { Composition } from "remotion";
 import { MainComposition } from "./MainComposition";
+import {
+  VIDEO_FPS,
+  VIDEO_WIDTH,
+  VIDEO_HEIGHT,
+  VIDEO_DURATION_FRAMES,
+} from "./lib/video-constants";
 
-export const VIDEO_FPS = 60;
-export const VIDEO_WIDTH = 2560;
-export const VIDEO_HEIGHT = 1440;
-export const VIDEO_DURATION_SECONDS = 72;
-export const VIDEO_DURATION_FRAMES = VIDEO_DURATION_SECONDS * VIDEO_FPS;
+export {
+  VIDEO_FPS,
+  VIDEO_WIDTH,
+  VIDEO_HEIGHT,
+  VIDEO_DURATION_FRAMES,
+} from "./lib/video-constants";
 
 export const RemotionRoot: React.FC = () => {
   return (

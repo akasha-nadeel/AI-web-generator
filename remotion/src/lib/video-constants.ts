@@ -1,0 +1,5 @@
+export const VIDEO_FPS = 60;
+export const VIDEO_WIDTH = 2560;
+export const VIDEO_HEIGHT = 1440;
+export const VIDEO_DURATION_SECONDS = 72;
+export const VIDEO_DURATION_FRAMES = VIDEO_DURATION_SECONDS * VIDEO_FPS;

@@ -1,4 +1,4 @@
-import { VIDEO_FPS } from "../Root";
+import { VIDEO_FPS } from "./video-constants";
 
 export const secondsToFrames = (seconds: number): number =>
   Math.round(seconds * VIDEO_FPS);

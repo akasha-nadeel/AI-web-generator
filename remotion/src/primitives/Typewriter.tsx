@@ -1,5 +1,5 @@
 import { useCurrentFrame } from "remotion";
-import { VIDEO_FPS } from "../Root";
+import { VIDEO_FPS } from "../lib/video-constants";
 
 type Props = {
   text: string;

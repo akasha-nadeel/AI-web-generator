@@ -5,7 +5,7 @@ import { KinoSiteMock } from "../components/KinoSiteMock";
 import { COLORS } from "../lib/colors";
 import { BEATS, secondsToFrames } from "../lib/timing";
 import { softEaseOut } from "../lib/easing";
-import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../Root";
+import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../lib/video-constants";
 
 const TYPED_URL = "kino.weavostudio.com";
 

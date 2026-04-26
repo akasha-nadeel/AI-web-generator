@@ -7,7 +7,7 @@ import { WeavoDashboard } from "../components/WeavoDashboard";
 import { COLORS } from "../lib/colors";
 import { BEATS, CAPTIONS, secondsToFrames } from "../lib/timing";
 import { softEaseOut } from "../lib/easing";
-import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../Root";
+import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../lib/video-constants";
 
 const PROMPT_TEXT =
   "Build a streaming platform called Kino — dark cinematic with red accents, show trending movies and series.";

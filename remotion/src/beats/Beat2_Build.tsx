@@ -6,7 +6,7 @@ import { KINO_HTML_SNIPPET } from "../data/kino-html-snippet";
 import { COLORS } from "../lib/colors";
 import { BEATS, CAPTIONS, secondsToFrames } from "../lib/timing";
 import { softEaseOut } from "../lib/easing";
-import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../Root";
+import { VIDEO_WIDTH, VIDEO_HEIGHT } from "../lib/video-constants";
 
 export const Beat2_Build: React.FC = () => {
   const frame = useCurrentFrame();
