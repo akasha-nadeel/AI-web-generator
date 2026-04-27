@@ -36,7 +36,7 @@ export function Contact() {
             <div className="relative z-10 flex flex-col justify-between h-full p-8 md:p-10">
               {/* Top */}
               <div>
-                <h2 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tighter">
+                <h2 className="text-[clamp(45px,6vw,82px)] font-medium text-white mb-4 leading-[1.05] tracking-tight">
                   Get in Touch
                 </h2>
                 <p className="text-white/70 text-base max-w-sm leading-relaxed font-medium">
@@ -113,7 +113,7 @@ export function Contact() {
 
               <button
                 type="submit"
-                className="w-full inline-flex items-center justify-center gap-2 bg-foreground text-background font-semibold px-6 py-3.5 rounded-lg hover:opacity-90 transition-opacity text-sm"
+                className="btn-metal-shine w-full inline-flex items-center justify-center gap-2 bg-foreground text-background font-semibold px-6 py-3.5 rounded-lg hover:opacity-90 transition-opacity text-sm"
               >
                 Send Message
                 <Send className="w-4 h-4" />

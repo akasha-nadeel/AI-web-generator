@@ -54,7 +54,7 @@ export function HowItWorks() {
             <div className="w-1.5 h-1.5 rounded-full bg-foreground/60" />
             <span className="text-sm text-muted-foreground">How we work</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] font-light leading-[1.1] tracking-tight mb-4 italic text-foreground">
+          <h2 className="text-[clamp(45px,6vw,82px)] font-medium leading-[1.05] tracking-tight mb-4 text-foreground">
             Three Steps to Your<br /> Dream Website
           </h2>
           <p className="text-sm text-muted-foreground/70 max-w-md leading-relaxed">

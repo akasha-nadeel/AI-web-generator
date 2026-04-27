@@ -18,9 +18,10 @@ export function VideoDemo() {
   const y = useTransform(scrollYProgress, [0, 0.45], [150, 0]);
 
   return (
-    <section 
-      ref={containerRef} 
-      className="relative pt-4 md:pt-6 pb-20 md:pb-32 overflow-hidden bg-background"
+    <section
+      ref={containerRef}
+      id="video-demo"
+      className="relative pt-4 md:pt-6 pb-20 md:pb-32 overflow-hidden bg-background scroll-mt-20"
     >
       <div className="max-w-[1450px] mx-auto px-4 md:px-6">
         <motion.div

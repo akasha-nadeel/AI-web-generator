@@ -88,7 +88,7 @@ export function Navbar() {
           </Link>
           <Link
             href="/sign-up"
-            className="inline-flex items-center bg-foreground text-background font-semibold px-5 py-2 rounded-full text-sm hover:bg-foreground/90 transition-colors"
+            className="btn-metal-shine inline-flex items-center bg-foreground text-background font-semibold px-5 py-2 rounded-full text-sm hover:bg-foreground/90 transition-colors"
           >
             Get Started Free
           </Link>
@@ -133,7 +133,7 @@ export function Navbar() {
             </Link>
             <Link
               href="/sign-up"
-              className="inline-flex items-center justify-center bg-foreground text-background font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-foreground/90 transition-colors"
+              className="btn-metal-shine inline-flex items-center justify-center bg-foreground text-background font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-foreground/90 transition-colors"
             >
               Get Started Free
             </Link>

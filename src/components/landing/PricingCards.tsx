@@ -117,7 +117,7 @@ export function PricingCards() {
     <SectionWrapper id="pricing" variants={fadeDown}>
       {/* Heading */}
       <div className="text-center max-w-4xl mx-auto mb-10 md:mb-16">
-        <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-bold leading-[1.05] tracking-[-0.02em] text-foreground">
+        <h2 className="text-[clamp(45px,6vw,82px)] font-medium leading-[1.05] tracking-tight text-foreground">
           Transparent pricing<br className="hidden sm:block" /> for everyone
         </h2>
         <p className="text-[15px] md:text-base text-muted-foreground mt-5 max-w-xl mx-auto leading-relaxed">

@@ -49,7 +49,7 @@ export function CTA() {
           variants={fadeUp}
           transition={ease.slow}
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 max-w-3xl leading-[1.1] tracking-tight">
+          <h2 className="text-[clamp(45px,6vw,82px)] font-medium text-white mb-4 max-w-3xl leading-[1.05] tracking-tight">
             Ready to Build Your Website?
           </h2>
           <p className="text-white/80 max-w-xl mx-auto mb-8 text-base md:text-lg font-medium leading-relaxed">

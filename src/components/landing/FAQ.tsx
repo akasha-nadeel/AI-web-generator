@@ -60,7 +60,7 @@ export function FAQ() {
               <div className="w-2 h-2 rounded-full bg-foreground/60" />
               <span className="text-sm text-foreground/50">Explore Our Advantages</span>
             </div>
-            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-foreground leading-tight mb-6">
+            <h2 className="text-[clamp(45px,6vw,82px)] font-medium text-foreground leading-[1.05] tracking-tight mb-6">
               Frequently Asked<br />
               Questions
               <svg viewBox="0 0 80 80" className="inline-block w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 ml-2 -mt-2 pointer-events-none select-none -rotate-[15deg]" fill="none" xmlns="http://www.w3.org/2000/svg">

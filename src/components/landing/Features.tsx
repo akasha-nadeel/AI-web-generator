@@ -122,7 +122,7 @@ export function Features() {
             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
             <span className="text-sm text-muted-foreground font-bold tracking-widest uppercase">Features</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-bold leading-[1.05] tracking-tighter mb-6 text-foreground">
+          <h2 className="text-[clamp(45px,6vw,82px)] font-medium leading-[1.05] tracking-tight mb-6 text-foreground">
             Everything You Need<br /> to Build Fast
           </h2>
           <p className="text-base text-muted-foreground/70 max-w-md leading-relaxed mb-8">
@@ -131,7 +131,7 @@ export function Features() {
           </p>
           <a
             href="#contact"
-            className="inline-flex items-center justify-center px-8 py-3.5 bg-foreground text-background text-sm font-bold rounded-full hover:bg-foreground/90 transition-all active:scale-95 shadow-lg"
+            className="btn-metal-shine inline-flex items-center justify-center px-8 py-3.5 bg-foreground text-background text-sm font-bold rounded-full hover:bg-foreground/90 transition-all active:scale-95 shadow-lg"
           >
             Contact Us
           </a>
