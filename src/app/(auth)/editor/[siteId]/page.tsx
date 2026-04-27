@@ -17,18 +17,23 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { PublishDialog } from "@/components/editor/PublishDialog";
+import { ExportButton } from "@/components/export/ExportButton";
+import { useCreditsStore } from "@/stores/creditsStore";
 
 export default function EditorPage({ params }: { params: Promise<{ siteId: string }> }) {
   const { siteId } = use(params);
 
   const [siteName, setSiteName] = useState("");
   const [siteHtml, setSiteHtml] = useState("");
+  const [siteCreatedAt, setSiteCreatedAt] = useState<string | null>(null);
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
 
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
   const [publishOpen, setPublishOpen] = useState(false);
   const [subdomain, setSubdomain] = useState<string | null>(null);
+  const userPlan = useCreditsStore((s) => s.plan);
+  const refreshCredits = useCreditsStore((s) => s.refresh);
 
   // Load site data
   useEffect(() => {
@@ -43,6 +48,7 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
             const html = data.site.site_json?.html || "";
             setSiteHtml(html);
             setSubdomain(data.site.subdomain ?? null);
+            setSiteCreatedAt(data.site.created_at ?? null);
           }
         }
       } catch {
@@ -52,7 +58,10 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
       }
     }
     loadSite();
-  }, [siteId]);
+    // Ensure userPlan is hydrated so the Pro gate reflects reality. Keeps
+    // this page self-sufficient when opened directly (no dashboard preload).
+    refreshCredits();
+  }, [siteId, refreshCredits]);
 
   // Export handler — download as single HTML file
   const handleExport = useCallback(async () => {
@@ -182,14 +191,25 @@ export default function EditorPage({ params }: { params: Promise<{ siteId: strin
             <span className="hidden sm:inline">Edit</span>
           </Link>
 
-          {/* Export */}
+          {/* Export — HTML */}
           <button
             onClick={handleExport}
             className="flex items-center gap-1.5 h-8 px-2 md:px-3 rounded-lg bg-[#0072bf] hover:bg-[#005fa0] text-white text-xs font-bold transition-all shadow-md hover:shadow-lg"
+            title="Download as single HTML file"
           >
             <Download className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Export</span>
+            <span className="hidden sm:inline">HTML</span>
           </button>
+
+          {/* Export — Next.js (Pro) */}
+          <ExportButton
+            projectId={siteId}
+            userPlan={
+              userPlan === "pro" || userPlan === "business" ? userPlan : "free"
+            }
+            siteCreatedAt={siteCreatedAt ?? new Date().toISOString()}
+            siteName={siteName || "site"}
+          />
 
           {/* Publish */}
           <button

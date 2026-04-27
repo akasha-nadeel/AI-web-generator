@@ -37,6 +37,153 @@ function parseDataUrl(dataUrl: string): { base64: string; mediaType: string } {
   return { mediaType: "image/png", base64: dataUrl };
 }
 
+/**
+ * Hard upper bound on a single AI API call.
+ *
+ * Prod (Vercel): 100s leaves ~20s headroom inside maxDuration=120s for
+ *   classifier, image validation, post-process, DB write. At ~100-150
+ *   tokens/sec, this allows ~10-15k output tokens before abort. Streaming
+ *   ensures any partial response is salvaged via extractHtml's fragment
+ *   wrapping path — the user gets a partial site rather than nothing.
+ *
+ * Dev: 300s — no Vercel timeout to fight, give Sonnet room to actually
+ *   USE the 48k max_tokens cap. Without enough timeout headroom, raising
+ *   max_tokens alone is theatrical: the request aborts before the model
+ *   reaches the cap, so output is timeout-limited regardless of the cap.
+ *   At ~100-150 tokens/sec, 300s allows ~30-45k output tokens — enough
+ *   to finish a dense multi-section site with footer.
+ */
+const AI_FETCH_TIMEOUT_MS =
+  process.env.NODE_ENV === "production" ? 100_000 : 300_000;
+
+/**
+ * Output token cap. 48000 leaves Sonnet enough room to render a full
+ * multi-section site (hero + 5-7 content sections + footer) without
+ * truncating mid-attribute. Real-world usage is typically 20-30k for
+ * a normal site; the headroom only kicks in on dense layouts (gym sites
+ * with stats + program cards + facility grids + testimonials all on
+ * the same page).
+ *
+ * Sonnet supports up to 64k output tokens; staying at 48k preserves
+ * a small safety margin without paying for unused capacity. Bumped
+ * from 32k after observing footer + facilities images getting cut off
+ * on dense gym/restaurant generations.
+ */
+const MAX_OUTPUT_TOKENS = 48000;
+
+interface StreamResult {
+  content: string;
+  inputTokens: number;
+  outputTokens: number;
+  cacheRead: number;
+  cacheWrite: number;
+  stopReason: string | null;
+  aborted: boolean;
+}
+
+/**
+ * Stream Anthropic SSE response and accumulate text deltas. The point of
+ * streaming here isn't UX — it's bill-safety. With non-streaming, an abort
+ * at 100s means Anthropic billed us for tokens we never received. With
+ * streaming, every delta is captured as it arrives, so even if the stream
+ * is cut short we have the partial HTML to save.
+ *
+ * Returns whatever was accumulated, never throws on stream errors — the
+ * caller decides if the partial is salvageable via extractHtml.
+ */
+async function readAnthropicStream(response: Response): Promise<StreamResult> {
+  const result: StreamResult = {
+    content: "",
+    inputTokens: 0,
+    outputTokens: 0,
+    cacheRead: 0,
+    cacheWrite: 0,
+    stopReason: null,
+    aborted: false,
+  };
+
+  if (!response.body) return result;
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      // SSE frames are separated by blank lines; events use "data: <json>".
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || ""; // keep partial last line for next chunk
+
+      for (const line of lines) {
+        if (!line.startsWith("data: ")) continue;
+        const payload = line.slice(6).trim();
+        if (!payload || payload === "[DONE]") continue;
+        try {
+          const evt = JSON.parse(payload);
+          if (evt.type === "content_block_delta" && evt.delta?.type === "text_delta") {
+            result.content += evt.delta.text;
+          } else if (evt.type === "message_start" && evt.message?.usage) {
+            result.inputTokens = evt.message.usage.input_tokens ?? 0;
+            result.cacheRead = evt.message.usage.cache_read_input_tokens ?? 0;
+            result.cacheWrite = evt.message.usage.cache_creation_input_tokens ?? 0;
+          } else if (evt.type === "message_delta") {
+            if (evt.delta?.stop_reason) result.stopReason = evt.delta.stop_reason;
+            if (evt.usage?.output_tokens) result.outputTokens = evt.usage.output_tokens;
+          }
+        } catch {
+          // Bad JSON in the middle of a stream — skip; we still keep
+          // everything we accumulated up to this point.
+        }
+      }
+    }
+  } catch (err) {
+    const isAbort = err instanceof Error && err.name === "AbortError";
+    result.aborted = isAbort;
+    console.warn(
+      `[Generate] Anthropic stream ${isAbort ? "aborted" : "errored"} — preserved ${result.content.length} chars (${result.outputTokens} tokens) before failure`
+    );
+  }
+
+  return result;
+}
+
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number = AI_FETCH_TIMEOUT_MS
+): Promise<Response> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: ctrl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Variant of fetchWithTimeout that exposes the AbortController so the caller
+ * can keep the timeout alive across the streaming read (not just the initial
+ * request). Without this, the timer fires only against the headers — once
+ * headers arrive the body could stream forever.
+ */
+function fetchAbortable(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number = AI_FETCH_TIMEOUT_MS
+): { responsePromise: Promise<Response>; cancel: () => void } {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  return {
+    responsePromise: fetch(url, { ...init, signal: ctrl.signal }),
+    cancel: () => clearTimeout(timer),
+  };
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { userId: clerkId } = await auth();
@@ -299,41 +446,84 @@ ${userPrompt}`;
         },
       ];
 
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01",
-        },
-        body: JSON.stringify({
-          model: modelUsed,
-          max_tokens: 32000,
-          system: systemBlocks,
-          messages: [{ role: "user", content: userContent }],
-        }),
-      });
+      // STREAMING: tokens arrive incrementally via SSE. Critical because
+      // Anthropic bills for every output token they generate — even if we
+      // abort mid-response. With non-streaming, abort = pay for nothing.
+      // With streaming, we keep every token that reached us before the cut.
+      const { responsePromise, cancel } = fetchAbortable(
+        "https://api.anthropic.com/v1/messages",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+          },
+          body: JSON.stringify({
+            model: modelUsed,
+            max_tokens: MAX_OUTPUT_TOKENS,
+            stream: true,
+            system: systemBlocks,
+            messages: [{ role: "user", content: userContent }],
+          }),
+        }
+      );
+
+      let response: Response;
+      try {
+        response = await responsePromise;
+      } catch (fetchErr) {
+        cancel();
+        const isAbort = fetchErr instanceof Error && fetchErr.name === "AbortError";
+        console.error(
+          `[Generate] Anthropic fetch ${isAbort ? "timed out before headers" : "failed"} after ${AI_FETCH_TIMEOUT_MS}ms:`,
+          fetchErr
+        );
+        return NextResponse.json(
+          {
+            error: isAbort
+              ? "Generation timed out. Please try again — your app credits were not deducted."
+              : "AI service unreachable. Please try again.",
+          },
+          { status: 504 }
+        );
+      }
 
       if (!response.ok) {
+        cancel();
         const errorData = await response.json().catch(() => ({}));
         console.error("Anthropic API error:", errorData);
       } else {
-        const data = await response.json();
-        const content = data.content?.[0]?.text;
-        if (content) {
-          generatedHtml = extractHtml(content);
-        }
-        const usage = data.usage || {};
-        const cacheRead = usage.cache_read_input_tokens ?? 0;
-        const cacheWrite = usage.cache_creation_input_tokens ?? 0;
-        const inputTokens = usage.input_tokens ?? 0;
-        const outputTokens = usage.output_tokens ?? 0;
-        const stopReason = data.stop_reason;
+        const stream = await readAnthropicStream(response);
+        cancel();
         console.log(
-          `[Generate] Tokens — input: ${inputTokens}, output: ${outputTokens}, cache_read: ${cacheRead}, cache_write: ${cacheWrite}, stop: ${stopReason}`
+          `[Generate] Tokens — input: ${stream.inputTokens}, output: ${stream.outputTokens}, cache_read: ${stream.cacheRead}, cache_write: ${stream.cacheWrite}, stop: ${stream.stopReason}${stream.aborted ? " (ABORTED)" : ""}`
         );
-        if (stopReason === "max_tokens") {
-          console.warn(`[Generate] ⚠ Output hit max_tokens cap (${outputTokens} tokens). HTML will be truncated — footer/sections may be cut off.`);
+        if (stream.stopReason === "max_tokens") {
+          console.warn(`[Generate] ⚠ Output hit max_tokens cap (${stream.outputTokens} tokens). HTML will be truncated — footer/sections may be cut off.`);
+        }
+        if (stream.aborted && stream.content.length > 0) {
+          console.warn(
+            `[Generate] ⚠ Stream aborted but salvaging ${stream.content.length} chars (${stream.outputTokens} billed tokens). User pays, user gets the partial.`
+          );
+        }
+        if (stream.content) {
+          generatedHtml = extractHtml(stream.content);
+          // If extraction failed despite billed tokens, dump raw response
+          // so we can see WHY the model output was rejected. Never silently
+          // throw away tokens the user paid for.
+          if (!generatedHtml) {
+            const head = stream.content.slice(0, 600).replace(/\n/g, "\\n");
+            const tail = stream.content.slice(-600).replace(/\n/g, "\\n");
+            console.error(
+              `[Generate] ⚠ extractHtml returned null after Anthropic billed ${stream.outputTokens} output tokens. ` +
+                `stop=${stream.stopReason}. Response head: "${head}" ... tail: "${tail}"`
+            );
+          }
+        } else if (stream.outputTokens > 0) {
+          console.error(
+            `[Generate] ⚠ Stream produced no content despite ${stream.outputTokens} output tokens billed. Stop reason: ${stream.stopReason}`
+          );
         }
       }
     } else if (process.env.OPENAI_API_KEY) {
@@ -364,7 +554,7 @@ ${userPrompt}`;
             { role: "user", content: userContent },
           ],
           temperature: 0.7,
-          max_tokens: 32000,
+          max_tokens: MAX_OUTPUT_TOKENS,
         }),
       });
 
@@ -403,7 +593,7 @@ ${userPrompt}`;
             contents: [{ parts }],
             generationConfig: {
               temperature: 0.7,
-              maxOutputTokens: 32000,
+              maxOutputTokens: MAX_OUTPUT_TOKENS,
             },
           }),
         }
@@ -449,8 +639,11 @@ ${userPrompt}`;
     const enhanced = enhanceGeneratedHtml(generatedHtml);
     generatedHtml = enhanced.html;
     console.log(
-      `[Generate] Runtime enhance — ids:+${enhanced.addedIds}, nav fixed:${enhanced.fixedNavLinks}, reveals:+${enhanced.addedReveals}, runtime injected:${enhanced.injectedRuntime}`
+      `[Generate] Runtime enhance — ids:+${enhanced.addedIds}, nav fixed:${enhanced.fixedNavLinks}, reveals:+${enhanced.addedReveals}, runtime injected:${enhanced.injectedRuntime}, viewport injected:${enhanced.injectedViewport}`
     );
+    if (enhanced.responsiveWarnings.length > 0) {
+      console.warn(`[Generate] Responsive drift — ${enhanced.responsiveWarnings.join("; ")}`);
+    }
 
     // Store the generated HTML in site_json as { html: "..." }
     const siteData = { html: generatedHtml };
@@ -524,26 +717,68 @@ ${userPrompt}`;
 
 /**
  * Extract clean HTML from AI response.
- * Handles cases where the AI wraps HTML in markdown code fences.
+ *
+ * Resilience matters here: the model is paid for, the user is paid for.
+ * If we return null, the route reports "generation failed" and the user
+ * loses real Anthropic money for nothing. So this function tries hard:
+ *
+ *   1. Unwrap markdown code fences (with or without `html` lang tag)
+ *   2. Find the first <!DOCTYPE or <html (case-insensitive) and start there
+ *   3. Truncate after the last </html> if present (drops trailing chatter)
+ *   4. If only a body/head fragment exists, wrap it in a minimal shell
+ *      so the user gets *something* renderable instead of a blank page
+ *
+ * Returns null only if the response contains no HTML-shaped content at all.
  */
 function extractHtml(content: string): string | null {
   let html = content.trim();
+  if (!html) return null;
 
-  // Remove markdown code fences if present
-  const codeBlockMatch = html.match(/```(?:html)?\s*\n?([\s\S]*?)\n?\s*```/);
-  if (codeBlockMatch) {
-    html = codeBlockMatch[1].trim();
+  // Strip ALL markdown code fences (some models wrap with ```html ... ```
+  // even when told not to; some emit multiple fenced blocks). Take the
+  // longest fenced block — that's almost always the actual HTML payload.
+  const fences = [...html.matchAll(/```(?:html|HTML)?\s*\n?([\s\S]*?)\n?\s*```/g)];
+  if (fences.length > 0) {
+    const longest = fences.reduce((a, b) => (b[1].length > a[1].length ? b : a));
+    html = longest[1].trim();
   }
 
-  // Validate it looks like HTML
-  if (html.includes("<!DOCTYPE html>") || html.includes("<html")) {
+  // Find the first real HTML start marker, case-insensitive.
+  // Skip any preamble the model emitted ("Here is your website: ...").
+  const startMatch = html.match(/<!doctype\s+html|<html\b/i);
+  if (startMatch && startMatch.index !== undefined && startMatch.index > 0) {
+    html = html.slice(startMatch.index);
+  }
+
+  // Drop anything after the closing </html> (trailing markdown / commentary).
+  const endIdx = html.toLowerCase().lastIndexOf("</html>");
+  if (endIdx !== -1) {
+    html = html.slice(0, endIdx + "</html>".length);
+  }
+
+  // Happy path: we have a recognizable HTML document.
+  if (/<!doctype\s+html|<html\b/i.test(html)) {
     return html;
   }
 
-  // Try to find HTML within the response
-  const htmlMatch = html.match(/(<!DOCTYPE html>[\s\S]*<\/html>)/i);
-  if (htmlMatch) {
-    return htmlMatch[1];
+  // Salvage path: model returned a fragment (just <body>, just <head>, or
+  // a sequence of <section>s). Wrap it so the browser can still render it
+  // and the user gets value for their tokens. The post-processor will
+  // inject the runtime + viewport meta on top.
+  if (/<(body|head|section|main|header|nav|div)\b/i.test(html)) {
+    console.warn("[Generate] extractHtml: salvaging fragment with minimal HTML shell");
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Site</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+${html}
+</body>
+</html>`;
   }
 
   return null;

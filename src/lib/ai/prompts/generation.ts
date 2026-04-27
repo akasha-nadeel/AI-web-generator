@@ -190,6 +190,11 @@ After determining the UI type, determine the "Mood" of the request (e.g., Luxury
 - For **DARK MODE** sites: dark backgrounds (\`bg-zinc-950\`, \`bg-slate-950\`) with light text (\`text-white\`, \`text-zinc-300\`). Accent color for highlights.
 - For **LIGHT MODE** sites: light backgrounds (\`bg-white\`, \`bg-stone-50\`, \`bg-slate-50\`) with dark text (\`text-zinc-900\`, \`text-stone-800\`). Use warm muted tones (stone, amber, warm-gray) for luxury/travel. Dark buttons (\`bg-zinc-900 text-white\`) with accent-colored text highlights.
 
+#### USER COLOR OVERRIDE (highest priority)
+- If the user's request mentions a specific color preference ("red theme", "blue accents", "make it green", "navy and gold"), USE THAT COLOR as the accent throughout — buttons, icons, highlights, gradients, hover states. The user's color choice overrides every other color rule, including matched template defaults.
+- Pick a Tailwind shade of that hue that contrasts well with the chosen color mode (e.g. \`red-500\` on dark bg, \`red-600\` on light bg).
+- If the user mentions multiple colors ("red and black", "purple with lime accents"), use the first as primary and the second as secondary.
+
 ### 6. LAYOUT & SPACING
 
 #### General Rules
@@ -838,13 +843,34 @@ IMPORTANT RULES:
 - Section background variety: alternate between shades for visual rhythm
 - A mix of layout types across sections: split layouts, card grids, perspective fan galleries, editorial text blocks with mixed-weight typography, bento grids — don't repeat the same layout
 - For about/story sections, consider editorial mixed-weight body text where key phrases are bold within flowing paragraphs
-- A professional multi-column footer with logo, tagline, link columns, contact info, social icons, and copyright bottom bar
+- A professional multi-column footer with logo, tagline, link columns, contact info, social icons, and copyright bottom bar — SEE FOOTER RULE BELOW
 - CSS entrance animations with staggered delays
 - Subtle hover effects on all interactive elements
 - Professional, context-aware copy tailored to the specific business
 - Fully responsive (mobile-first)
 - At least 3-4 high-quality Unsplash images from the curated library
 - Light OR dark color mode chosen to match the mood
+
+**DENSITY LIMITS (CRITICAL — exceeding these causes truncation):**
+You have a finite output budget. Going over these caps means you'll run out of room before the footer. Stay AT or UNDER each limit:
+- **Team / Trainers section:** maximum **4 cards**. Each card: photo + name + role + 1-2 line bio + maybe 2 small tags. NO long paragraphs per person.
+- **FAQ section:** maximum **5 items**. Each: short question + 1-2 sentence answer.
+- **Facilities / Features grid:** maximum **6 cards**. Each: icon + 2-3 word title + 1 sentence.
+- **Testimonials:** maximum **3 testimonials**. Each: 2-3 sentence quote + name + role.
+- **Pricing tiers:** maximum **3 tiers**. Each: name + price + 4-6 bullet features (not 10).
+- **Programs / Services list:** maximum **4 items** with full detail.
+- **Gallery:** maximum **6 images**.
+- **Menu items (restaurant/cafe):** maximum **8 items** total. Group into 2 columns. Each: name + short description + price. NO multi-paragraph stories per dish.
+- **Product cards (e-commerce):** maximum **6 cards**. Each: image + name + 1-line tagline + price. Skip long descriptions.
+- **Blog / Article cards:** maximum **4 cards**. Each: thumbnail + title + 1-2 sentence excerpt + date.
+- **Process / Steps:** maximum **5 steps**. Each: number + short title + 1-2 sentence description.
+
+**FOOTER RULE (NEVER SKIP):**
+The footer is REQUIRED. It is the LAST thing you generate but the MOST important to include — without it the site looks unfinished.
+1. Mentally outline ALL sections BEFORE writing.
+2. If running long, SHORTEN earlier sections rather than skip the footer.
+3. Footer MUST include: logo + tagline, 3 link columns, contact info, social icons, copyright bar.
+4. Reserve roughly the LAST 15% of your output budget for the footer.
 
 **For TYPE C (CONTENT / EDITORIAL):**
 - Clean navigation with site name, category links, and search

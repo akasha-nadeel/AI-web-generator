@@ -42,19 +42,47 @@ SITE SECTIONS (top-level only):
 ${sections.map((s) => `[${s.index}] <${s.tag}> — "${s.preview}"`).join("\n")}
 
 If the user wants a CHANGE, decide the scope:
+
+★★★ HIGHEST-PRIORITY RULE — read this BEFORE the lists below ★★★
+If the user names a SPECIFIC element by its visible label, text, or unique identifier (e.g. "the JOIN NOW button", "the START TRAINING button", "the hero title", "the third pricing card", "the chef's photo", "the EXPLORE THE VAULT button"), route to the BODY SECTION containing that element. NEVER route to the <style> section for surgical edits to a single named element — even if the change is a CSS property like color/size/font. The editor will inline the style on the targeted element so the change does not cascade to other elements that happen to share the same Tailwind class.
+
+  Example: "change the JOIN NOW button to blue" → CHANGE_SCOPED [header's index]   (NOT the style block)
+  Example: "make the START TRAINING button bigger" → CHANGE_SCOPED [hero's index]   (NOT the style block)
+  Example: "change the EXPLORE THE VAULT button color to purple" → CHANGE_SCOPED [hero's index]   (NOT the style block)
+  Example: "make the hero title larger" → CHANGE_SCOPED [hero's index]
+  Example: "change the founder's photo" → CHANGE_SCOPED [about's index]
+
 - CHANGE_SCOPED [indexes] — the change affects SPECIFIC sections listed above. PREFER THIS when the user names or clearly implies a particular section.
   Example: "make the hero title bigger" when section 1 is the hero → CHANGE_SCOPED [1]
   Example: "change the hero background to black" → CHANGE_SCOPED [hero's index]
   Example: "add a second card to features" → CHANGE_SCOPED [features' index]
   Example: "remove the testimonials" → CHANGE_SCOPED [testimonials' index]
   Example: "update the footer links" → CHANGE_SCOPED [footer's index]
-- CHANGE_ALL — ONLY when the change is explicitly GLOBAL and affects most/all sections.
+
+  TRULY GLOBAL CSS requests (NO specific element named, the change MUST live in <style>) — route to the <style> section when present:
+    • scrollbar / overflow tweaks ("remove the extra scrollbar", "hide scrollbars")
+    • site-wide animations / transitions ("disable ALL animations", "slow down the fade-in", "remove EVERY hover effect")
+    • global spacing/font-size/line-height ("tighten vertical spacing across the site", "bump body text to 18px everywhere")
+    • cart panel / fixed-position overlay visibility ("the cart panel is showing by default")
+    • keyframes, .active classes, tooltip styling, and any rule that lives ONLY in the <style> block
+    • EXPLICITLY site-wide button/heading/card style requests ("change ALL buttons to blue", "make EVERY heading uppercase", "round the corners of EVERY card")
+    Example: "remove the scroll bar" → CHANGE_SCOPED [0]
+    Example: "disable animations" → CHANGE_SCOPED [0]
+    Example: "make ALL hover effects subtler" → CHANGE_SCOPED [0]
+    Example: "change ALL buttons to blue" → CHANGE_SCOPED [0]   (note the word "ALL" — without it, treat as surgical)
+  If a request affects both the style and a specific body section (rare), include both indexes.
+
+- CHANGE_ALL — ONLY when the change is explicitly GLOBAL and affects most/all sections in ways that can't be done in just <style>.
   Example: "make the whole site dark mode"
   Example: "change the font across the site to serif"
   Example: "use a blue color palette everywhere"
   Example: "redesign the whole site"
 
-Default to CHANGE_SCOPED when a specific section is named or implied. Only use CHANGE_ALL when the user says "whole site", "everywhere", "all sections", or asks for a theme/typography/palette overhaul.
+DEFAULT BEHAVIOR for ambiguous requests:
+- If the user names ANY specific element/text/button/heading → CHANGE_SCOPED on that body section (NEVER style block)
+- Only use the style block when the request is EXPLICITLY site-wide (uses words like "all", "every", "throughout", "globally", "site-wide", "across the site")
+- When in doubt, prefer the NARROWER scope. The user can always say "now do it everywhere" — undoing accidental site-wide changes is much harder.
+
 Output ONE of: CHAT: <reply>    CHANGE_ALL    CHANGE_SCOPED [0,2]`;
 
 export const NO_SCOPE_INSTRUCTIONS = `

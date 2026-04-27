@@ -47,6 +47,16 @@ interface ChatMessage {
     images?: ChatImage[];
     status?: "loading" | "done" | "error";
     elapsed?: number;
+    // Present when the server blocked an expensive full-regen to ask the
+    // user to opt in. The Continue/Cancel buttons on the warning card use
+    // these fields to replay the request with { confirmed: true } or
+    // discard it. Cleared once the user chooses.
+    pendingConfirm?: {
+        userMsg: string;
+        images: ChatImage[];
+        htmlChars: number;
+        estimatedSeconds: number;
+    };
 }
 
 /* ===== SUGGESTION CHIPS ===== */
@@ -474,26 +484,17 @@ function GeneratePageContent() {
         startGeneration();
     };
 
-    // Follow-up chat — send message to modify the site
-    const handleChatSend = async () => {
-        if ((!chatInput.trim() && attachedImages.length === 0) || !siteHtml || isChatLoading) return;
-
-        const userMsg = chatInput.trim();
-        const imagesToSend = [...attachedImages];
-        setChatInput("");
-        setAttachedImages([]);
+    // Low-level chat runner. Pushes a loading AI message, fires the request,
+    // walks the NDJSON stream, and resolves the placeholder. Shared by the
+    // normal Send flow (handleChatSend) and the large-regen Continue flow
+    // (handleContinueConfirm) so the stream-parsing logic doesn't fork.
+    const runChatRequest = async (
+        userMsg: string,
+        imagesToSend: ChatImage[],
+        priorTurns: Array<{ role: "user" | "assistant"; content: string }>,
+        options: { confirmed?: boolean } = {}
+    ) => {
         setIsChatLoading(true);
-
-        // Capture prior turns BEFORE we append the new ones so the history
-        // we send reflects only completed conversation (no empty loading bubble).
-        const priorTurns = messages
-            .filter((m) => m.status !== "error" && m.status !== "loading" && m.content.trim())
-            .slice(-10) // keep the last ~5 exchanges; each exchange is user+ai
-            .map((m) => ({ role: m.role === "ai" ? "assistant" : "user", content: m.content }));
-
-        setMessages((prev) => [...prev, { role: "user", content: userMsg, images: imagesToSend.length > 0 ? imagesToSend : undefined }]);
-        setMessages((prev) => [...prev, { role: "ai", content: "", status: "loading" }]);
-
         const start = Date.now();
 
         try {
@@ -509,6 +510,9 @@ function GeneratePageContent() {
                         data: img.data,
                         type: img.type,
                     })),
+                    // Skip the cost guard when the user has already acked the
+                    // large-regen warning on this request.
+                    ...(options.confirmed ? { confirmed: true } : {}),
                 }),
             });
 
@@ -598,6 +602,31 @@ function GeneratePageContent() {
                         // Server picked specific sections — tell the user we're doing a targeted edit.
                         const n = evt.targets.length;
                         patchLast(() => `Editing ${n === 1 ? "1 section" : `${n} sections`}…`, "loading");
+                    } else if (evt.type === "confirm_required") {
+                        // Cost guard tripped — swap the loading bubble for a
+                        // warning card with Continue/Cancel. Request is NOT
+                        // retried automatically; user has to opt in.
+                        const htmlChars = typeof evt.htmlChars === "number" ? evt.htmlChars : siteHtml.length;
+                        const estimatedSeconds = typeof evt.estimatedSeconds === "number" ? evt.estimatedSeconds : 180;
+                        setMessages((prev) => {
+                            const updated = [...prev];
+                            const last = updated[updated.length - 1];
+                            if (!last || last.role !== "ai") return prev;
+                            updated[updated.length - 1] = {
+                                ...last,
+                                status: "done",
+                                content: "",
+                                elapsed: Math.round((Date.now() - start) / 1000),
+                                pendingConfirm: {
+                                    userMsg,
+                                    images: imagesToSend,
+                                    htmlChars,
+                                    estimatedSeconds,
+                                },
+                            };
+                            return updated;
+                        });
+                        break outer;
                     } else if (evt.type === "done") {
                         if (typeof evt.creditsRemaining === "number") {
                             useCreditsStore.getState().setBalance(evt.creditsRemaining);
@@ -660,6 +689,81 @@ function GeneratePageContent() {
         } finally {
             setIsChatLoading(false);
         }
+    };
+
+    // Follow-up chat — send message to modify the site.
+    const handleChatSend = async () => {
+        if ((!chatInput.trim() && attachedImages.length === 0) || !siteHtml || isChatLoading) return;
+
+        const userMsg = chatInput.trim();
+        const imagesToSend = [...attachedImages];
+        setChatInput("");
+        setAttachedImages([]);
+
+        // Capture prior turns BEFORE we append the new ones so the history
+        // we send reflects only completed conversation (no empty loading bubble).
+        const priorTurns: Array<{ role: "user" | "assistant"; content: string }> = messages
+            .filter((m) => m.status !== "error" && m.status !== "loading" && m.content.trim())
+            .slice(-10)
+            .map((m) => ({
+                role: m.role === "ai" ? ("assistant" as const) : ("user" as const),
+                content: m.content,
+            }));
+
+        setMessages((prev) => [
+            ...prev,
+            { role: "user", content: userMsg, images: imagesToSend.length > 0 ? imagesToSend : undefined },
+        ]);
+        setMessages((prev) => [...prev, { role: "ai", content: "", status: "loading" }]);
+
+        await runChatRequest(userMsg, imagesToSend, priorTurns);
+    };
+
+    // User opted in on the large-regen warning. Replay the same request with
+    // confirmed:true so the server skips the cost guard this time.
+    const handleContinueConfirm = async (msgIndex: number) => {
+        const target = messages[msgIndex];
+        if (!target?.pendingConfirm || isChatLoading) return;
+        const { userMsg, images } = target.pendingConfirm;
+
+        // Clear the warning card; replace with a short breadcrumb.
+        setMessages((prev) => {
+            const updated = [...prev];
+            const m = updated[msgIndex];
+            if (!m) return prev;
+            updated[msgIndex] = {
+                ...m,
+                pendingConfirm: undefined,
+                content: "Proceeding with full-site rewrite…",
+            };
+            return updated;
+        });
+
+        const priorTurns: Array<{ role: "user" | "assistant"; content: string }> = messages
+            .filter((m) => m.status !== "error" && m.status !== "loading" && m.content.trim())
+            .slice(-10)
+            .map((m) => ({
+                role: m.role === "ai" ? ("assistant" as const) : ("user" as const),
+                content: m.content,
+            }));
+
+        setMessages((prev) => [...prev, { role: "ai", content: "", status: "loading" }]);
+        await runChatRequest(userMsg, images, priorTurns, { confirmed: true });
+    };
+
+    const handleCancelConfirm = (msgIndex: number) => {
+        setMessages((prev) => {
+            const updated = [...prev];
+            const m = updated[msgIndex];
+            if (!m) return prev;
+            updated[msgIndex] = {
+                ...m,
+                pendingConfirm: undefined,
+                content:
+                    "Okay — I cancelled that. Try a more specific change (e.g. \"change the hero background\" or \"remove the scrollbar\") and I can do it fast without the warning.",
+            };
+            return updated;
+        });
     };
 
     const handleChatKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -977,6 +1081,39 @@ function GeneratePageContent() {
                                                     Try Again
                                                 </button>
                                             )}
+                                        </div>
+                                    )}
+
+                                    {msg.pendingConfirm && (
+                                        <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 space-y-2">
+                                            <div className="flex items-start gap-2">
+                                                <Zap className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                                                <div className="text-sm text-foreground/90 leading-relaxed">
+                                                    <p className="font-medium">This is a full-site rewrite.</p>
+                                                    <p className="text-foreground/70 mt-1">
+                                                        Your site is {(msg.pendingConfirm.htmlChars / 1000).toFixed(0)}k characters, so this edit has to regenerate everything. Expected time: ~{Math.max(1, Math.round(msg.pendingConfirm.estimatedSeconds / 60))} minute{msg.pendingConfirm.estimatedSeconds > 90 ? "s" : ""}. It uses significantly more AI tokens than a scoped edit.
+                                                    </p>
+                                                    <p className="text-foreground/60 text-xs mt-2">
+                                                        Tip: a more specific request (e.g. &ldquo;remove the scrollbar&rdquo;, &ldquo;change the hero background to black&rdquo;) runs in seconds at a fraction of the cost.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 pt-1">
+                                                <button
+                                                    disabled={isChatLoading}
+                                                    onClick={() => handleContinueConfirm(i)}
+                                                    className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-amber-500 text-white text-xs font-medium hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    Continue anyway
+                                                </button>
+                                                <button
+                                                    disabled={isChatLoading}
+                                                    onClick={() => handleCancelConfirm(i)}
+                                                    className="h-8 px-3 rounded-full border border-border text-xs text-foreground/80 hover:bg-foreground/[0.04] transition-colors disabled:opacity-50"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
                                         </div>
                                     )}
 

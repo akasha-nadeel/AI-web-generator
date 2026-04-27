@@ -380,6 +380,10 @@ html {
 .gemini-border-wrap {
   position: relative;
   isolation: isolate;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 4px 10px rgba(0, 0, 0, 0.15),
+    0 10px 20px rgba(0, 0, 0, 0.12);
   /* Crisp border gradient — concentrated color spotlight */
   background: conic-gradient(
     from var(--border-angle),
@@ -422,4 +426,11 @@ html {
   opacity: 0.5;
   z-index: -1;
   animation: border-rotate 5s linear infinite;
+}
+
+.dark .gemini-border-wrap {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 4px 10px rgba(0, 0, 0, 0.4),
+    0 10px 20px rgba(0, 0, 0, 0.35);
 }

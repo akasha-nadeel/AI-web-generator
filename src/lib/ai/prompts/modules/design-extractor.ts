@@ -135,7 +135,8 @@ export function formatDesignBriefForPrompt(brief: DesignBrief): string {
   lines.push(`MOOD: ${brief.moodKeywords}`);
   lines.push(`ANIMATIONS: ${brief.animations}`);
   lines.push(``);
-  lines.push(`YOU MUST faithfully reproduce these exact design patterns, colors, typography, and layout structure. This brief IS the design spec — match it precisely while incorporating the user's content request below.`);
+  lines.push(`YOU MUST faithfully reproduce these design patterns, typography, layout structure, and spacing. This brief IS the design spec — match it precisely.`);
+  lines.push(`EXCEPTION — accent color: if the user's request below mentions a specific color preference ("red theme", "blue accents", etc.), USE THAT COLOR as the accent throughout instead of the colors in this brief. The user's color choice always wins; everything else from this brief stays.`);
 
   return lines.join("\n");
 }

@@ -19,6 +19,8 @@ interface EnhanceResult {
   addedReveals: number;
   addedIds: number;
   fixedNavLinks: number;
+  injectedViewport: boolean;
+  responsiveWarnings: string[];
 }
 
 const SECTION_TAG_REGEX = /<(section|header|footer|main|aside)\b([^>]*)>/gi;
@@ -223,6 +225,70 @@ function fixNavLinks(html: string, headingMap: Map<string, string>): { html: str
 }
 
 /**
+ * Ensure <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ * is present in <head>. Without it, mobile browsers render at desktop width
+ * and zoom out — Tailwind breakpoints fire correctly in our preview iframes
+ * but the site is broken on real phones. Universally needed; safe to inject.
+ */
+const VIEWPORT_META_REGEX = /<meta\s+[^>]*name\s*=\s*["']viewport["']/i;
+const HEAD_OPEN_REGEX = /<head\b[^>]*>/i;
+
+function ensureViewportMeta(html: string): { html: string; injected: boolean } {
+  if (VIEWPORT_META_REGEX.test(html)) return { html, injected: false };
+  if (!HEAD_OPEN_REGEX.test(html)) return { html, injected: false };
+  return {
+    html: html.replace(
+      HEAD_OPEN_REGEX,
+      (m) => `${m}\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">`
+    ),
+    injected: true,
+  };
+}
+
+/**
+ * Detection-only scan for two responsive red flags. We don't auto-fix —
+ * rewriting class lists could damage carefully-tuned designs. The counts
+ * are logged so we can see when the AI drifts and tighten the prompt.
+ *
+ *   1. Unprefixed `text-{6,7,8,9}xl` — applies to mobile, will overflow
+ *      on a 375px viewport. Correct form is `text-3xl md:text-6xl` etc.
+ *   2. Fixed `w-[Npx]` for N >= 400 with no responsive alternative on
+ *      the same element — content wider than the smallest mobile
+ *      viewport (~375px) almost always causes horizontal scroll.
+ */
+const OVERSIZE_TEXT_TOKEN = /^text-[6-9]xl$/;
+const FIXED_WIDTH_TOKEN = /^w-\[(\d+)px\]$/;
+const RESPONSIVE_WIDTH_HINT = /(?:^|\s)(?:sm:|md:|lg:|xl:|2xl:)w-/;
+const CLASS_ATTR_REGEX = /\bclass\s*=\s*"([^"]*)"/gi;
+
+function scanResponsiveWarnings(html: string): string[] {
+  let oversizeText = 0;
+  let fixedWidth = 0;
+  let m: RegExpExecArray | null;
+  while ((m = CLASS_ATTR_REGEX.exec(html)) !== null) {
+    const classList = m[1];
+    const tokens = classList.split(/\s+/).filter(Boolean);
+    let hasResponsiveWidth: boolean | null = null;
+    for (const tok of tokens) {
+      if (OVERSIZE_TEXT_TOKEN.test(tok)) oversizeText++;
+      const w = FIXED_WIDTH_TOKEN.exec(tok);
+      if (w && parseInt(w[1], 10) >= 400) {
+        if (hasResponsiveWidth === null) hasResponsiveWidth = RESPONSIVE_WIDTH_HINT.test(classList);
+        if (!hasResponsiveWidth) fixedWidth++;
+      }
+    }
+  }
+  const warnings: string[] = [];
+  if (oversizeText > 0) {
+    warnings.push(`${oversizeText} unprefixed text-{6-9}xl (overflows mobile)`);
+  }
+  if (fixedWidth > 0) {
+    warnings.push(`${fixedWidth} fixed w-[≥400px] without responsive alt`);
+  }
+  return warnings;
+}
+
+/**
  * Top-level entry point — runs all enhancements and returns the result
  * along with a small report for logging.
  */
@@ -233,11 +299,15 @@ export function enhanceGeneratedHtml(html: string): EnhanceResult {
   const nav = fixNavLinks(ids.html, ids.headingMap);
   const reveals = addReveals(nav.html);
   const runtime = injectRuntime(reveals.html);
+  const viewport = ensureViewportMeta(runtime.html);
+  const responsiveWarnings = scanResponsiveWarnings(viewport.html);
   return {
-    html: runtime.html,
+    html: viewport.html,
     injectedRuntime: runtime.injected,
     addedReveals: reveals.count,
     addedIds: ids.count,
     fixedNavLinks: nav.count,
+    injectedViewport: viewport.injected,
+    responsiveWarnings,
   };
 }

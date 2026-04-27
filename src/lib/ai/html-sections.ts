@@ -7,6 +7,10 @@
 // Strategy: walk <section>, <header>, <footer>, <nav>, <main>, <aside>
 // tags with a tag-name stack. Only OUTERMOST matches count — nested
 // sections inside another are ignored (they'll travel with their parent).
+//
+// Additionally, the <style> block inside <head> is captured as section 0
+// when present. CSS-only edits (scrollbar, animations, global fonts,
+// hover effects) scope to it instead of forcing a full-HTML regen.
 
 // Tags we treat as top-level layout sections.
 // NOTE: <main> and <article> are CONTAINERS that typically wrap many
@@ -42,6 +46,46 @@ function buildPreview(content: string, max = 120): string {
   return text.length > max ? text.slice(0, max) + "…" : text;
 }
 
+// Summarise a <style> block for the classifier: list a few class names so
+// the router can reason about what lives in CSS without reading it all.
+function buildStylePreview(content: string, max = 120): string {
+  const tokens: string[] = [];
+  const seen = new Set<string>();
+  for (const m of content.matchAll(/\.([a-zA-Z_][\w-]*)/g)) {
+    const name = m[1];
+    if (!seen.has(name)) {
+      seen.add(name);
+      tokens.push(name);
+    }
+    if (tokens.length >= 6) break;
+  }
+  const summary =
+    tokens.length > 0
+      ? `Global CSS — rules: .${tokens.join(", .")}`
+      : "Global CSS (keyframes, resets, utility classes)";
+  return summary.length > max ? summary.slice(0, max) + "…" : summary;
+}
+
+// Locate the first <style>…</style> inside <head>. Returns byte offsets
+// so the caller can build a SectionSpan that round-trips through the
+// gaps/splice pipeline. Returns null when there is no head or no style.
+function findHeadStyleBlock(
+  html: string
+): { start: number; end: number; content: string } | null {
+  const headMatch = /<head\b[^>]*>([\s\S]*?)<\/head>/i.exec(html);
+  if (!headMatch) return null;
+  const headInner = headMatch[1];
+  const headInnerStart = headMatch.index + headMatch[0].indexOf(headInner);
+  const styleMatch = /<style\b[^>]*>[\s\S]*?<\/style>/i.exec(headInner);
+  if (!styleMatch) return null;
+  const start = headInnerStart + styleMatch.index;
+  return {
+    start,
+    end: start + styleMatch[0].length,
+    content: styleMatch[0],
+  };
+}
+
 /**
  * Tokenize HTML at the level of start/end tags for the section tags we care
  * about. Returns null if the HTML is too malformed to split reliably — the
@@ -55,7 +99,8 @@ export function splitSections(html: string): SectionSplit | null {
   // handle AI-generated markup, which is well-formed ~99% of the time.
   const tagRegex = /<(\/?)(section|header|footer|nav|main|aside)\b([^>]*)>/gi;
 
-  const spans: SectionSpan[] = [];
+  interface RawSpan { tag: string; start: number; end: number; content: string }
+  const rawBody: RawSpan[] = [];
   const stack: Array<{ tag: string; startIdx: number }> = [];
   let m: RegExpExecArray | null;
 
@@ -82,21 +127,47 @@ export function splitSections(html: string): SectionSplit | null {
       if (top.startIdx >= 0 && stack.length === 0) {
         // This was a top-level section — record its span.
         const end = m.index + m[0].length;
-        const content = html.substring(top.startIdx, end);
-        spans.push({
-          index: spans.length,
+        rawBody.push({
           tag,
           start: top.startIdx,
           end,
-          content,
-          preview: buildPreview(content),
+          content: html.substring(top.startIdx, end),
         });
       }
     }
   }
 
   if (stack.length !== 0) return null; // unbalanced
-  if (spans.length < 2) return null;   // nothing useful to scope
+
+  // Prepend the head <style> block (if any) as section 0 so CSS-only edits
+  // can be routed to it via the same scoped-splice pipeline used for body
+  // sections. It must precede every body section in byte order by
+  // construction (head comes before body), which keeps the gaps math
+  // below valid.
+  const spans: SectionSpan[] = [];
+  const styleBlock = findHeadStyleBlock(html);
+  if (styleBlock) {
+    spans.push({
+      index: 0,
+      tag: "style",
+      start: styleBlock.start,
+      end: styleBlock.end,
+      content: styleBlock.content,
+      preview: buildStylePreview(styleBlock.content),
+    });
+  }
+  for (const rb of rawBody) {
+    spans.push({
+      index: spans.length,
+      tag: rb.tag,
+      start: rb.start,
+      end: rb.end,
+      content: rb.content,
+      preview: buildPreview(rb.content),
+    });
+  }
+
+  if (spans.length < 2) return null; // nothing useful to scope
 
   // Build gaps (everything between sections, plus before/after).
   const gaps: string[] = [];

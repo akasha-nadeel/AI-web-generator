@@ -165,6 +165,7 @@ const INDUSTRY_IMAGE_MAP: Record<string, string[]> = {
   tourism:       ["travel-destinations", "travel-hotels", "nature", "portraits"],
   "real-estate": ["real-estate", "interior", "portraits"],
   "real estate": ["real-estate", "interior", "portraits"],
+  realestate:    ["real-estate", "interior", "portraits"],
   property:      ["real-estate", "interior", "portraits"],
   beauty:        ["beauty", "skincare", "portraits", "women-portraits"],
   spa:           ["beauty", "health-wellness", "portraits"],
@@ -193,8 +194,12 @@ const INDUSTRY_IMAGE_MAP: Record<string, string[]> = {
   pets:          ["pets", "nature", "lifestyle"],
   children:      ["children-family", "lifestyle-friends", "spring-nature"],
   nonprofit:     ["lifestyle", "diverse-people", "nature", "portraits"],
+  charity:       ["lifestyle", "diverse-people", "nature", "portraits"],
   law:           ["business", "city", "portraits"],
   portfolio:     ["portfolio", "abstract", "nature", "city"],
+  blog:          ["lifestyle", "workspace", "abstract", "portraits"],
+  magazine:      ["lifestyle", "workspace", "abstract", "portraits"],
+  news:          ["lifestyle", "workspace", "city", "portraits"],
   dashboard:     ["tech", "abstract", "workspace"],
 };
 
@@ -249,6 +254,16 @@ const INDUSTRY_ICON_MAP: Record<string, string[]> = {
   music:        ["play", "heart", "users"],
   gaming:       ["zap", "target", "trophy"],
   sports:       ["trophy", "target", "users", "heart"],
+  portfolio:    ["camera", "sparkles", "star", "globe"],
+  blog:         ["star", "users", "sparkles", "mail"],
+  magazine:     ["star", "users", "sparkles", "mail"],
+  news:         ["star", "users", "globe", "mail"],
+  realestate:   ["map-pin", "globe", "shield", "users"],
+  "real-estate": ["map-pin", "globe", "shield", "users"],
+  "real estate": ["map-pin", "globe", "shield", "users"],
+  property:     ["map-pin", "globe", "shield", "users"],
+  nonprofit:    ["heart", "users", "shield", "globe"],
+  charity:      ["heart", "users", "shield", "globe"],
 };
 
 function selectIcons(industry: string): string[] {
@@ -283,6 +298,10 @@ const LOGO_ICON_MAP: Record<string, string> = {
   dental: "shield",
   sports: "trophy",
   law: "shield",
+  portfolio: "camera",
+  blog: "sparkles", magazine: "sparkles", news: "globe",
+  realestate: "map-pin", "real-estate": "map-pin", "real estate": "map-pin", property: "map-pin",
+  nonprofit: "heart", charity: "heart",
 };
 
 function selectLogoIcon(industry: string): string {
@@ -343,6 +362,53 @@ function calculateConfidence(industry: string, mood: string, uiType: string, pro
   if (uiType === "app" && detectAppReference(prompt)) score += 0.2;
   if (prompt.length > 30) score += 0.1;
   return Math.min(score, 1);
+}
+
+// ── Industry Auto-Detection from Description ───────────────────────
+
+/**
+ * Scan a free-text description for any keyword we have specific design
+ * support for (image categories, icons, logo, layout). Returns the
+ * canonical industry key the rest of the classifier already understands,
+ * or null if nothing matched.
+ *
+ * Why this exists: the wizard no longer asks the user to pick an industry
+ * chip. We derive it from the description so all of selectImageCategories /
+ * selectIcons / selectLogoIcon / selectLayoutStyle still get a meaningful
+ * input — without that, every site falls through to generic defaults.
+ *
+ * Matching rules:
+ *  - Word-boundary regex (avoids "art" matching inside "smart")
+ *  - Multi-word keys ("real estate") match across hyphen OR space
+ *  - Longest keyword wins (so "real estate" beats "real")
+ *  - First match returned (no scoring — we just need *a* signal)
+ */
+export function detectIndustryFromPrompt(text: string): string | null {
+  if (!text || typeof text !== "string") return null;
+  const lower = text.toLowerCase();
+
+  // Union of all industry keys that drive a downstream design decision.
+  const knownKeys = new Set<string>([
+    ...Object.keys(INDUSTRY_IMAGE_MAP),
+    ...Object.keys(INDUSTRY_ICON_MAP),
+    ...Object.keys(LOGO_ICON_MAP),
+  ]);
+
+  // Sort longest first so "real estate" matches before "real".
+  const sorted = [...knownKeys].sort((a, b) => b.length - a.length);
+
+  for (const key of sorted) {
+    // Allow hyphen OR space in multi-word keys (handles both "real-estate"
+    // and "real estate" in user input). Escape other regex metachars.
+    const pattern = key
+      .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+      .replace(/[-\s]+/g, "[-\\s]+");
+    if (new RegExp(`\\b${pattern}\\b`, "i").test(lower)) {
+      return key;
+    }
+  }
+
+  return null;
 }
 
 // ── Main Classifier ────────────────────────────────────────────────

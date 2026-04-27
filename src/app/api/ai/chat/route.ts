@@ -39,8 +39,16 @@ type StreamEvent =
   | { type: "token"; text: string }
   | { type: "progress"; chars: number }
   | { type: "scope"; targets: number[] }
+  | { type: "confirm_required"; reason: "large_regen"; htmlChars: number; estimatedSeconds: number }
   | { type: "done"; html?: string; reply?: string; creditsRemaining: number }
   | { type: "error"; message: string };
+
+// Threshold above which a CHANGE_ALL (full-site regen) gets a confirmation
+// step instead of firing straight at Claude. Picked so a typical 5-section
+// site (~20k chars) passes through automatically, while ecommerce/heavy
+// sites (~40k+) require an explicit opt-in. Crossing this boundary is
+// what caused the ~$1 silent burn during the 2026-04-25 bug.
+const LARGE_REGEN_CHAR_THRESHOLD = 30_000;
 
 function parseDataUrl(dataUrl: string): { base64: string; mimeType: string } | null {
   const match = dataUrl.match(/^data:(image\/\w+);base64,(.+)$/);
@@ -67,8 +75,11 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { message, html, siteJson, images, siteId, history } = body;
+  const { message, html, siteJson, images, siteId, history, confirmed } = body;
   const currentHtml = html || siteJson?.html;
+  // Set to true by the client when resubmitting after the user accepts the
+  // large-regen warning. Prevents the cost guard from blocking the retry.
+  const userConfirmedLargeRegen = confirmed === true;
 
   // Normalize history: accept { role: "user" | "assistant" | "ai"; content: string }
   // Drop anything malformed. Keep the last 10 turns — enough to carry intent
@@ -305,6 +316,30 @@ export async function POST(req: NextRequest) {
         console.warn("[chat] Classifier threw, falling back to full regen:", err);
       }
 
+      // ── Cost guard: full regens of large sites cost real money ──
+      // Sonnet regenerating a 60k-char HTML bills ~20k input + 15-20k output
+      // tokens per attempt (~$0.30–0.40), and timing out client-side doesn't
+      // stop Anthropic from charging for the tokens already streamed. Before
+      // firing that call, ask the user to confirm. The client re-sends with
+      // { confirmed: true } to skip this block on the second attempt.
+      const wouldRunFullRegen = scopeTargets === null;
+      const siteIsLarge = currentHtml.length > LARGE_REGEN_CHAR_THRESHOLD;
+      if (wouldRunFullRegen && siteIsLarge && !userConfirmedLargeRegen) {
+        const estimatedSeconds = Math.ceil(currentHtml.length / 250); // ~250 chars/sec at Sonnet stream speed
+        console.log(
+          `[chat] Cost guard: blocked full-regen on ${currentHtml.length}-char site pending user confirmation`
+        );
+        send({
+          type: "confirm_required",
+          reason: "large_regen",
+          htmlChars: currentHtml.length,
+          estimatedSeconds,
+        });
+        controller.close();
+        clearTimeout(timeout);
+        return;
+      }
+
       // ── Step 2a: Scoped Claude edit (only touches target sections) ──
       // When the classifier picks specific sections, we send ONLY those
       // to Claude — much smaller prompt, no truncation risk, ~3-5× cheaper.
@@ -539,7 +574,14 @@ export async function POST(req: NextRequest) {
       // Re-run runtime enhancements. For scoped edits this is a no-op
       // (runtime already lives in the gap region). For full regens this
       // restores any IDs/anchors/reveals/script the model may have dropped.
-      updatedHtml = enhanceGeneratedHtml(updatedHtml).html;
+      const chatEnhanced = enhanceGeneratedHtml(updatedHtml);
+      updatedHtml = chatEnhanced.html;
+      if (chatEnhanced.injectedViewport) {
+        console.warn("[Chat] viewport meta was missing — injected by post-process");
+      }
+      if (chatEnhanced.responsiveWarnings.length > 0) {
+        console.warn(`[Chat] Responsive drift — ${chatEnhanced.responsiveWarnings.join("; ")}`);
+      }
 
       // Deduct credits — only for real HTML updates.
       const deductResult = await deductCredits(user.id, editCost, "generation", {
@@ -651,10 +693,11 @@ STRICT OUTPUT RULES:
    <!-- WVSCOPE:0:END -->
 2. Do NOT output any text outside the sentinel markers. No prose, no markdown, no code fences.
 3. Do NOT include <!DOCTYPE>, <html>, <head>, <body>, or <script> wrapper tags — you are NOT writing a full document.
-4. Preserve each section's OUTER tag type (a <header> stays <header>, a <section> stays <section>). Change its contents, attributes, and children freely.
+4. Preserve each section's OUTER tag type (a <header> stays <header>, a <section> stays <section>, a <style> stays <style>). Change its contents, attributes, and children freely.
 5. If a section is shown but doesn't need changing, OMIT it entirely from your output.
 6. Use Tailwind classes and inline styles consistent with the existing code.
 7. Keep all image srcs, Unsplash URLs, and icon SVGs intact unless the request is specifically about them.
+8. When editing a <style> section: keep the opening <style> and closing </style> tags. You may add, remove, or rewrite CSS rules inside, but do not convert the section into anything else. Do NOT delete rules the user did not ask to change.
 
 The rest of the website (not shown) will be preserved byte-for-byte.`;
 

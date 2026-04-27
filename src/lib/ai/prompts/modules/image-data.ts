@@ -12,20 +12,51 @@ export type LabeledSection = { title: string; photos: LabeledPhoto[] };
 export type ImageSection = string | LabeledSection;
 
 export const IMAGE_SECTIONS: Record<string, ImageSection> = {
-  "gym-venue": `**Gym/Fitness — Venue & Equipment:**
-photo-1534438327276-14e5300c3a48, photo-1571019614242-c5c5dee9f50b, photo-1549060279-7e168fcee0c2, photo-1540497077202-7c8a3999166f, photo-1517836357463-d25dfeac3438, photo-1576678927484-cc907957088c, photo-1593079831268-3381b0db4a77, photo-1558611848-73f7eb4001a1`,
+  "gym-venue": {
+    title: "Gym/Fitness — Venue & Equipment",
+    photos: [
+      { id: "photo-1534438327276-14e5300c3a48", desc: "modern gym interior with machines, wide shot" },
+      { id: "photo-1571019614242-c5c5dee9f50b", desc: "weight rack with dumbbells, equipment detail" },
+      { id: "photo-1549060279-7e168fcee0c2", desc: "industrial gym space with squat racks" },
+      { id: "photo-1540497077202-7c8a3999166f", desc: "kettlebells lined up, functional fitness equipment" },
+      { id: "photo-1517836357463-d25dfeac3438", desc: "gym floor with cardio machines, treadmill row" },
+      { id: "photo-1576678927484-cc907957088c", desc: "barbell on rack, strength training setup" },
+      { id: "photo-1593079831268-3381b0db4a77", desc: "boutique gym studio, atmospheric lighting" },
+      { id: "photo-1558611848-73f7eb4001a1", desc: "rope and crossfit gear, athletic training space" },
+    ],
+  },
 
-  "gym-people": `**Gym/Fitness — People Working Out:**
-photo-1581009146145-b5ef050c2e1e, photo-1583454110551-21f2fa2afe61, photo-1550345332-09e3ac987658, photo-1574680096145-d05b474e2155, photo-1597452485669-2c7bb5fef90d`,
+  "gym-people": {
+    title: "Gym/Fitness — People Working Out",
+    photos: [
+      { id: "photo-1581009146145-b5ef050c2e1e", desc: "athlete lifting weights, focused intensity" },
+      { id: "photo-1583454110551-21f2fa2afe61", desc: "person doing pushups or floor exercises" },
+      { id: "photo-1550345332-09e3ac987658", desc: "fitness model mid-workout, dynamic pose" },
+      { id: "photo-1574680096145-d05b474e2155", desc: "trainer coaching client, gym session" },
+      { id: "photo-1597452485669-2c7bb5fef90d", desc: "woman strength training with dumbbells" },
+      { id: "photo-1521791136064-7986c2920216", desc: "personal trainer with athlete, instruction" },
+      { id: "photo-1517245386807-bb43f82c33c4", desc: "yoga or stretching session, mindful fitness" },
+      { id: "photo-1454165804606-c3d57bc86b40", desc: "runner outdoors, cardio and endurance training" },
+      { id: "photo-1571902943202-507ec2618e8f", desc: "person doing plank or core work" },
+      { id: "photo-1571388208497-71bedc66e932", desc: "athlete with barbell, powerlifting moment" },
+    ],
+  },
 
   "restaurant-venue": {
     title: "Restaurant/Food — Venue & Ambiance",
     photos: [
       { id: "photo-1517248135467-4c7edcad34c4", desc: "restaurant dining room, warm ambient lighting" },
-      { id: "photo-1414235077428-338989a2e8c0", desc: "dinner table setting, cozy candlelit atmosphere" },
       { id: "photo-1555396273-367ea4eb4db5", desc: "bistro interior, bar seating" },
       { id: "photo-1537047902294-62a40c20a6ae", desc: "elegant fine-dining table setting, white cloth" },
       { id: "photo-1552566626-52f8b828add9", desc: "rustic café interior, wood tones" },
+      { id: "photo-1559925393-8be0ec4767c8", desc: "modern minimalist restaurant interior, clean lines" },
+      { id: "photo-1592861956120-e524fc739696", desc: "casual neighborhood eatery, relaxed atmosphere" },
+      { id: "photo-1559329007-40df8a9345d8", desc: "industrial-style restaurant with exposed brick" },
+      { id: "photo-1424847651672-bf20a4b0982b", desc: "vibrant street food or casual dining counter" },
+      { id: "photo-1466978913421-dad2ebd01d17", desc: "outdoor patio dining, al fresco seating" },
+      { id: "photo-1567129937968-cdad8f07e2f8", desc: "ramen bar or asian noodle counter, intimate seating" },
+      { id: "photo-1559339352-11d035aa65de", desc: "open kitchen or chef's counter, watch-the-cooking design" },
+      { id: "photo-1521017432531-fbd92d768814", desc: "upscale steakhouse or chophouse, dark moody dining" },
     ],
   },
 
@@ -33,28 +64,63 @@ photo-1581009146145-b5ef050c2e1e, photo-1583454110551-21f2fa2afe61, photo-155034
     title: "Restaurant/Food — Dishes",
     photos: [
       { id: "photo-1504674900247-0877df9cc836", desc: "plated dish overhead, rustic styling" },
-      { id: "photo-1567620905732-2d1ec7ab7445", desc: "burger and fries, casual dining close-up" },
-      { id: "photo-1565299624946-b28f40a0ae38", desc: "pizza with basil and toppings, close-up" },
+      { id: "photo-1565299624946-b28f40a0ae38", desc: "margherita-style pizza with fresh basil and tomato, close-up" },
+      { id: "photo-1473093295043-cdd812d0e601", desc: "italian pasta dish with red sauce and fresh herbs" },
+      { id: "photo-1551183053-bf91a1d81141", desc: "creamy carbonara or alfredo pasta in dark bowl" },
+      { id: "photo-1551892374-ecf8754cf8b0", desc: "tiramisu dessert with cocoa dusting, italian classic" },
       { id: "photo-1565958011703-44f9829ba187", desc: "elegant plated main course, fine dining" },
       { id: "photo-1482049016688-2d3e1b311543", desc: "gourmet tasting dish, artful presentation" },
-      { id: "photo-1476224203421-9ac39bcb3327", desc: "fresh salad bowl, vibrant greens and fruit" },
-      { id: "photo-1473093295043-cdd812d0e601", desc: "pasta dish, red sauce and herbs" },
-      { id: "photo-1432139555190-58524dae6a55", desc: "breakfast brunch spread, pancakes and coffee" },
+      { id: "photo-1476224203421-9ac39bcb3327", desc: "fresh caprese-style salad with greens and tomatoes" },
       { id: "photo-1414235077428-338989a2e8c0", desc: "dining table with plated meal, warm ambiance" },
+      { id: "photo-1542223616-740d5dff7f56", desc: "espresso shot with crema, italian coffee culture" },
+      { id: "photo-1528137871618-79d2761e3fd5", desc: "wood-fired neapolitan pizza, charred crust" },
     ],
   },
 
-  "tech": `**Tech/SaaS:**
-photo-1551434678-e076c223a692, photo-1460925895917-afdab827c52f, photo-1519389950473-47ba0277781c, photo-1504384308090-c894fdcc538d, photo-1531297484001-80022131f5a1, photo-1550751827-4bd374c3f58b, photo-1518770660439-4636190af475, photo-1488590528505-98d2b5aba04b`,
+  "tech": {
+    title: "Tech/SaaS",
+    photos: [
+      { id: "photo-1551434678-e076c223a692", desc: "team collaboration around laptop, modern office" },
+      { id: "photo-1460925895917-afdab827c52f", desc: "data dashboard or analytics on laptop screen" },
+      { id: "photo-1519389950473-47ba0277781c", desc: "developers coding together, focused workspace" },
+      { id: "photo-1504384308090-c894fdcc538d", desc: "minimal desk setup, clean tech aesthetic" },
+      { id: "photo-1531297484001-80022131f5a1", desc: "code on screen close-up, programming visualization" },
+      { id: "photo-1550751827-4bd374c3f58b", desc: "abstract tech background, glowing servers or hardware" },
+      { id: "photo-1518770660439-4636190af475", desc: "circuit board macro, hardware detail" },
+      { id: "photo-1488590528505-98d2b5aba04b", desc: "laptop with notepad, modern remote work scene" },
+    ],
+  },
 
-  "portfolio": `**Portfolio/Creative:**
-photo-1558618666-fcd25c85f82e, photo-1542744094-3a31f272c490, photo-1545665277-5937489ef756, photo-1561070791-2526d30994b5, photo-1535016120720-40c646be5580, photo-1513364776144-60967b0f800f`,
+  "portfolio": {
+    title: "Portfolio/Creative",
+    photos: [
+      { id: "photo-1542744094-3a31f272c490", desc: "designer working on creative project, hands and tools" },
+      { id: "photo-1561070791-2526d30994b5", desc: "creative workspace with art supplies and computer" },
+      { id: "photo-1535016120720-40c646be5580", desc: "photographer composing shot, behind-the-scenes" },
+      { id: "photo-1513364776144-60967b0f800f", desc: "design mockups and sketches on desk" },
+      { id: "photo-1499744937866-d7e566a20a61", desc: "modern art piece or design exhibition" },
+      { id: "photo-1542744095-fcf48d80b0fd", desc: "creative tools spread across workspace" },
+      { id: "photo-1559136555-9303baea8ebd", desc: "designer reviewing portfolio on tablet" },
+      { id: "photo-1542038784456-1ea8e935640e", desc: "branding deliverables and mockups, design portfolio" },
+    ],
+  },
 
-  "business": `**Business/Agency:**
-photo-1497366216548-37526070297c, photo-1552664730-d307ca884978, photo-1556761175-5973dc0f32e7, photo-1521737711867-e3b97375f902, photo-1522071820081-009f0129c71c, photo-1542744173-8e7e91415657`,
+  "business": {
+    title: "Business/Agency",
+    photos: [
+      { id: "photo-1497366216548-37526070297c", desc: "modern open office, collaborative workspace" },
+      { id: "photo-1552664730-d307ca884978", desc: "team meeting around table, business strategy" },
+      { id: "photo-1556761175-5973dc0f32e7", desc: "business handshake or partnership moment" },
+      { id: "photo-1521737711867-e3b97375f902", desc: "professional team in office hallway" },
+      { id: "photo-1522071820081-009f0129c71c", desc: "team brainstorming session with sticky notes" },
+      { id: "photo-1486325212027-8081e485255e", desc: "executive at desk, professional portrait" },
+      { id: "photo-1485827404703-89b55fcc595e", desc: "consulting team reviewing data on screen" },
+      { id: "photo-1531058020387-3be344556be6", desc: "business presentation to clients" },
+    ],
+  },
 
   "travel-destinations": `**Travel/Tourism — Destinations & Landscapes:**
-photo-1507525428034-b723cf961d3e, photo-1506929562872-d5de6b6e94a8, photo-1476514525535-07fb3b4ae5f1, photo-1469474968028-56623f02e42e, photo-1501785888041-af3ef285b470, photo-1504280390367-361c6d9f38f4, photo-1530789253388-582c481c54b0, photo-1539635278303-d4002c07eae3, photo-1493976040374-85c8e12f0c0e, photo-1552733407-5d5c46c3bb3b`,
+photo-1507525428034-b723cf961d3e, photo-1506929562872-d5de6b6e94a8, photo-1476514525535-07fb3b4ae5f1, photo-1469474968028-56623f02e42e, photo-1501785888041-af3ef285b470, photo-1504280390367-361c6d9f38f4, photo-1530789253388-582c481c54b0, photo-1493976040374-85c8e12f0c0e, photo-1552733407-5d5c46c3bb3b, photo-1528127269322-539801943592, photo-1473625247510-8ceb1760943f, photo-1499856871958-5b9627545d1a`,
 
   "travel-hotels": `**Travel — Hotels & Resorts:**
 photo-1566073771259-6a8506099945, photo-1582719508461-905c673771fd, photo-1571896349842-33c89424de2d, photo-1520250497591-112f2f40a3f4`,
@@ -90,7 +156,7 @@ photo-1470071459604-3b5ec3a7fe05, photo-1441974231531-c6227db76b6e, photo-147221
 photo-1477959858617-67f85cf4f1df, photo-1480714378408-67cf0d13bc1b, photo-1449824913935-59a10b8d2000, photo-1514565131-fce0801e5785, photo-1444723121867-7a241cacace9, photo-1519501025264-65ba15a82390, photo-1470219556762-1e71f4a2ccab, photo-1534430480872-3498386e7856, photo-1519608487953-e999c86e7455`,
 
   "ocean": `**Ocean/Water — Serene & Dramatic:**
-photo-1505118380757-91f5f5632de0, photo-1518837695005-2083093ee35b, photo-1507525428034-b723cf961d3e, photo-1468413253725-0d5181091126, photo-1544551763-46a013bb70d5, photo-1505142468610-359e7d316be0`,
+photo-1505118380757-91f5f5632de0, photo-1468413253725-0d5181091126, photo-1544551763-46a013bb70d5, photo-1505142468610-359e7d316be0, photo-1559535332-db9971090158, photo-1503803548695-c2a7b4a5b875, photo-1606857521015-7f9fcf423740`,
 
   "dark-moody": `**Dark/Moody Atmospheres:**
 photo-1478760329108-5c3ed9d495a0, photo-1451187580459-43490279c0fa, photo-1419242902214-272b3f66ee7a, photo-1462331940025-496dfbfc7564, photo-1444703686981-a3abbc4d4fe3, photo-1536183922588-166604a45d81, photo-1557683316-973673baf926`,
@@ -107,14 +173,31 @@ photo-1493225457124-a3eb161ffa5f, photo-1470229722913-7c0e2dbbafd3, photo-151167
       { id: "photo-1554118811-1e0d58224f24", desc: "cozy cafe interior with people" },
       { id: "photo-1559305616-3f99cd43e353", desc: "iced coffee drink, cold brew styling" },
       { id: "photo-1511920170033-f8396924c348", desc: "coffee cup with dessert, flat lay" },
+      { id: "photo-1517048676732-d65bc937f952", desc: "fresh croissants and pastries on display" },
+      { id: "photo-1568901346375-23c9450c58cd", desc: "smoothie bowl or healthy breakfast plate" },
+      { id: "photo-1546069901-ba9599a7e63c", desc: "avocado toast and breakfast spread, modern brunch" },
+      { id: "photo-1542838132-92c53300491e", desc: "barista pouring milk for latte art, behind counter" },
+      { id: "photo-1488477181946-6428a0291777", desc: "fresh juices and smoothies, healthy drinks" },
+      { id: "photo-1525351484163-7529414344d8", desc: "muffins or baked goods, bakery style" },
     ],
   },
 
   "education": `**Education/Learning:**
 photo-1523050854058-8df90110c9f1, photo-1503676260728-1c00da094a0b, photo-1524178232363-1fb2b075b655, photo-1427504494785-3a9ca7044f45, photo-1481627834876-b7833e8f5570, photo-1488190211105-8b0e65b80b4e`,
 
-  "medical": `**Medical/Healthcare:**
-photo-1519494026892-80bbd2d6fd0d, photo-1538108149393-fbbd81895907, photo-1576091160399-112ba8d25d1d, photo-1579684385127-1ef15d508118, photo-1551076805-e1869033e561, photo-1559757148-5c350d0d3c56`,
+  "medical": {
+    title: "Medical/Healthcare",
+    photos: [
+      { id: "photo-1519494026892-80bbd2d6fd0d", desc: "modern hospital corridor or clinic interior" },
+      { id: "photo-1538108149393-fbbd81895907", desc: "medical professional with stethoscope, portrait" },
+      { id: "photo-1576091160399-112ba8d25d1d", desc: "doctor in white coat, professional headshot" },
+      { id: "photo-1579684385127-1ef15d508118", desc: "patient consultation, doctor explaining" },
+      { id: "photo-1551076805-e1869033e561", desc: "medical staff in clinical setting, treatment" },
+      { id: "photo-1559757148-5c350d0d3c56", desc: "friendly healthcare conversation, patient care" },
+      { id: "photo-1599058917212-d750089bc07e", desc: "medical equipment or operating room, modern healthcare tech" },
+      { id: "photo-1554284126-aa88f22d8b74", desc: "healthcare team meeting, collaborative care" },
+    ],
+  },
 
   "automotive": `**Automotive/Cars:**
 photo-1494976388531-d1058494cdd8, photo-1503376780353-7e6692767b70, photo-1544636331-e26879cd4d9b, photo-1492144534655-ae79c964c9d7, photo-1542362567-b07e54358753`,
@@ -128,8 +211,18 @@ photo-1461896836934-bd45ba7b6e7b, photo-1546519638-68e109498ffc, photo-153054938
   "ecommerce": `**E-commerce/Products/Shopping:**
 photo-1441986300917-64674bd600d8, photo-1472851294608-062f824d29cc, photo-1556742049-0cfed4f6a45d, photo-1523275335684-37898b6baf30, photo-1491553895911-0055eca6402d, photo-1542291026-7eec264c27ff, photo-1505740420928-5e560c06d30e, photo-1526170375885-4d8ecf77b99f`,
 
-  "abstract": `**Abstract/Textures/Gradients (decorative backgrounds):**
-photo-1557683316-973673baf926, photo-1558591710-4b4a1ae0f04d, photo-1579546929518-9e396f3cc809, photo-1557682250-33bd709cbe85, photo-1550684376-efcbd6e3f031, photo-1557682224-5b8590cd9ec5`,
+  "abstract": {
+    title: "Abstract/Textures/Gradients (decorative backgrounds)",
+    photos: [
+      { id: "photo-1558591710-4b4a1ae0f04d", desc: "abstract gradient texture, soft color blend" },
+      { id: "photo-1579546929518-9e396f3cc809", desc: "colorful abstract pattern, vibrant" },
+      { id: "photo-1557682250-33bd709cbe85", desc: "muted abstract texture, decorative neutral" },
+      { id: "photo-1550684376-efcbd6e3f031", desc: "warm gradient background, pastel tones" },
+      { id: "photo-1557682224-5b8590cd9ec5", desc: "subtle abstract surface, calm decorative" },
+      { id: "photo-1612392061787-2d078b3e573c", desc: "fluid liquid texture, modern abstract" },
+      { id: "photo-1530103862676-de8c9debad1d", desc: "geometric abstract shapes, design-friendly" },
+    ],
+  },
 
   "portraits": `**Portrait Headshots (team members, testimonials, trainers, staff):**
 photo-1472099645785-5658abf4ff4e, photo-1438761681033-6461ffad8d80, photo-1500648767791-00dcc994a43e, photo-1494790108377-be9c29b29330, photo-1580489944761-15a19d654956, photo-1573496359142-b8d87734a5a2, photo-1560250097-0b93528c311a, photo-1487412720507-e7ab37603c6f, photo-1544005313-94ddf0286df2, photo-1519085360753-af0119f7cbe7, photo-1506794778202-cad84cf45f1d, photo-1534528741775-53994a69daeb, photo-1517841905240-472988babdf9, photo-1531746020798-e6953c6e8e04`,
@@ -155,20 +248,59 @@ photo-1441986300917-64674bd600d8, photo-1469334031218-e382a71b716b, photo-155817
   "health-wellness": `**Health & Wellness — Active & Mindful:**
 photo-1506126613408-eca07ce68773, photo-1544367567-0f2fcb009e0b, photo-1545205597-3d9d02c29597, photo-1518611012118-696072aa579a, photo-1507120366498-80b18bf40f64, photo-1552196563-55cd4e45efb3, photo-1571019613454-1cb2f99b2d8b, photo-1574680096145-d05b474e2155, photo-1549576490-b0b4831ef60a, photo-1508672019048-805c876b67e2`,
 
-  "children-family": `**Children & Family:**
-photo-1503454537195-1dcabb73ffb9, photo-1476703993599-0035a21b17a9, photo-1502086223501-7ea6ecd79368, photo-1484665563340-91a3ce6b4106, photo-1513542789411-b6a5d4f31634, photo-1471342051430-c8e318f3bac7, photo-1495579888242-4b86af1f44be, photo-1508214751196-bcfd4ca60f91, photo-1516627145497-ae6968895b74, photo-1473448912268-2022ce9509d8`,
+  "children-family": {
+    title: "Children & Family",
+    photos: [
+      { id: "photo-1503454537195-1dcabb73ffb9", desc: "happy family moment outdoors" },
+      { id: "photo-1476703993599-0035a21b17a9", desc: "child laughing or playing, joyful candid" },
+      { id: "photo-1502086223501-7ea6ecd79368", desc: "kids reading or learning together" },
+      { id: "photo-1513542789411-b6a5d4f31634", desc: "child playing with toys, indoor scene" },
+      { id: "photo-1508214751196-bcfd4ca60f91", desc: "parent and child bonding moment" },
+      { id: "photo-1516627145497-ae6968895b74", desc: "family at the beach or park together" },
+      { id: "photo-1473448912268-2022ce9509d8", desc: "child running or playing outdoors, freedom" },
+      { id: "photo-1607604276583-eef5d076aa5f", desc: "kids art and crafts, creative play" },
+      { id: "photo-1497032628192-86f99bcd76bc", desc: "family dinner or meal together" },
+      { id: "photo-1601758228041-f3b2795255f1", desc: "siblings or kids hugging, warm family moment" },
+    ],
+  },
 
   "couple-romance": `**Couple/Romance:**
 photo-1529333166437-7750a6dd5a70, photo-1516589178581-6cd7833ae3b2, photo-1516967124798-10656f7dca28, photo-1518199266791-5375a83190b7, photo-1521038199265-bc482db0f923, photo-1522673607200-164d1b6ce486`,
 
-  "dental": `**Dental/Medical — Professional:**
-photo-1588776814546-1ffcf47267a5, photo-1606811841689-23dfddce3e95, photo-1598256989800-fe5f95da9787, photo-1579684385127-1ef15d508118, photo-1576091160399-112ba8d25d1d, photo-1551076805-e1869033e561, photo-1559757148-5c350d0d3c56, photo-1612349317150-e413f6a5b16d, photo-1629909613654-28e377c37b09, photo-1606265752439-1f18756aa5fc`,
+  "dental": {
+    title: "Dental/Medical — Professional",
+    photos: [
+      { id: "photo-1588776814546-1ffcf47267a5", desc: "dental clinic interior, modern equipment" },
+      { id: "photo-1606811841689-23dfddce3e95", desc: "dentist examining patient, treatment in progress" },
+      { id: "photo-1598256989800-fe5f95da9787", desc: "dental tools and instruments close-up" },
+      { id: "photo-1579684385127-1ef15d508118", desc: "smiling patient after dental treatment" },
+      { id: "photo-1576091160399-112ba8d25d1d", desc: "medical professional in white coat, portrait" },
+      { id: "photo-1551076805-e1869033e561", desc: "dentist working with patient, clinical setting" },
+      { id: "photo-1559757148-5c350d0d3c56", desc: "doctor consultation, friendly conversation" },
+      { id: "photo-1612349317150-e413f6a5b16d", desc: "dental chair and lamp, treatment room" },
+      { id: "photo-1629909613654-28e377c37b09", desc: "smiling woman with healthy white teeth" },
+      { id: "photo-1606265752439-1f18756aa5fc", desc: "dental hygienist with patient, clean clinical scene" },
+    ],
+  },
 
   "skincare": `**Skincare/Beauty — Products & People:**
 photo-1556228578-0d85b1a4d571, photo-1570172619644-dfd03ed5d881, photo-1596755389378-c31d21fd1273, photo-1512290923902-8a9f81dc236c, photo-1540555700478-4be289fbec6d, photo-1544161515-4ab6ce6db874, photo-1519824145371-296894a0daa9, photo-1515377905703-c4788e51af15, photo-1505944270255-72b8c68c6a70, photo-1571781926291-c477ebfd024b`,
 
-  "pets": `**Pets/Animals:**
-photo-1587300003388-59208cc962cb, photo-1543466835-00a7907e9de1, photo-1548199973-03cce0bbc87b, photo-1583511655857-d19b40a7a54e, photo-1537151625747-768eb6cf92b2, photo-1561037404-61cd46aa615b, photo-1425082661705-1834bfd09dca, photo-1574158622682-e40e69881006`,
+  "pets": {
+    title: "Pets/Animals",
+    photos: [
+      { id: "photo-1587300003388-59208cc962cb", desc: "happy golden retriever dog outdoors" },
+      { id: "photo-1543466835-00a7907e9de1", desc: "playful puppy with toy" },
+      { id: "photo-1548199973-03cce0bbc87b", desc: "dog being walked on leash" },
+      { id: "photo-1583511655857-d19b40a7a54e", desc: "dog being held or pet, gentle close-up" },
+      { id: "photo-1537151625747-768eb6cf92b2", desc: "cat resting on bed, peaceful indoor scene" },
+      { id: "photo-1561037404-61cd46aa615b", desc: "tabby cat close-up portrait" },
+      { id: "photo-1425082661705-1834bfd09dca", desc: "person hugging pet dog, bond between owner and pet" },
+      { id: "photo-1574158622682-e40e69881006", desc: "small dog in grass, joyful pet moment" },
+      { id: "photo-1592194996308-7b43878e84a6", desc: "pet store or pet care service interior" },
+      { id: "photo-1450778869180-41d0601e046e", desc: "cat in window light, serene mood" },
+    ],
+  },
 
   "workspace": `**Creative Workspace — Desks & Tools:**
 photo-1499750310107-5fef28a66643, photo-1497215842964-222b430dc094, photo-1483058712412-4245e9b90334, photo-1496181133206-80ce9b88a853, photo-1484788984921-03950022c9ef, photo-1517694712202-14dd9538aa97, photo-1498050108023-c5249f4df085, photo-1522542550221-31fd19575a2d`,

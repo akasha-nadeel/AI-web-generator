@@ -139,6 +139,12 @@ function buildDesignDirection(c: Classification): string {
 ${colorGuidance}
 - Ensure high contrast for accessibility
 
+##### USER COLOR OVERRIDE (highest priority)
+- If the user's request mentions ANY color preference — explicit ("red theme", "dark blue accents", "make it green") OR implicit ("a powerlifting brand uses red", "elegant gold") — that color WINS over every other color rule, including any matched design pattern's default accent.
+- Replace the pattern's accent color throughout: buttons, icons, highlights, gradients, hover states, section dividers — everywhere the original accent appeared.
+- Keep the matched pattern's LAYOUT / TYPOGRAPHY / SPACING — only the accent color changes.
+- If the user mentions a color but it would clash with the color mode (e.g. light yellow on light bg), pick a darker/more saturated shade of the same hue rather than abandoning the user's choice.
+
 #### Logo
 - Use the **${logoIcon}** SVG icon next to the brand name for the logo`;
 }
@@ -331,14 +337,37 @@ function buildPageStructure(c: Classification): string {
   return `### PAGE STRUCTURE
 - Responsive nav: logo left, links center, CTA right. Working mobile hamburger menu.
 - Hero section: massive headline with accent technique, subtext, CTA buttons. ONE full-bleed background image.
-- At least 5-6 content sections (features, about, testimonials, stats, gallery, CTA)
+- 5-6 content sections (features, about, testimonials, stats, gallery, CTA) — see DENSITY LIMITS below
 - Use small muted section labels above large headings
 - Section background variety for visual rhythm
 - Mix of layout types across sections (split, cards, editorial, bento)
-- Professional multi-column footer with logo, links, social, copyright
+- Professional multi-column footer with logo, links, social, copyright — SEE FOOTER RULE BELOW
 - CSS entrance animations with staggered delays
 - Subtle hover effects on all interactive elements
 - Realistic, context-aware copy
 - Fully responsive (mobile-first)
-- At least 3-4 high-quality images from the curated library`;
+- At least 3-4 high-quality images from the curated library
+
+#### DENSITY LIMITS (CRITICAL — exceeding these causes truncation)
+You have a finite output budget. Going over these caps means you'll run out of room before the footer. Stay AT or UNDER each limit:
+- **Team / Trainers section:** maximum **4 cards** (not 6, not 8). Each card: photo + name + role + 1-2 line bio + maybe 2 small tags. NO long paragraphs per person.
+- **FAQ section:** maximum **5 items**. Each: short question + 1-2 sentence answer.
+- **Facilities / Features grid:** maximum **6 cards**. Each: icon + 2-3 word title + 1 sentence.
+- **Testimonials:** maximum **3 testimonials**. Each: 2-3 sentence quote + name + role.
+- **Pricing tiers:** maximum **3 tiers**. Each: name + price + 4-6 bullet features (not 10).
+- **Programs / Services list:** maximum **4 items** with full detail; if more needed, use a compact list (just title + 1 line) for items 5+.
+- **Gallery:** maximum **6 images**.
+- **Menu items (restaurant/cafe):** maximum **8 items** total. Group into 2 columns (e.g. "Pizzas" + "Pasta", or "Mains" + "Sides"). Each item: name + short 1-line description + price. NO long descriptions, NO multi-paragraph stories per dish.
+- **Product cards (e-commerce):** maximum **6 cards**. Each: image + name + 1-line tagline + price. Skip long descriptions; that belongs on the product detail page.
+- **Blog / Article preview cards:** maximum **4 cards**. Each: thumbnail + title + 1-2 sentence excerpt + date. NO full article body.
+- **Process / How It Works / Steps:** maximum **5 steps**. Each: number + short title + 1-2 sentence description. Avoid long step explanations.
+
+#### FOOTER RULE (NEVER SKIP)
+The footer is REQUIRED. It is the LAST thing you generate but the MOST important to include — without it the site looks unfinished.
+
+Strategy:
+1. Mentally outline ALL sections (hero → about → services → trainers → testimonials → pricing → faq → CONTACT/CTA → footer) BEFORE you start writing.
+2. If, while writing section 5+, you sense you're using too much space — SHORTEN that section (drop testimonials to 2, drop FAQ to 3) rather than skip the footer.
+3. The footer must include: logo + 1-line tagline, 3 link columns (Services / About / Legal), contact info (email + phone + address if relevant), social icons, copyright bar.
+4. Reserve roughly the LAST 15% of your output budget for the footer. If you've written ~85% of what you planned and don't see the footer coming up — wrap up the current section in 1-2 lines and move to footer immediately.`;
 }

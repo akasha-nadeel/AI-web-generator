@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useWizardStore } from "@/stores/wizardStore";
 import { useCreditsStore } from "@/stores/creditsStore";
 import { MODEL_COSTS, type ModelKey, canUseModel } from "@/lib/constants";
+import { detectIndustryFromPrompt } from "@/lib/ai/prompts/modules/classifier";
 import { cn } from "@/lib/utils";
 import { Sparkles, Lock, Zap, Gem, Crown, AlertTriangle, ArrowRight } from "lucide-react";
 import { PricingPopup } from "@/components/billing/PricingPopup";
@@ -72,7 +73,19 @@ export function StepModelSelection() {
 
     setModelKey(key);
 
-    const prompt = `Build a ${overallFeel} ${industry} website for "${businessName}". ${description}`;
+    // Industry source priority: explicit store value (URL pre-fill or
+    // legacy chip) → auto-detect from description → "general" fallback.
+    // Detection is rule-based regex, runs locally, costs nothing.
+    const effectiveIndustry =
+      industry || detectIndustryFromPrompt(description) || "general";
+
+    // Build the prompt without an awkward double-space when industry is
+    // the generic fallback ("Build a modern website for ...").
+    const industryWord =
+      effectiveIndustry && effectiveIndustry !== "general"
+        ? `${effectiveIndustry} `
+        : "";
+    const prompt = `Build a ${overallFeel} ${industryWord}website for "${businessName}". ${description}`;
 
     if (inspirationImages.length > 0) {
       try {
@@ -85,7 +98,7 @@ export function StepModelSelection() {
 
     const params = new URLSearchParams({
       prompt: prompt.trim(),
-      industry,
+      industry: effectiveIndustry,
       mood: overallFeel || "modern",
       pages: selectedPages.join(","),
       model: key,
