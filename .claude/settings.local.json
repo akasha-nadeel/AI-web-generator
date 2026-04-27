@@ -53,7 +53,20 @@
       "Bash(powershell *)",
       "Bash(awk '{print $NF}')",
       "WebFetch(domain:ai.google.dev)",
-      "Bash(node scripts/upload-wavevibes-pattern.mjs)"
+      "Bash(node scripts/upload-wavevibes-pattern.mjs)",
+      "Bash(start chrome *)",
+      "Bash(git restore *)",
+      "Bash(rm src/proxy.ts)",
+      "Bash(tasklist //FI \"IMAGENAME eq node.exe\")",
+      "Bash(node *)",
+      "Bash(grep -v 'Use \\\\`node')",
+      "Bash(npm uninstall *)",
+      "Bash(npm test *)",
+      "Bash(unzip -q site.zip -d unpacked)",
+      "Bash(git stash *)",
+      "Bash(awk *)",
+      "Bash(gh api *)",
+      "Bash(git revert *)"
     ]
   }
 }

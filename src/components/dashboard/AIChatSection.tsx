@@ -359,10 +359,10 @@ export function AIChatSection() {
       >
         {/* Hero heading — Google AI Studio style */}
         <div className="relative z-10 text-center mb-8">
-          <h1 className="text-3xl md:text-4xl lg:text-[2.6rem] font-medium tracking-tight leading-tight flex items-center justify-center gap-2 text-foreground/70">
-            <span>Build your ideas with</span>
+          <h1 className="text-3xl md:text-4xl lg:text-[2.6rem] font-medium tracking-tight leading-tight flex items-center justify-center gap-2 text-foreground/85">
+            <span>Build your ideas with Weavo</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo.png" alt="Weavo Logo" className="h-[1.6rem] md:h-[2rem] lg:h-[2.2rem] w-auto object-contain opacity-70 dark:invert-0 invert" />
+            <img src="/images/weavo-icon.png" alt="Weavo" className="h-[1.8rem] md:h-[2.2rem] lg:h-[2.6rem] w-auto object-contain dark:invert-0 invert opacity-85" />
           </h1>
         </div>
 
